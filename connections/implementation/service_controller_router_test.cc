@@ -36,6 +36,7 @@
 #include "connections/v3/connections_device.h"
 #include "connections/v3/listening_result.h"
 #include "connections/v3/params.h"
+#include "internal/interop/authentication_status.h"
 #include "internal/flags/nearby_flags.h"
 #include "internal/platform/byte_array.h"
 #include "internal/platform/condition_variable.h"
@@ -279,17 +280,25 @@ class ServiceControllerRouterTest : public testing::Test {
                            ResultCallback callback, bool call_all_cb,
                            bool check_result = true,
                            bool endpoint_info_present = true) {
+    ConnectionResponseInfo response_info{
+        .remote_endpoint_info = ByteArray{"endpoint_name"},
+        .authentication_token = "auth_token",
+        .raw_authentication_token = ByteArray{"auth_token"},
+        .is_incoming_connection = true,
+        .authentication_status = AuthenticationStatus::kSuccess,
+    };
+
     // If we set check_result to false, we expect that RequestConnection will
     // not be called.
     if (check_result) {
       EXPECT_CALL(*mock_, RequestConnectionV3)
-          .WillOnce([call_all_cb, endpoint_info_present, this](
+          .WillOnce([call_all_cb, endpoint_info_present, response_info, this](
                         ClientProxy*, const NearbyDevice&,
                         const ConnectionRequestInfo& info,
                         const ConnectionOptions&) {
             EXPECT_EQ(info.endpoint_info.Empty(), !endpoint_info_present);
             if (call_all_cb) {
-              info.listener.initiated_cb(kRemoteEndpointId, {});
+              info.listener.initiated_cb(kRemoteEndpointId, response_info);
               info.listener.accepted_cb(kRemoteEndpointId);
               info.listener.rejected_cb(kRemoteEndpointId,
                                         Status{Status::kConnectionRejected});
@@ -312,12 +321,6 @@ class ServiceControllerRouterTest : public testing::Test {
         EXPECT_EQ(result_, Status{Status::kSuccess});
       }
     }
-    ConnectionResponseInfo response_info{
-        .remote_endpoint_info = ByteArray{"endpoint_name"},
-        .authentication_token = "auth_token",
-        .raw_authentication_token = ByteArray{"auth_token"},
-        .is_incoming_connection = true,
-    };
     if (client->HasPendingConnectionToEndpoint(kRemoteDevice.GetEndpointId())) {
       // we are calling this again, and do not need to rerun the below behavior.
       return;
@@ -862,7 +865,9 @@ TEST_F(ServiceControllerRouterTest, RequestConnectionCalledV3) {
           .listener = {
               .initiated_cb =
                   [&initiated_latch](const NearbyDevice&,
-                                     const v3::InitialConnectionInfo&) {
+                                     const v3::InitialConnectionInfo& info) {
+                    EXPECT_EQ(info.authentication_status,
+                              AuthenticationStatus::kSuccess);
                     initiated_latch.CountDown();
                   },
               .result_cb =
