@@ -1,7 +1,5 @@
-extern crate presence_core;
+include!(concat!(env!("CARGO_MANIFEST_DIR"), "/presence_provider.rs"));
 
-use log::log;
-use std::fmt::format;
 pub use presence_core::{
     PresenceBleProvider,
     PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
@@ -16,8 +14,11 @@ impl PresenceBleProviderCpp {
 }
 
 impl PresenceBleProvider for PresenceBleProviderCpp {
-    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest) {
+    fn start_ble_scan(&self, _request: &PresenceDiscoveryRequest) {
         println!("Provider start ble scan");
+        unsafe {
+            hello();
+        }
     }
 }
 
@@ -93,11 +94,15 @@ pub unsafe extern "C" fn presence_request_debug_print(
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        presence_request_builder_add_condition, presence_request_builder_build,
-        presence_request_builder_new,
-    };
+    use crate::{hello, presence_request_builder_add_condition, presence_request_builder_build, presence_request_builder_new};
     use presence_core::{PresenceIdentityType, PresenceMeasurementAccuracy};
+
+    #[test]
+    fn test_hello() {
+        unsafe {
+            hello();
+        }
+    }
 
     #[test]
     fn test_request_builder() {
