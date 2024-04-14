@@ -3,7 +3,7 @@ project(presence)
 
 enable_testing()
 
-add_subdirectory(hello)
+add_subdirectory(cpp)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CARGO_CMD cargo build)
@@ -20,7 +20,7 @@ add_custom_target(presence ALL
     COMMAND CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} ${CARGO_CMD}
     COMMAND cp ${PRESENCE_ENGINE_SO} ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-add_dependencies(presence hello)
+add_dependencies(presence presence_provider)
 set_target_properties(presence PROPERTIES BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 add_test(NAME presence_engine_test

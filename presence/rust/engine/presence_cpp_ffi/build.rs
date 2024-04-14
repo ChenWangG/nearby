@@ -20,20 +20,21 @@ fn main() {
 
     let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
 
+    // Generates C header to access the Rust Engine.
     cbindgen::generate(&crate_dir)
         .unwrap()
         .write_to_file("presence.h");
 
-    // This is the directory where the `c` library is located.
-    let lib_dir_path = PathBuf::from(crate_dir.as_str()).join("hello").join("hello.h")
+    // Generates bindings for Rust Engine to access C++ system APIs.
+    let lib_dir_path = PathBuf::from(crate_dir.as_str())
+        .join("cpp")
+        .join("presence_provider.h")
         .canonicalize()
-        .expect(&*format!("cannot canonicalize path: {}", crate_dir.as_str()));
-
-    // This is the path to the `c` headers file.
+        .expect(&*format!(
+            "cannot canonicalize path: {}",
+            crate_dir.as_str()
+        ));
     let headers_path_str = lib_dir_path.to_str().expect("Path not valid");
-
-    println!("cargo:rustc-link-search={}/build/hello", crate_dir);
-    println!("cargo:rustc-link-lib=hello");
 
     let bindings = bindgen::Builder::default()
         .header(headers_path_str)
@@ -46,5 +47,7 @@ fn main() {
         .write_to_file(out_path)
         .expect("Couldn't write bindings!");
 
-
+    let link_lib_dir = env::var("CARGO_TARGET_DIR").unwrap();
+    println!("cargo:rustc-link-search={}/cpp", link_lib_dir);
+    println!("cargo:rustc-link-lib=presence_provider");
 }

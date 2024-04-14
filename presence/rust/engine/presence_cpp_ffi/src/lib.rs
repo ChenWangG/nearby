@@ -1,4 +1,4 @@
-include!(concat!(env!("CARGO_MANIFEST_DIR"), "/presence_provider.rs"));
+include!(concat!(env!("OUT_DIR"), "/presence_provider.rs"));
 
 pub use presence_core::{
     PresenceBleProvider,
