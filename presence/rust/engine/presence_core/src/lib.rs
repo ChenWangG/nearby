@@ -42,6 +42,7 @@ impl PresenceEngine {
     }
 
     pub fn start_discovery(&self, request: &PresenceDiscoveryRequest) {
+        println!("Rust Engine: start discovery with request: {:?}.", request);
         self.ble_provider.start_ble_scan(request);
     }
 }

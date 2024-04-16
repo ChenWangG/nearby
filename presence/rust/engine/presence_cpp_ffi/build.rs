@@ -20,11 +20,6 @@ fn main() {
 
     let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    // Generates C header to access the Rust Engine.
-    cbindgen::generate(&crate_dir)
-        .unwrap()
-        .write_to_file("presence.h");
-
     // Generates bindings for Rust Engine to access C++ system APIs.
     let lib_dir_path = PathBuf::from(crate_dir.as_str())
         .join("cpp")
@@ -50,4 +45,10 @@ fn main() {
     let link_lib_dir = env::var("CARGO_TARGET_DIR").unwrap();
     println!("cargo:rustc-link-search={}/cpp", link_lib_dir);
     println!("cargo:rustc-link-lib=presence_provider");
+
+    // Generates C header to access the Rust Engine.
+    cbindgen::generate(&crate_dir)
+        .unwrap()
+        .write_to_file("presence.h");
+
 }

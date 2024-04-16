@@ -14,16 +14,24 @@
 
 #include <iostream>
 #include "presence.h"
+#include "cpp/presence_provider.h"
 
 using namespace std;
 
+void start_ble_scan(PresenceBleScanRequest request) {
+   cout << "C System API: start BLE scan with Priority: " << request.priority << endl;
+}
+
 int main(int argc, char **argv) {
-   cout << "main " << endl;
-   auto builder_ptr = presence_request_builder_new(10);
+   cout << "C main starts." << endl;
+
+   PresenceProvider provider;
+   provider.start_ble_scan = start_ble_scan;
+   auto engine_ptr = presence_engine_new(&provider);
+
+   auto builder_ptr = presence_request_builder_new(10 /* priority */);
    presence_request_builder_add_condition(builder_ptr,
-       1, PresenceIdentityType::Private, PresenceMeasurementAccuracy::CoarseAccuracy);
+       1 /* action */, PresenceIdentityType::Private, PresenceMeasurementAccuracy::CoarseAccuracy);
    auto request_ptr =  presence_request_builder_build(builder_ptr);
-   presence_request_debug_print(request_ptr);
-   auto engine_ptr = presence_engine_new();
    presence_engine_start_discovery(engine_ptr, request_ptr);
 }

@@ -14,10 +14,10 @@ impl PresenceBleProviderCpp {
 }
 
 impl PresenceBleProvider for PresenceBleProviderCpp {
-    fn start_ble_scan(&self, _request: &PresenceDiscoveryRequest) {
-        println!("Provider start ble scan");
+    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest) {
+        println!("Rust Provider: start ble scan.");
         unsafe {
-            presence_start_ble_scan()
+            presence_start_ble_scan(PresenceBleScanRequest{ priority: request.priority })
         }
     }
 }
@@ -48,7 +48,8 @@ impl PresenceDiscoveryRequestBuilder {
 }
 
 #[no_mangle]
-pub extern "C" fn presence_engine_new() -> *mut PresenceEngine {
+pub unsafe extern "C" fn presence_engine_new(provider: *mut ::std::os::raw::c_void) -> *mut PresenceEngine {
+    presence_register_provider(provider);
    Box::into_raw(Box::new(PresenceEngine::new(Box::new(PresenceBleProviderCpp::new()))))
 }
 

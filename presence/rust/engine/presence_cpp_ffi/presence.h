@@ -49,7 +49,7 @@ struct PresenceEngine;
 
 extern "C" {
 
-PresenceEngine *presence_engine_new();
+PresenceEngine *presence_engine_new(void *provider);
 
 void presence_engine_start_discovery(PresenceEngine *engine_ptr,
                                      const PresenceDiscoveryRequest *request_ptr);
