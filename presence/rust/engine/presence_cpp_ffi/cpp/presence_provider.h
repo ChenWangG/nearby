@@ -1,1 +1,1 @@
-int hello();
+void presence_start_ble_scan();

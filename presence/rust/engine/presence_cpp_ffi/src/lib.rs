@@ -17,7 +17,7 @@ impl PresenceBleProvider for PresenceBleProviderCpp {
     fn start_ble_scan(&self, _request: &PresenceDiscoveryRequest) {
         println!("Provider start ble scan");
         unsafe {
-            hello();
+            presence_start_ble_scan()
         }
     }
 }

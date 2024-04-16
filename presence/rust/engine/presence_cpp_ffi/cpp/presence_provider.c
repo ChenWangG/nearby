@@ -1,5 +1,5 @@
 #include <stdio.h>
-int hello() {
-    printf("hello world again from hello.c\n");
-    return 42;
+
+void presence_start_ble_scan() {
+    printf("presence_provider in C: start_ble_scan\n");
 }
