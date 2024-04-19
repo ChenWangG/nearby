@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <iostream>
-#include "presence.h"
+#include "presence_ffi.h"
 #include "cpp/presence_provider.h"
 
 using namespace std;

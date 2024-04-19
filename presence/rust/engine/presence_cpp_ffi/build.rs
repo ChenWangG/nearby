@@ -49,6 +49,6 @@ fn main() {
     // Generates C header to access the Rust Engine.
     cbindgen::generate(&crate_dir)
         .unwrap()
-        .write_to_file("presence.h");
+        .write_to_file("presence_ffi.h");
 
 }
