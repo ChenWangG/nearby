@@ -8,6 +8,7 @@ pub use presence_core::{
 };
 use presence_core::{PresenceDiscoveryCallback, PresenceEngine};
 
+#[derive(Copy, Clone)]
 pub struct PresenceBleProviderCpp {}
 
 impl PresenceBleProviderCpp {
@@ -49,9 +50,11 @@ impl PresenceDiscoveryRequestBuilder {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn presence_engine_new(provider: *mut ::std::os::raw::c_void) -> *mut PresenceEngine {
-    presence_register_provider(provider);
-   Box::into_raw(Box::new(PresenceEngine::new(Box::new(PresenceBleProviderCpp::new()))))
+pub unsafe extern "C" fn presence_engine_new(platform: *mut ::std::os::raw::c_void) -> *mut PresenceEngine {
+    let mut provider_cpp_boxed = Box::new(PresenceBleProviderCpp::new());
+    let provider_cpp_ptr: *mut PresenceBleProviderCpp = &mut *provider_cpp_boxed;
+    presence_platform_init(platform, provider_cpp_ptr);
+    Box::into_raw(Box::new(PresenceEngine::new(provider_cpp_boxed)))
 }
 
 #[no_mangle]
