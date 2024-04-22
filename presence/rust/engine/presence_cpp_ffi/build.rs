@@ -24,10 +24,10 @@ fn main() {
     // Generates bindings for Rust Engine to access C++ system APIs.
     let lib_dir_path = PathBuf::from(crate_dir.as_str())
         .join("cpp")
-        .join("presence_provider.h")
+        .join("presence_platform.h")
         .canonicalize()
         .expect(&*format!(
-            "cannot canonicalize path: {}/cpp/presence_provider.h",
+            "cannot canonicalize path: {}/cpp/presence_platform.h",
             crate_dir.as_str()
         ));
     let headers_path_str = lib_dir_path.to_str().expect("Path not valid");
@@ -38,14 +38,14 @@ fn main() {
         .expect("Unable to generate bindings");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("presence_provider.rs");
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("presence_platform.rs");
     bindings
         .write_to_file(out_path)
         .expect("Couldn't write bindings!");
 
     let link_lib_dir = env::var("CARGO_TARGET_DIR").unwrap();
     println!("cargo:rustc-link-search={}/cpp", link_lib_dir);
-    println!("cargo:rustc-link-lib=presence_provider");
+    println!("cargo:rustc-link-lib=presence_platform");
 
     let presence_h_path =PathBuf::from(crate_dir.as_str())
         .join("presence.h")

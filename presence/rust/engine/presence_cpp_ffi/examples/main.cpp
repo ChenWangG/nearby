@@ -14,7 +14,7 @@
 
 #include <iostream>
 #include "presence_ffi.h"
-#include "cpp/presence_provider.h"
+#include "cpp/presence_platform.h"
 
 using namespace std;
 
@@ -29,9 +29,9 @@ void presence_discovery_callback(int32_t input) {
 int main(int argc, char **argv) {
    cout << "C main starts." << endl;
 
-   PresenceProvider provider;
-   provider.start_ble_scan = start_ble_scan;
-   auto engine_ptr = presence_engine_new(&provider);
+   PresencePlatform platform;
+   platform.start_ble_scan = start_ble_scan;
+   auto engine_ptr = presence_engine_new(&platform);
 
    auto builder_ptr = presence_request_builder_new(10 /* priority */);
    presence_request_builder_add_condition(builder_ptr,

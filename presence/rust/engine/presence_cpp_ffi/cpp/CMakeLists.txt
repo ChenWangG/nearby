@@ -1,1 +1,1 @@
-add_library(presence_provider presence_provider.c)
+add_library(presence_platform presence_platform.c)

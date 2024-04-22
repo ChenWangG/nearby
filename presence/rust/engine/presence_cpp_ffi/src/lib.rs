@@ -1,4 +1,4 @@
-include!(concat!(env!("OUT_DIR"), "/presence_provider.rs"));
+include!(concat!(env!("OUT_DIR"), "/presence_platform.rs"));
 include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
 pub use presence_core::{
