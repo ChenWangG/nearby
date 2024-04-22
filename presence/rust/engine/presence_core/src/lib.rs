@@ -28,21 +28,26 @@ pub struct PresenceDiscoveryRequest {
     pub conditions: Vec<PresenceDiscoveryCondition>,
 }
 
+pub type PresenceDiscoveryCallback = fn(i32);
+
 pub trait PresenceBleProvider {
-    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest);
+    // TODO: refactor to use BLE scan request and callback.
+    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest, cb: PresenceDiscoveryCallback);
 }
 
 pub struct PresenceEngine {
     ble_provider: Box<dyn PresenceBleProvider>,
 }
 
+
+
 impl PresenceEngine {
     pub fn new(ble_provider: Box<dyn PresenceBleProvider>) -> Self {
         Self { ble_provider }
     }
 
-    pub fn start_discovery(&self, request: &PresenceDiscoveryRequest) {
+    pub fn start_discovery(&mut self, request: &PresenceDiscoveryRequest, discovery_callback: PresenceDiscoveryCallback) {
         println!("Rust Engine: start discovery with request: {:?}.", request);
-        self.ble_provider.start_ble_scan(request);
+        self.ble_provider.start_ble_scan(request, discovery_callback);
     }
 }

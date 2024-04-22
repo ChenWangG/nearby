@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 use std::env;
+use std::fs::create_dir;
 use std::path::PathBuf;
 
 fn main() {
@@ -26,7 +27,7 @@ fn main() {
         .join("presence_provider.h")
         .canonicalize()
         .expect(&*format!(
-            "cannot canonicalize path: {}",
+            "cannot canonicalize path: {}/cpp/presence_provider.h",
             crate_dir.as_str()
         ));
     let headers_path_str = lib_dir_path.to_str().expect("Path not valid");
@@ -45,6 +46,23 @@ fn main() {
     let link_lib_dir = env::var("CARGO_TARGET_DIR").unwrap();
     println!("cargo:rustc-link-search={}/cpp", link_lib_dir);
     println!("cargo:rustc-link-lib=presence_provider");
+
+    let presence_h_path =PathBuf::from(crate_dir.as_str())
+        .join("presence.h")
+        .canonicalize()
+        .expect(&*format!("cannot canonicalize path: {}/presence.h", crate_dir.as_str()));
+    let presence_h_path_str = presence_h_path.to_str().expect("");
+
+    let client_bindings = bindgen::Builder::default()
+        .header(presence_h_path_str)
+        .generate()
+        .expect("Unable to generate client bindings");
+
+    let presence_out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("presence_client.rs");
+    client_bindings
+        .write_to_file(presence_out_path)
+        .expect("Couldn't write bindings!");
+
 
     // Generates C header to access the Rust Engine.
     cbindgen::generate(&crate_dir)

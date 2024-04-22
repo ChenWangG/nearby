@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <ostream>
 #include <new>
+#include "presence.h"
 
 
 enum class PresenceIdentityType : uint32_t {
@@ -46,13 +47,16 @@ struct PresenceDiscoveryRequestBuilder;
 
 struct PresenceEngine;
 
+using PresenceDiscoveryCallback = void(*)(int32_t);
+
 
 extern "C" {
 
 PresenceEngine *presence_engine_new(void *provider);
 
 void presence_engine_start_discovery(PresenceEngine *engine_ptr,
-                                     const PresenceDiscoveryRequest *request_ptr);
+                                     const PresenceDiscoveryRequest *request_ptr,
+                                     PresenceDiscoveryCallback discovery_callback);
 
 PresenceDiscoveryRequestBuilder *presence_request_builder_new(int32_t priority);
 

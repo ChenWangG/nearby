@@ -11,3 +11,7 @@ void presence_start_ble_scan(PresenceBleScanRequest request) {
 void presence_register_provider(void* provider) {
     provider_ptr = (PresenceProvider*) provider;
 }
+
+void presence_register_rust_callback(int (*cb)(int)) {
+    cb(101);
+}

@@ -22,6 +22,10 @@ void start_ble_scan(PresenceBleScanRequest request) {
    cout << "C System API: start BLE scan with Priority: " << request.priority << endl;
 }
 
+void presence_discovery_callback(int32_t input) {
+    cout << "presence discovery callback input: " << input << endl;
+}
+
 int main(int argc, char **argv) {
    cout << "C main starts." << endl;
 
@@ -33,5 +37,5 @@ int main(int argc, char **argv) {
    presence_request_builder_add_condition(builder_ptr,
        1 /* action */, PresenceIdentityType::Private, PresenceMeasurementAccuracy::CoarseAccuracy);
    auto request_ptr =  presence_request_builder_build(builder_ptr);
-   presence_engine_start_discovery(engine_ptr, request_ptr);
+   presence_engine_start_discovery(engine_ptr, request_ptr, presence_discovery_callback);
 }

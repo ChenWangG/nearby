@@ -1,11 +1,12 @@
 include!(concat!(env!("OUT_DIR"), "/presence_provider.rs"));
+include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
 pub use presence_core::{
     PresenceBleProvider,
     PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
     PresenceMeasurementAccuracy,
 };
-use presence_core::PresenceEngine;
+use presence_core::{PresenceDiscoveryCallback, PresenceEngine};
 
 pub struct PresenceBleProviderCpp {}
 
@@ -14,7 +15,7 @@ impl PresenceBleProviderCpp {
 }
 
 impl PresenceBleProvider for PresenceBleProviderCpp {
-    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest) {
+    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest, cb: PresenceDiscoveryCallback) {
         println!("Rust Provider: start ble scan.");
         unsafe {
             presence_start_ble_scan(PresenceBleScanRequest{ priority: request.priority })
@@ -54,9 +55,11 @@ pub unsafe extern "C" fn presence_engine_new(provider: *mut ::std::os::raw::c_vo
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn presence_engine_start_discovery(engine_ptr: *mut PresenceEngine,
-                                                  request_ptr: *const PresenceDiscoveryRequest) {
-    (*engine_ptr).start_discovery(&*request_ptr);
+pub unsafe extern "C" fn presence_engine_start_discovery(
+    engine_ptr: *mut PresenceEngine,
+    request_ptr: *const PresenceDiscoveryRequest,
+    discovery_callback: PresenceDiscoveryCallback) {
+    (*engine_ptr).start_discovery(&*request_ptr, discovery_callback);
 }
 #[no_mangle]
 pub extern "C" fn presence_request_builder_new(
