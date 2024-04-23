@@ -1,6 +1,8 @@
 include!(concat!(env!("OUT_DIR"), "/presence_platform.rs"));
 include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
+use std::ffi::c_void;
+
 pub use presence_core::{
     PresenceBleProvider,
     PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
@@ -8,18 +10,28 @@ pub use presence_core::{
 };
 use presence_core::{PresenceDiscoveryCallback, PresenceEngine};
 
-#[derive(Copy, Clone)]
+
 pub struct PresenceBleProviderCpp {}
 
 impl PresenceBleProviderCpp {
-     fn new() -> Self { Self {} }
+    fn new() -> Self { Self {} }
+
+    fn ble_scan_callback(&self) {
+        println!("PresenceBleProviderCpp: ble_scan_callback");
+    }
+
+}
+
+unsafe extern "C" fn ble_scan_callback(ble_provider: *mut c_void) {
+    println!("ble_scan_callback");
+    (*(ble_provider as *mut PresenceBleProviderCpp)).ble_scan_callback();
 }
 
 impl PresenceBleProvider for PresenceBleProviderCpp {
     fn start_ble_scan(&self, request: &PresenceDiscoveryRequest, cb: PresenceDiscoveryCallback) {
         println!("Rust Provider: start ble scan.");
         unsafe {
-            presence_start_ble_scan(PresenceBleScanRequest{ priority: request.priority })
+            presence_start_ble_scan(PresenceBleScanRequest{ priority: request.priority }, Some(ble_scan_callback));
         }
     }
 }
@@ -53,7 +65,7 @@ impl PresenceDiscoveryRequestBuilder {
 pub unsafe extern "C" fn presence_engine_new(platform: *mut ::std::os::raw::c_void) -> *mut PresenceEngine {
     let mut provider_cpp_boxed = Box::new(PresenceBleProviderCpp::new());
     let provider_cpp_ptr: *mut PresenceBleProviderCpp = &mut *provider_cpp_boxed;
-    presence_platform_init(platform, provider_cpp_ptr);
+    presence_platform_init(platform, provider_cpp_ptr as *mut c_void);
     Box::into_raw(Box::new(PresenceEngine::new(provider_cpp_boxed)))
 }
 
