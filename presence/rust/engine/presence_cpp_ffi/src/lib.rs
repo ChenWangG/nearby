@@ -1,8 +1,6 @@
 include!(concat!(env!("OUT_DIR"), "/presence_platform.rs"));
 include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
-use std::ffi::c_void;
-
 pub use presence_core::{
     PresenceBleProvider,
     PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
@@ -22,9 +20,9 @@ impl PresenceBleProviderCpp {
 
 }
 
-unsafe extern "C" fn ble_scan_callback(ble_provider: *mut c_void) {
+unsafe extern "C" fn ble_scan_callback(ble_provider: *mut PresenceBleProviderCpp) {
     println!("ble_scan_callback");
-    (*(ble_provider as *mut PresenceBleProviderCpp)).ble_scan_callback();
+    (*ble_provider).ble_scan_callback();
 }
 
 impl PresenceBleProvider for PresenceBleProviderCpp {
@@ -65,7 +63,7 @@ impl PresenceDiscoveryRequestBuilder {
 pub unsafe extern "C" fn presence_engine_new(platform: *mut ::std::os::raw::c_void) -> *mut PresenceEngine {
     let mut provider_cpp_boxed = Box::new(PresenceBleProviderCpp::new());
     let provider_cpp_ptr: *mut PresenceBleProviderCpp = &mut *provider_cpp_boxed;
-    presence_platform_init(platform, provider_cpp_ptr as *mut c_void);
+    presence_platform_init(platform, provider_cpp_ptr);
     Box::into_raw(Box::new(PresenceEngine::new(provider_cpp_boxed)))
 }
 

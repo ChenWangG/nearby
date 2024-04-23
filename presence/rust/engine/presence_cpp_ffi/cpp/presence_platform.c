@@ -3,9 +3,9 @@
 
 PresencePlatform* platform_ptr;
 // Object opaque to C codes and used within the Rust callback.
-void* provider_ptr;
+struct PresenceBleProviderCpp* provider_ptr;
 
-void presence_platform_init(void* platform, void* provider) {
+void presence_platform_init(void* platform, struct PresenceBleProviderCpp* provider) {
     platform_ptr = (PresencePlatform*) platform;
     provider_ptr = provider;
 }
