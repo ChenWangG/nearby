@@ -45,7 +45,7 @@ fn main() {
 
     let link_lib_dir = env::var("CARGO_TARGET_DIR").unwrap();
     println!("cargo:rustc-link-search={}/cpp", link_lib_dir);
-    println!("cargo:rustc-link-lib=presence_platform");
+    println!("cargo:rustc-link-lib=static=presence_platform");
 
     let presence_h_path =PathBuf::from(crate_dir.as_str())
         .join("presence.h")

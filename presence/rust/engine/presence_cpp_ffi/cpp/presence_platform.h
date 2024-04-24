@@ -2,8 +2,9 @@ typedef struct PresenceBleScanRequestTag {
    int priority;
 } PresenceBleScanRequest;
 
+/// <div rustbindgen hide></div>
 typedef struct PresencePlatformTag {
-    void (*start_ble_scan)(PresenceBleScanRequest request);
+    void (*start_ble_scan)(PresenceBleScanRequest, void (*PlatformBleCallback)(int));
 } PresencePlatform;
 
 // Forward declaration the object which is defined in Rust.
@@ -11,8 +12,7 @@ typedef struct PresencePlatformTag {
 /// <div rustbindgen hide></div>
 struct PresenceBleProviderCpp;
 
-typedef void (*BleScanCallback)(struct PresenceBleProviderCpp*);
+typedef void (*BleScanCallback)(struct PresenceBleProviderCpp*, int);
 
 void presence_platform_init(void* platform, struct PresenceBleProviderCpp* provider);
 void presence_start_ble_scan(PresenceBleScanRequest request, BleScanCallback cb);
-void presence_register_rust_callback(int (*cb)(int));

@@ -32,7 +32,7 @@ pub type PresenceDiscoveryCallback = fn(i32);
 
 pub trait PresenceBleProvider {
     // TODO: refactor to use BLE scan request and callback.
-    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest, cb: PresenceDiscoveryCallback);
+    fn start_ble_scan(&mut self, request: &PresenceDiscoveryRequest, cb: PresenceDiscoveryCallback);
 }
 
 pub struct PresenceEngine {

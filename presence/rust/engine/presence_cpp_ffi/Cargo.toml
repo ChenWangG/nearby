@@ -7,7 +7,7 @@ edition = "2021"
 
 [lib]
 name = "presence"
-crate-type = ["cdylib"]
+crate-type = ["staticlib"]
 
 
 [dependencies]

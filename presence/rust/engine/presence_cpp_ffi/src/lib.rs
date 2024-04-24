@@ -9,25 +9,29 @@ pub use presence_core::{
 use presence_core::{PresenceDiscoveryCallback, PresenceEngine};
 
 
-pub struct PresenceBleProviderCpp {}
+pub struct PresenceBleProviderCpp {
+    discovery_callback: Option<PresenceDiscoveryCallback>,
+}
 
 impl PresenceBleProviderCpp {
-    fn new() -> Self { Self {} }
+    fn new() -> Self { Self {discovery_callback: None} }
 
-    fn ble_scan_callback(&self) {
-        println!("PresenceBleProviderCpp: ble_scan_callback");
+    fn ble_scan_callback(&self, priority: i32) {
+        println!("PresenceBleProviderCpp: ble_scan_callback with priority: {}", priority);
+        self.discovery_callback.unwrap()(priority);
     }
 
 }
 
-unsafe extern "C" fn ble_scan_callback(ble_provider: *mut PresenceBleProviderCpp) {
+unsafe extern "C" fn ble_scan_callback(ble_provider: *mut PresenceBleProviderCpp, priority: i32) {
     println!("ble_scan_callback");
-    (*ble_provider).ble_scan_callback();
+    (*ble_provider).ble_scan_callback(priority);
 }
 
 impl PresenceBleProvider for PresenceBleProviderCpp {
-    fn start_ble_scan(&self, request: &PresenceDiscoveryRequest, cb: PresenceDiscoveryCallback) {
+    fn start_ble_scan(&mut self, request: &PresenceDiscoveryRequest, discovery_callback: PresenceDiscoveryCallback) {
         println!("Rust Provider: start ble scan.");
+        self.discovery_callback = Some(discovery_callback);
         unsafe {
             presence_start_ble_scan(PresenceBleScanRequest{ priority: request.priority }, Some(ble_scan_callback));
         }

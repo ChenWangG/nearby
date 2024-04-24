@@ -18,12 +18,16 @@
 
 using namespace std;
 
-void start_ble_scan(PresenceBleScanRequest request) {
+// BLE system API.
+void start_ble_scan(PresenceBleScanRequest request, void (*platform_ble_scan_callback)(int)) {
    cout << "C System API: start BLE scan with Priority: " << request.priority << endl;
+   // Echo back the priority.
+   platform_ble_scan_callback(request.priority);
 }
 
-void presence_discovery_callback(int32_t input) {
-    cout << "presence discovery callback input: " << input << endl;
+// Client callback to receive discovery results.
+void presence_discovery_callback(int32_t priority) {
+    cout << "C presence discovery callback with priority: " << priority << endl;
 }
 
 int main(int argc, char **argv) {
@@ -31,11 +35,12 @@ int main(int argc, char **argv) {
 
    PresencePlatform platform;
    platform.start_ble_scan = start_ble_scan;
-   auto engine_ptr = presence_engine_new(&platform);
+   auto engine = presence_engine_new(&platform);
 
-   auto builder_ptr = presence_request_builder_new(10 /* priority */);
-   presence_request_builder_add_condition(builder_ptr,
+   auto request_builder = presence_request_builder_new(111 /* priority */);
+   presence_request_builder_add_condition(request_builder,
        1 /* action */, PresenceIdentityType::Private, PresenceMeasurementAccuracy::CoarseAccuracy);
-   auto request_ptr =  presence_request_builder_build(builder_ptr);
-   presence_engine_start_discovery(engine_ptr, request_ptr, presence_discovery_callback);
+   auto request =  presence_request_builder_build(request_builder);
+
+   presence_engine_start_discovery(engine, request, presence_discovery_callback);
 }

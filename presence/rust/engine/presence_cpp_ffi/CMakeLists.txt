@@ -13,12 +13,12 @@ else ()
     set(TARGET_DIR "release")
 endif ()
 
-set(PRESENCE_ENGINE_SO "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_DIR}/libpresence.so")
+set(PRESENCE_ENGINE_A "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_DIR}/libpresence.a")
 
 add_custom_target(presence ALL
     COMMENT "Compiling Presence Engine module"
     COMMAND CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} ${CARGO_CMD}
-    COMMAND cp ${PRESENCE_ENGINE_SO} ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND cp ${PRESENCE_ENGINE_A} ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 add_dependencies(presence presence_platform)
 set_target_properties(presence PROPERTIES BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
