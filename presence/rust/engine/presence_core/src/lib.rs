@@ -2,7 +2,7 @@ pub mod client_provider;
 
 use tokio::sync::mpsc;
 use tokio::runtime::Builder;
-use crate::client_provider::PresenceClientProvider;
+use crate::client_provider::{PresenceClientProvider, PresenceDiscoveryCallback};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
@@ -36,7 +36,7 @@ pub struct PresenceDiscoveryRequest {
 
 pub struct PresenceDiscoveryResult {}
 
-pub type PresenceDiscoveryCallback = fn(i32);
+// pub type PresenceDiscoveryCallback = fn(i32);
 
 pub enum ProviderEvent {
     PresenceDiscoveryRequest(PresenceDiscoveryRequest),
@@ -44,7 +44,7 @@ pub enum ProviderEvent {
 
 pub trait PresenceBleProvider {
     // TODO: refactor to use BLE scan request and callback.
-    fn start_ble_scan(&mut self, request: &PresenceDiscoveryRequest, cb: PresenceDiscoveryCallback);
+    fn start_ble_scan(&mut self, request: &PresenceDiscoveryRequest);
 }
 
 pub struct PresenceEngine {
@@ -57,7 +57,7 @@ pub struct PresenceEngine {
 impl PresenceEngine {
     pub fn new(provider_tx: mpsc::Sender<ProviderEvent>,
                provider_rx: mpsc::Receiver<ProviderEvent>,
-               discovery_callback: PresenceDiscoveryCallback,
+               discovery_callback: Box<dyn PresenceDiscoveryCallback>,
                ble_provider: Box<dyn PresenceBleProvider> ) -> Self {
         let client_provider = PresenceClientProvider::new(provider_tx, discovery_callback);
         Self { provider_rx, client_provider, ble_provider }

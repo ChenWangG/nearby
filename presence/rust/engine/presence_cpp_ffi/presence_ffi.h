@@ -47,20 +47,17 @@ struct PresenceDiscoveryRequestBuilder;
 
 struct PresenceEngine;
 
-using PresenceDiscoveryCallback = void(*)(int32_t);
+using PresenceDiscoveryCallbackCpp = void(*)(int32_t);
 
 
 extern "C" {
 
-PresenceEngine *presence_engine_new(void *platform, PresenceDiscoveryCallback discovery_callback);
+PresenceEngine *presence_engine_new(void *platform,
+                                    PresenceDiscoveryCallbackCpp discovery_callback);
 
 void presence_engine_run(PresenceEngine *engine);
 
 void presence_engine_set_request(PresenceEngine *engine, PresenceDiscoveryRequest *request);
-
-void presence_engine_start_discovery(PresenceEngine *engine_ptr,
-                                     const PresenceDiscoveryRequest *request_ptr,
-                                     PresenceDiscoveryCallback discovery_callback);
 
 PresenceDiscoveryRequestBuilder *presence_request_builder_new(int32_t priority);
 
