@@ -2,7 +2,7 @@ pub mod client_provider;
 
 use tokio::sync::mpsc;
 use tokio::runtime::Builder;
-use crate::client_provider::PresenceClient;
+use crate::client_provider::PresenceClientProvider;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
@@ -50,7 +50,7 @@ pub trait PresenceBleProvider {
 pub struct PresenceEngine {
     // Receive events from Providers.
     provider_rx: mpsc::Receiver<ProviderEvent>,
-    client_provider: PresenceClient,
+    client_provider: PresenceClientProvider,
     ble_provider: Box<dyn PresenceBleProvider>,
 }
 
@@ -59,11 +59,11 @@ impl PresenceEngine {
                provider_rx: mpsc::Receiver<ProviderEvent>,
                discovery_callback: PresenceDiscoveryCallback,
                ble_provider: Box<dyn PresenceBleProvider> ) -> Self {
-        let client_provider = PresenceClient::new(provider_tx, discovery_callback);
+        let client_provider = PresenceClientProvider::new(provider_tx, discovery_callback);
         Self { provider_rx, client_provider, ble_provider }
     }
 
-    pub fn get_client_provider(&self) -> &PresenceClient {
+    pub fn get_client_provider(&self) -> &PresenceClientProvider {
         &self.client_provider
     }
 

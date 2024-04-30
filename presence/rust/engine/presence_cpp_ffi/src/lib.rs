@@ -3,7 +3,7 @@ include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
 use tokio::sync::mpsc;
 
-use presence_core::client_provider::PresenceClient;
+use presence_core::client_provider::PresenceClientProvider;
 pub use presence_core::{
     PresenceBleProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest,
     PresenceIdentityType, PresenceMeasurementAccuracy,
