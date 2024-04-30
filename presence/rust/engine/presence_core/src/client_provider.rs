@@ -1,6 +1,6 @@
 use tokio::sync::mpsc;
+use crate::{PresenceClientProvider, PresenceDiscoveryCallback, PresenceDiscoveryRequest, PresenceDiscoveryResult, ProviderEvent};
 
-use presence_core::{PresenceClientProvider, PresenceDiscoveryCallback, PresenceDiscoveryRequest, PresenceDiscoveryResult, ProviderEvent};
 
 pub struct PresenceClient {
     provider_event_tx: mpsc::Sender<ProviderEvent>,

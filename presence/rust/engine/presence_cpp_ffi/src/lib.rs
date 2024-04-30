@@ -3,16 +3,13 @@ include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
 use tokio::sync::mpsc;
 
-mod client_provider;
-
 pub use presence_core::{
     PresenceBleProvider,
     PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
     PresenceMeasurementAccuracy,
 };
 use presence_core::{PresenceDiscoveryCallback, PresenceEngine, ProviderEvent};
-
-use crate::client_provider::PresenceClient;
+use presence_core::client_provider::PresenceClient;
 
 pub struct PresenceBleProviderCpp {
     discovery_callback: Option<PresenceDiscoveryCallback>,

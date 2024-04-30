@@ -1,3 +1,5 @@
+pub mod client_provider;
+
 use tokio::sync::mpsc;
 use tokio::runtime::Builder;
 
