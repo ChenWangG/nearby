@@ -1,4 +1,4 @@
 /// <div rustbindgen opaque></div>
-struct PresenceDiscoveryResultCpp {
+struct PresenceDiscoveryResult {
     int priority;
 };

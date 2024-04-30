@@ -34,7 +34,7 @@ pub struct PresenceDiscoveryRequest {
     pub conditions: Vec<PresenceDiscoveryCondition>,
 }
 
-pub struct PresenceDiscoveryResult {}
+pub struct DiscoveryResult {}
 
 // pub type PresenceDiscoveryCallback = fn(i32);
 

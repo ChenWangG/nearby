@@ -8,7 +8,7 @@ pub use presence_core::{
     PresenceBleProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest,
     PresenceIdentityType, PresenceMeasurementAccuracy,
 };
-use presence_core::{PresenceDiscoveryResult, PresenceEngine, ProviderEvent};
+use presence_core::{DiscoveryResult, PresenceEngine, ProviderEvent};
 
 pub struct PresenceBleProviderCpp {}
 
@@ -77,13 +77,13 @@ impl PresenceDiscoveryRequestBuilder {
     }
 }
 
-pub type PresenceDiscoveryCallback = fn(i32);
+pub type PresenceDiscoveryCallback = fn(PresenceDiscoveryResult);
 struct DiscoveryCallbackCpp {
      presence_discovery_callback: PresenceDiscoveryCallback,
 }
 
 impl DiscoveryCallback for DiscoveryCallbackCpp {
-    fn on_device_updated(&self, result: PresenceDiscoveryResult) {
+    fn on_device_updated(&self, result: DiscoveryResult) {
         todo!()
     }
 }

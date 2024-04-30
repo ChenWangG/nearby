@@ -27,8 +27,8 @@ void start_ble_scan(PresenceBleScanRequest request, void (*platform_ble_scan_cal
 }
 
 // Client callback to receive discovery results.
-void presence_discovery_callback(int32_t priority) {
-    cout << "C presence discovery callback with priority: " << priority << endl;
+void presence_discovery_callback(PresenceDiscoveryResult result) {
+    cout << "C presence discovery callback with priority: " << result.priority << endl;
 }
 
 int main(int argc, char **argv) {
