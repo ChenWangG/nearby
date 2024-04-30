@@ -1,3 +1,6 @@
+use tokio::sync::mpsc;
+use tokio::runtime::Builder;
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(u32)]
 pub enum PresenceIdentityType {
@@ -28,7 +31,18 @@ pub struct PresenceDiscoveryRequest {
     pub conditions: Vec<PresenceDiscoveryCondition>,
 }
 
+pub struct PresenceDiscoveryResult {}
+
 pub type PresenceDiscoveryCallback = fn(i32);
+
+pub enum ProviderEvent {
+    PresenceDiscoveryRequest(PresenceDiscoveryRequest),
+}
+
+pub trait PresenceClientProvider {
+    fn set_request(&self, request: PresenceDiscoveryRequest);
+    fn on_device_updated(&self, result: PresenceDiscoveryResult);
+}
 
 pub trait PresenceBleProvider {
     // TODO: refactor to use BLE scan request and callback.
@@ -36,18 +50,42 @@ pub trait PresenceBleProvider {
 }
 
 pub struct PresenceEngine {
+    // Receive events from Providers.
+    provider_rx: mpsc::Receiver<ProviderEvent>,
+    client_provider: Box<dyn PresenceClientProvider>,
     ble_provider: Box<dyn PresenceBleProvider>,
 }
 
-
-
 impl PresenceEngine {
-    pub fn new(ble_provider: Box<dyn PresenceBleProvider>) -> Self {
-        Self { ble_provider }
+    pub fn new(provider_rx: mpsc::Receiver<ProviderEvent>,
+               client_provider: Box<dyn PresenceClientProvider>,
+               ble_provider: Box<dyn PresenceBleProvider> ) -> Self {
+        Self { provider_rx, client_provider, ble_provider }
     }
 
-    pub fn start_discovery(&mut self, request: &PresenceDiscoveryRequest, discovery_callback: PresenceDiscoveryCallback) {
-        println!("Rust Engine: start discovery with request: {:?}.", request);
-        self.ble_provider.start_ble_scan(request, discovery_callback);
+    pub fn get_client_provider(&self) -> &Box<dyn PresenceClientProvider> {
+        &self.client_provider
+    }
+
+    pub fn run(&mut self) {
+        println!("Presence Engine run.");
+        Builder::new_current_thread()
+            .build()
+            .unwrap().block_on(async move {
+                self.poll_providers().await; });
+    }
+
+    async fn poll_providers(&mut self) {
+        // loop to receive events from Providers and process the event according to its type.
+        loop {
+            println!("loop to receive provider events.");
+            if let Some(event) = self.provider_rx.recv().await {
+                match event {
+                    ProviderEvent::PresenceDiscoveryRequest(request) => {
+                        println!("received discovery request: {:?}.", request);
+                    }
+                }
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <iostream>
+#include <thread>
 #include "presence_ffi.h"
 #include "cpp/presence_platform.h"
 
@@ -35,12 +36,16 @@ int main(int argc, char **argv) {
 
    PresencePlatform platform;
    platform.start_ble_scan = start_ble_scan;
-   auto engine = presence_engine_new(&platform);
+   auto engine = presence_engine_new(&platform, presence_discovery_callback);
+
+   thread engine_thread { [=]() { presence_engine_run(engine); }};
 
    auto request_builder = presence_request_builder_new(111 /* priority */);
    presence_request_builder_add_condition(request_builder,
        1 /* action */, PresenceIdentityType::Private, PresenceMeasurementAccuracy::CoarseAccuracy);
    auto request =  presence_request_builder_build(request_builder);
 
-   presence_engine_start_discovery(engine, request, presence_discovery_callback);
+   presence_engine_set_request(engine, request);
+
+   engine_thread.join();
 }

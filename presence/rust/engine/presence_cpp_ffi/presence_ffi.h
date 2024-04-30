@@ -52,7 +52,11 @@ using PresenceDiscoveryCallback = void(*)(int32_t);
 
 extern "C" {
 
-PresenceEngine *presence_engine_new(void *platform);
+PresenceEngine *presence_engine_new(void *platform, PresenceDiscoveryCallback discovery_callback);
+
+void presence_engine_run(PresenceEngine *engine);
+
+void presence_engine_set_request(PresenceEngine *engine, PresenceDiscoveryRequest *request);
 
 void presence_engine_start_discovery(PresenceEngine *engine_ptr,
                                      const PresenceDiscoveryRequest *request_ptr,
@@ -65,7 +69,7 @@ void presence_request_builder_add_condition(PresenceDiscoveryRequestBuilder *bui
                                             PresenceIdentityType identity_type,
                                             PresenceMeasurementAccuracy measurement_accuracy);
 
-const PresenceDiscoveryRequest *presence_request_builder_build(PresenceDiscoveryRequestBuilder *builder);
+PresenceDiscoveryRequest *presence_request_builder_build(PresenceDiscoveryRequestBuilder *builder);
 
 void presence_request_debug_print(const PresenceDiscoveryRequest *request);
 

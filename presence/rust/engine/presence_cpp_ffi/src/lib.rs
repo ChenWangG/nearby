@@ -1,13 +1,18 @@
 include!(concat!(env!("OUT_DIR"), "/presence_platform.rs"));
 include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
+use tokio::sync::mpsc;
+
+mod client_provider;
+
 pub use presence_core::{
     PresenceBleProvider,
     PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
     PresenceMeasurementAccuracy,
 };
-use presence_core::{PresenceDiscoveryCallback, PresenceEngine};
+use presence_core::{PresenceDiscoveryCallback, PresenceEngine, ProviderEvent};
 
+use crate::client_provider::PresenceClient;
 
 pub struct PresenceBleProviderCpp {
     discovery_callback: Option<PresenceDiscoveryCallback>,
@@ -64,11 +69,26 @@ impl PresenceDiscoveryRequestBuilder {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn presence_engine_new(platform: *mut ::std::os::raw::c_void) -> *mut PresenceEngine {
-    let mut provider_cpp_boxed = Box::new(PresenceBleProviderCpp::new());
-    let provider_cpp_ptr: *mut PresenceBleProviderCpp = &mut *provider_cpp_boxed;
-    presence_platform_init(platform, provider_cpp_ptr);
-    Box::into_raw(Box::new(PresenceEngine::new(provider_cpp_boxed)))
+pub unsafe extern "C" fn presence_engine_new(
+    platform: *mut ::std::os::raw::c_void,
+    discovery_callback: PresenceDiscoveryCallback) -> *mut PresenceEngine {
+    // Channel for Providers to send events to Engine.
+    let (provider_event_tx, provider_event_rx)
+        = mpsc::channel::<ProviderEvent>(100);
+    let client_boxed = Box::new(PresenceClient::new(provider_event_tx, discovery_callback));
+    let mut ble_provider_boxed = Box::new(PresenceBleProviderCpp::new());
+    presence_platform_init(platform, &mut *ble_provider_boxed);
+    Box::into_raw(Box::new(PresenceEngine::new(provider_event_rx, client_boxed, ble_provider_boxed)))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn presence_engine_run(engine: *mut PresenceEngine) {
+    println!("start engine.");
+    (*engine).run();
+}
+#[no_mangle]
+pub unsafe extern "C" fn presence_engine_set_request(engine: *mut PresenceEngine, request: *mut PresenceDiscoveryRequest) {
+    (*engine).get_client_provider().set_request(*Box::from_raw(request));
 }
 
 #[no_mangle]
@@ -76,7 +96,6 @@ pub unsafe extern "C" fn presence_engine_start_discovery(
     engine_ptr: *mut PresenceEngine,
     request_ptr: *const PresenceDiscoveryRequest,
     discovery_callback: PresenceDiscoveryCallback) {
-    (*engine_ptr).start_discovery(&*request_ptr, discovery_callback);
 }
 #[no_mangle]
 pub extern "C" fn presence_request_builder_new(
@@ -102,7 +121,7 @@ pub unsafe extern "C" fn presence_request_builder_add_condition(
 #[no_mangle]
 pub unsafe extern "C" fn presence_request_builder_build(
     builder: *mut PresenceDiscoveryRequestBuilder,
-) -> *const PresenceDiscoveryRequest {
+) -> *mut PresenceDiscoveryRequest {
     Box::into_raw(Box::new(Box::from_raw(builder).build()))
 }
 
