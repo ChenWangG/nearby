@@ -1,6 +1,5 @@
 use tokio::sync::mpsc;
-use crate::{PresenceClientProvider, PresenceDiscoveryCallback, PresenceDiscoveryRequest, PresenceDiscoveryResult, ProviderEvent};
-
+use crate::{PresenceDiscoveryCallback, PresenceDiscoveryRequest, PresenceDiscoveryResult, ProviderEvent};
 
 pub struct PresenceClient {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
@@ -12,9 +11,7 @@ impl PresenceClient {
                discovery_callback: PresenceDiscoveryCallback) -> Self {
       Self { provider_event_tx, discovery_callback }
    }
-}
-impl PresenceClientProvider for PresenceClient {
-    fn set_request(&self, request: PresenceDiscoveryRequest) {
+    pub fn set_request(&self, request: PresenceDiscoveryRequest) {
         if let Err(e) = self.provider_event_tx.blocking_send(ProviderEvent::PresenceDiscoveryRequest(request)) {
             println!("Provider callback send error: {}", e);
         } else {
@@ -22,7 +19,7 @@ impl PresenceClientProvider for PresenceClient {
         }
     }
 
-    fn on_device_updated(&self, result: PresenceDiscoveryResult) {
+    pub fn on_device_updated(&self, result: PresenceDiscoveryResult) {
         todo!()
     }
 }
