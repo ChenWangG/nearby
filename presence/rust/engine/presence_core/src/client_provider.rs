@@ -1,18 +1,18 @@
 use tokio::sync::mpsc;
 use crate::{PresenceDiscoveryRequest, PresenceDiscoveryResult, ProviderEvent};
 
-pub trait PresenceDiscoveryCallback {
+pub trait DiscoveryCallback {
     fn on_device_updated(&self, result: PresenceDiscoveryResult);
 }
 
 pub struct PresenceClientProvider {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
-    discovery_callback: Box<dyn PresenceDiscoveryCallback>,
+    discovery_callback: Box<dyn DiscoveryCallback>,
 }
 
 impl PresenceClientProvider {
-   pub fn new( provider_event_tx: mpsc::Sender<ProviderEvent>,
-               discovery_callback: Box<dyn PresenceDiscoveryCallback>) -> Self {
+   pub fn new(provider_event_tx: mpsc::Sender<ProviderEvent>,
+              discovery_callback: Box<dyn DiscoveryCallback>) -> Self {
       Self { provider_event_tx, discovery_callback }
    }
     pub fn set_request(&self, request: PresenceDiscoveryRequest) {

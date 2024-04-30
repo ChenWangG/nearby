@@ -3,7 +3,7 @@ include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
 use tokio::sync::mpsc;
 
-use presence_core::client_provider::{PresenceClientProvider, PresenceDiscoveryCallback};
+use presence_core::client_provider::{PresenceClientProvider, DiscoveryCallback};
 pub use presence_core::{
     PresenceBleProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest,
     PresenceIdentityType, PresenceMeasurementAccuracy,
@@ -77,19 +77,21 @@ impl PresenceDiscoveryRequestBuilder {
     }
 }
 
-struct DiscoveryCallback {}
+pub type PresenceDiscoveryCallback = fn(i32);
+struct DiscoveryCallbackCpp {
+     presence_discovery_callback: PresenceDiscoveryCallback,
+}
 
-impl PresenceDiscoveryCallback for DiscoveryCallback {
+impl DiscoveryCallback for DiscoveryCallbackCpp {
     fn on_device_updated(&self, result: PresenceDiscoveryResult) {
         todo!()
     }
 }
-pub type PresenceDiscoveryCallbackCpp = fn(i32);
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_new(
     platform: *mut ::std::os::raw::c_void,
-    discovery_callback: PresenceDiscoveryCallbackCpp,
+    presence_discovery_callback: PresenceDiscoveryCallback,
 ) -> *mut PresenceEngine {
     // Channel for Providers to send events to Engine.
     let (provider_event_tx, provider_event_rx) = mpsc::channel::<ProviderEvent>(100);
@@ -98,7 +100,7 @@ pub unsafe extern "C" fn presence_engine_new(
     Box::into_raw(Box::new(PresenceEngine::new(
         provider_event_tx,
         provider_event_rx,
-        Box::new(DiscoveryCallback{}),
+        Box::new(DiscoveryCallbackCpp { presence_discovery_callback }),
         ble_provider_boxed,
     )))
 }
