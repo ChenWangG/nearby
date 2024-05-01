@@ -48,9 +48,9 @@ fn main() {
     println!("cargo:rustc-link-lib=static=presence_platform");
 
     let presence_h_path =PathBuf::from(crate_dir.as_str())
-        .join("presence.h")
+        .join("presence_data.h")
         .canonicalize()
-        .expect(&*format!("cannot canonicalize path: {}/presence.h", crate_dir.as_str()));
+        .expect(&*format!("cannot canonicalize path: {}/presence_data.h", crate_dir.as_str()));
     let presence_h_path_str = presence_h_path.to_str().expect("");
 
     let client_bindings = bindgen::Builder::default()
@@ -67,6 +67,6 @@ fn main() {
     // Generates C header to access the Rust Engine.
     cbindgen::generate(&crate_dir)
         .unwrap()
-        .write_to_file("presence_ffi.h");
+        .write_to_file("presence.h");
 
 }

@@ -14,7 +14,7 @@
 
 #include <iostream>
 #include <thread>
-#include "presence_ffi.h"
+#include "presence.h"
 #include "cpp/presence_platform.h"
 
 using namespace std;
