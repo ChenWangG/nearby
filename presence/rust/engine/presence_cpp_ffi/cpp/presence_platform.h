@@ -1,11 +1,4 @@
-typedef struct PresenceBleScanRequestTag {
-   int priority;
-} PresenceBleScanRequest;
-
-/// <div rustbindgen hide></div>
-typedef struct PresencePlatformTag {
-    void (*start_ble_scan)(PresenceBleScanRequest, void (*PlatformBleCallback)(int));
-} PresencePlatform;
+#include "../presence_data.h"
 
 // Forward declaration the object which is defined in Rust.
 // The object is opaque to C and used by Rust callback.
