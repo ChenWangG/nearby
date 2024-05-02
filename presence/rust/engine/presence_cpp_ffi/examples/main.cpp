@@ -17,6 +17,7 @@
 #include<unistd.h>
 #include <mutex>
 #include <condition_variable>
+#include "spdlog/spdlog.h"
 #include "presence.h"
 #include "cpp/presence_platform.h"
 
@@ -31,7 +32,7 @@ PresenceBleScanRequest scan_request;
 
 // BLE system API.
 void start_ble_scan(PresenceBleScanRequest request, PlatformBleScanCallback callback) {
-    cout << "C System API: start BLE scan with Priority: " << request.priority << endl;
+    spdlog::info("Start BLE scan with Priority: {}",  request.priority);
     {
         std::unique_lock<std::mutex> lock(callback_mutex);
         platform_callback = callback;
@@ -43,21 +44,19 @@ void start_ble_scan(PresenceBleScanRequest request, PlatformBleScanCallback call
 // Sends a BLE scan result in a separated thread.
  thread platform_thread { []() {
      while(true) {
-        cout << "platform thread" << endl;
         std::unique_lock<std::mutex> lock(callback_mutex);
         callback_notification.wait(lock);
+        spdlog::info("Returns scan result.");
         platform_callback(scan_request.priority);
      }
  }};
 
 // Client callback to receive discovery results.
 void presence_discovery_callback(PresenceDiscoveryResult result) {
-    cout << "C presence discovery callback with priority: " << result.priority << endl;
+    spdlog::info("Received discovery result.");
 }
 
 int main(int argc, char **argv) {
-   cout << "C main starts." << endl;
-
    PresencePlatform platform;
    platform.start_ble_scan = start_ble_scan;
    auto engine = presence_engine_new(&platform, presence_discovery_callback);
