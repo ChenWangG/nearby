@@ -4,8 +4,9 @@
 #define presence_data_h
 
 /// <div rustbindgen opaque></div>
+struct TestOpaque {};
+// TODO(make it opaque)
 struct PresenceDiscoveryResult {
-    int priority;
 };
 
 typedef struct PresenceBleScanRequestTag {

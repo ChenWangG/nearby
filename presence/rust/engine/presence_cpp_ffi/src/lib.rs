@@ -82,7 +82,7 @@ struct DiscoveryCallbackCpp {
 
 impl DiscoveryCallback for DiscoveryCallbackCpp {
     fn on_device_updated(&self, result: DiscoveryResult) {
-        todo!()
+        (self.presence_discovery_callback)(PresenceDiscoveryResult{});
     }
 }
 

@@ -37,7 +37,9 @@ pub struct PresenceDiscoveryRequest {
     pub conditions: Vec<PresenceDiscoveryCondition>,
 }
 
-pub struct DiscoveryResult {}
+pub struct DiscoveryResult {
+    pub priority: i32,
+}
 
 // pub type PresenceDiscoveryCallback = fn(i32);
 
@@ -90,6 +92,7 @@ impl PresenceEngine {
                     }
                     ProviderEvent::BleScanResult(result)=> {
                         info!("received BLE scan result: {:?}.", result);
+                        self.client_provider.on_device_updated(DiscoveryResult{ priority: result.priority});
                     }
                 }
             }

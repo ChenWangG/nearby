@@ -25,6 +25,7 @@ impl PresenceClientProvider {
     }
 
     pub fn on_device_updated(&self, result: DiscoveryResult) {
-        todo!()
+        info!("on_device_updated.");
+        self.discovery_callback.on_device_updated(result);
     }
 }
