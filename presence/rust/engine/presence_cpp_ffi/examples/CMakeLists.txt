@@ -5,11 +5,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG         v1.14.1
 )
-FetchContent_GetProperties(spdlog)
-if (NOT spdlog_POPULATED)
-    FetchContent_Populate(spdlog)
-    add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
-endif ()
+FetchContent_MakeAvailable(spdlog)
 
 include_directories("${CMAKE_SOURCE_DIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
