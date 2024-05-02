@@ -14,17 +14,41 @@
 
 #include <iostream>
 #include <thread>
+#include<unistd.h>
+#include <mutex>
+#include <condition_variable>
 #include "presence.h"
 #include "cpp/presence_platform.h"
 
 using namespace std;
 
+typedef void (*PlatformBleScanCallback)(int);
+
+std::mutex callback_mutex;
+std::condition_variable callback_notification;
+PlatformBleScanCallback platform_callback;
+PresenceBleScanRequest scan_request;
+
 // BLE system API.
-void start_ble_scan(PresenceBleScanRequest request, void (*platform_ble_scan_callback)(int)) {
-   cout << "C System API: start BLE scan with Priority: " << request.priority << endl;
-   // Echo back the priority.
-   platform_ble_scan_callback(request.priority);
+void start_ble_scan(PresenceBleScanRequest request, PlatformBleScanCallback callback) {
+    cout << "C System API: start BLE scan with Priority: " << request.priority << endl;
+    {
+        std::unique_lock<std::mutex> lock(callback_mutex);
+        platform_callback = callback;
+        scan_request = request;
+    }
+    callback_notification.notify_all();
 }
+
+// Sends a BLE scan result in a separated thread.
+ thread platform_thread { []() {
+     while(true) {
+        cout << "platform thread" << endl;
+        std::unique_lock<std::mutex> lock(callback_mutex);
+        callback_notification.wait(lock);
+        platform_callback(scan_request.priority);
+     }
+ }};
 
 // Client callback to receive discovery results.
 void presence_discovery_callback(PresenceDiscoveryResult result) {
@@ -44,7 +68,6 @@ int main(int argc, char **argv) {
    presence_request_builder_add_condition(request_builder,
        1 /* action */, PresenceIdentityType::Private, PresenceMeasurementAccuracy::CoarseAccuracy);
    auto request =  presence_request_builder_build(request_builder);
-
    presence_engine_set_request(engine, request);
 
    engine_thread.join();

@@ -1,3 +1,4 @@
+use log::info;
 use tokio::sync::mpsc;
 use crate::{PresenceDiscoveryRequest, DiscoveryResult, ProviderEvent};
 
@@ -17,9 +18,9 @@ impl PresenceClientProvider {
    }
     pub fn set_request(&self, request: PresenceDiscoveryRequest) {
         if let Err(e) = self.provider_event_tx.blocking_send(ProviderEvent::PresenceDiscoveryRequest(request)) {
-            println!("Provider callback send error: {}", e);
+            info!("Provider callback send error: {}", e);
         } else {
-            println!("Provider callback sent an event.");
+            info!("Provider callback sent an event.");
         }
     }
 

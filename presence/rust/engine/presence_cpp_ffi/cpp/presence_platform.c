@@ -3,17 +3,17 @@
 
 PresencePlatform* platform_ptr;
 // Object opaque to C codes and used within the Rust callback.
-struct PresenceBleProviderCpp* provider_ptr;
+struct PresenceEngine* engine_ptr;
 
 BleScanCallback ble_scan_callback;
 
-void presence_platform_init(void* platform, struct PresenceBleProviderCpp* provider) {
+void presence_platform_init(void* platform, struct PresenceEngine* engine) {
     platform_ptr = (PresencePlatform*) platform;
-    provider_ptr = provider;
+    engine_ptr = engine;
 }
 
 void platform_ble_scan_callback(int priority) {
-    ble_scan_callback(provider_ptr, priority);
+    ble_scan_callback(engine_ptr, priority);
 }
 
 void presence_start_ble_scan(PresenceBleScanRequest request, BleScanCallback cb) {
