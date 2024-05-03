@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "presence_platform.h"
 
 PresencePlatform* platform_ptr;
@@ -20,4 +21,11 @@ void presence_start_ble_scan(PresenceBleScanRequest request, BleScanCallback cb)
     printf("C presence_provider: start_ble_scan with priority %d\n", request.priority);
     ble_scan_callback = cb;
     platform_ptr->start_ble_scan(request, platform_ble_scan_callback);
+}
+
+PresenceDiscoveryResult* presence_discovery_result_new() {
+    // struct PresenceDevice presence_device = { .actions = NULL, .actions_size = 20 };
+    PresenceDiscoveryResult *result = (struct PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
+    result->medium = PRESENCE_MEDIUM_BLE;
+    return result;
 }

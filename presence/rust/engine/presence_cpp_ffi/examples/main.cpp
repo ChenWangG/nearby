@@ -52,8 +52,8 @@ void start_ble_scan(PresenceBleScanRequest request, PlatformBleScanCallback call
  }};
 
 // Client callback to receive discovery results.
-void presence_discovery_callback(PresenceDiscoveryResult result) {
-    spdlog::info("Received discovery result.");
+void presence_discovery_callback(PresenceDiscoveryResult* result) {
+    spdlog::info("Received discovery result with medium: {}", (int)result->medium);
 }
 
 int main(int argc, char **argv) {

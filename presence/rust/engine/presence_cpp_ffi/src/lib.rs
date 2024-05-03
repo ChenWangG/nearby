@@ -75,14 +75,16 @@ impl PresenceDiscoveryRequestBuilder {
     }
 }
 
-pub type PresenceDiscoveryCallback = fn(PresenceDiscoveryResult);
+pub type PresenceDiscoveryCallback = fn(*mut PresenceDiscoveryResult);
 struct DiscoveryCallbackCpp {
      presence_discovery_callback: PresenceDiscoveryCallback,
 }
 
 impl DiscoveryCallback for DiscoveryCallbackCpp {
     fn on_device_updated(&self, result: DiscoveryResult) {
-        (self.presence_discovery_callback)(PresenceDiscoveryResult{});
+        unsafe {
+            (self.presence_discovery_callback)(presence_discovery_result_new());
+        }
     }
 }
 

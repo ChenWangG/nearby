@@ -47,7 +47,7 @@ struct PresenceDiscoveryRequestBuilder;
 
 struct PresenceEngine;
 
-using PresenceDiscoveryCallback = void(*)(PresenceDiscoveryResult);
+using PresenceDiscoveryCallback = void(*)(PresenceDiscoveryResult*);
 
 
 extern "C" {

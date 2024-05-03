@@ -4,10 +4,25 @@
 #define presence_data_h
 
 /// <div rustbindgen opaque></div>
-struct TestOpaque {};
-// TODO(make it opaque)
-struct PresenceDiscoveryResult {
-};
+typedef enum PresenceMedium {
+    RRESENCE_MEDIUM_UNKNOWN = 0,
+    PRESENCE_MEDIUM_BLE,
+    PRESENCE_MEDIUM_WIFI_RTT,
+    PRESENCE_MEDIUM_UWB,
+    PRESENCE_MEDIUM_MDNS,
+} PresenceMedium;
+
+/// <div rustbindgen opaque></div>
+typedef struct {
+    int* actions;
+    int  actions_size;
+} PresenceDevice;
+
+/// <div rustbindgen opaque></div>
+typedef struct {
+   PresenceMedium medium;
+   PresenceDevice device;
+} PresenceDiscoveryResult;
 
 typedef struct PresenceBleScanRequestTag {
    int priority;
