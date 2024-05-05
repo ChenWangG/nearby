@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "presence_platform.h"
+#include "presence_platform.hpp"
 
 PresencePlatform* platform_ptr;
 // Object opaque to C codes and used within the Rust callback.
@@ -25,7 +25,7 @@ void presence_start_ble_scan(PresenceBleScanRequest request, BleScanCallback cb)
 
 PresenceDiscoveryResult* presence_discovery_result_new() {
     // struct PresenceDevice presence_device = { .actions = NULL, .actions_size = 20 };
-    PresenceDiscoveryResult *result = (struct PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
+    PresenceDiscoveryResult *result = (PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
     result->medium = PRESENCE_MEDIUM_BLE;
     return result;
 }

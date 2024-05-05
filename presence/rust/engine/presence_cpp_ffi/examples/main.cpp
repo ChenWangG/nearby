@@ -19,7 +19,7 @@
 #include <condition_variable>
 #include "spdlog/spdlog.h"
 #include "presence.h"
-#include "cpp/presence_platform.h"
+#include "cpp/presence_platform.hpp"
 
 using namespace std;
 
