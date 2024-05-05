@@ -31,12 +31,12 @@ PlatformBleScanCallback platform_callback;
 PresenceBleScanRequest scan_request;
 
 // BLE system API.
-void start_ble_scan(PresenceBleScanRequest request, PlatformBleScanCallback callback) {
-    spdlog::info("Start BLE scan with Priority: {}",  request.priority);
+void start_ble_scan(PresenceBleScanRequest* request, PlatformBleScanCallback callback) {
+    spdlog::info("Start BLE scan with Priority: {}",  request->priority);
     {
         std::unique_lock<std::mutex> lock(callback_mutex);
         platform_callback = callback;
-        scan_request = request;
+        scan_request = *request;
     }
     callback_notification.notify_all();
 }

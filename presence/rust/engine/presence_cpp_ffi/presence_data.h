@@ -19,18 +19,18 @@ typedef struct {
 } PresenceDevice;
 
 /// <div rustbindgen opaque></div>
-typedef struct {
+struct PresenceDiscoveryResult {
    PresenceMedium medium;
    PresenceDevice device;
-} PresenceDiscoveryResult;
+};
 
-typedef struct PresenceBleScanRequestTag {
+struct PresenceBleScanRequest {
    int priority;
-} PresenceBleScanRequest;
+};
 
 /// <div rustbindgen opaque></div>
 typedef struct PresencePlatformTag {
-    void (*start_ble_scan)(PresenceBleScanRequest, void (*PlatformBleCallback)(int));
+    void (*start_ble_scan)(struct PresenceBleScanRequest*, void (*PlatformBleCallback)(int));
 } PresencePlatform;
 
 #endif // presence_data_h

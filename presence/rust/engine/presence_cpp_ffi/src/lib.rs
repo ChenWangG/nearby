@@ -95,9 +95,7 @@ impl BleScanner for BleScannerCpp {
         info!("BleScanner start ble scan with request {:?}.", request);
         unsafe {
             presence_start_ble_scan(
-                PresenceBleScanRequest {
-                    priority: request.priority,
-                },
+                presence_ble_scan_request_new(request.priority),
                 Some(ble_scan_callback),
             );
         }

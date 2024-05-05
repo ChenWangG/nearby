@@ -1,16 +1,23 @@
 // FFI the platform C APIs to Rust.
-#include "../presence_data.h"
 
-// Forward declaration the object which is defined in Rust.
-// The object is opaque to C and used by Rust callback.
+// Forward declaration of structs already defined in Rust while opaque to C.
 /// <div rustbindgen hide></div>
 struct PresenceEngine;
+
+// Forward declaration of structs opaque to Rust.
+struct PresenceBleScanRequest;
 
 typedef void (*BleScanCallback)(struct PresenceEngine*, int);
 
 extern "C" {
+// Both the platform (for system API) and the engine are glued in the platform
+// C implementation.
 void presence_platform_init(void* platform, struct PresenceEngine* engine);
-void presence_start_ble_scan(PresenceBleScanRequest request,
+
+struct PresenceBleScanRequest* presence_ble_scan_request_new(int priority);
+void presence_start_ble_scan(struct PresenceBleScanRequest* request,
                              BleScanCallback cb);
-PresenceDiscoveryResult* presence_discovery_result_new();
+
+// Build discovery result for the client.
+struct PresenceDiscoveryResult* presence_discovery_result_new();
 }
