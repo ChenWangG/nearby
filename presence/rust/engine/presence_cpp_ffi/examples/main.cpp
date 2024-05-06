@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
-#include <thread>
-#include<unistd.h>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <thread>
 #include "spdlog/spdlog.h"
 extern "C" {
 #include "presence.h"
