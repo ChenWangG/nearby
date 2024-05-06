@@ -1,3 +1,4 @@
+// Constants defined by enums shared between C and Rust.
 #ifndef presence_enums_h
 #define presence_enums_h
 
