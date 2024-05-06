@@ -18,8 +18,10 @@ struct PresenceBleScanRequest {
    int priority;
 };
 
+// Struct to hook system APIs from different platforms.
+typedef void (*PlatformBleScanCallback)(int);
 struct PresencePlatform {
-    void (*start_ble_scan)(struct PresenceBleScanRequest*, void (*PlatformBleCallback)(int));
+    void (*start_ble_scan)(struct PresenceBleScanRequest*, PlatformBleScanCallback);
 };
 
 #endif // presence_data_h

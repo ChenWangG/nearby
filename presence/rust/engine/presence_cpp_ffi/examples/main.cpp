@@ -24,8 +24,6 @@ extern "C" {
 
 using namespace std;
 
-typedef void (*PlatformBleScanCallback)(int);
-
 std::mutex callback_mutex;
 std::condition_variable callback_notification;
 PlatformBleScanCallback platform_callback;
