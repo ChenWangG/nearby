@@ -1,5 +1,4 @@
 include!(concat!(env!("OUT_DIR"), "/presence_platform.rs"));
-// include!(concat!(env!("OUT_DIR"), "/presence_client.rs"));
 
 use log::info;
 use tokio::sync::mpsc;

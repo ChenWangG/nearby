@@ -7,16 +7,18 @@ use log::{info, log};
 use crate::ble_scan_provider::{BleScanner, BleScanProvider, BleScanResult};
 use crate::client_provider::{PresenceClientProvider, DiscoveryCallback};
 
+// The enum is annotated by repr(C) to pass through FFI.
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[repr(u32)]
+#[repr(C)]
 pub enum PresenceIdentityType {
     Private = 0,
     Trusted,
     Public,
 }
 
+// The enum is annotated by repr(C) to pass through FFI.
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[repr(u32)]
+#[repr(C)]
 pub enum PresenceMeasurementAccuracy {
     Unknown = 0,
     CoarseAccuracy,

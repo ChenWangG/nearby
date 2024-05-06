@@ -18,8 +18,9 @@
 #include <mutex>
 #include <condition_variable>
 #include "spdlog/spdlog.h"
+extern "C" {
 #include "presence.h"
-#include "cpp/presence_platform.hpp"
+}
 
 using namespace std;
 
