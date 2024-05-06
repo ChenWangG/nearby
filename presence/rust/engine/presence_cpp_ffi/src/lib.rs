@@ -12,39 +12,6 @@ pub use presence_core::{
     PresenceMeasurementAccuracy,
 };
 
-pub struct PresenceBleProviderCpp {}
-
-impl PresenceBleProviderCpp {
-    fn new() -> Self {
-        Self {}
-    }
-
-    fn ble_scan_callback(&self, priority: i32) {
-        println!(
-            "PresenceBleProviderCpp: ble_scan_callback with priority: {}",
-            priority
-        );
-        // self.discovery_callback.unwrap()(priority);
-    }
-}
-
-impl PresenceBleProviderCpp {
-    fn start_ble_scan(&mut self, request: &PresenceDiscoveryRequest) {
-        println!("Rust Provider: start ble scan.");
-        /*
-        self.discovery_callback = Some(discovery_callback);
-        unsafe {
-            presence_start_ble_scan(
-                PresenceBleScanRequest {
-                    priority: request.priority,
-                },
-                Some(ble_scan_callback),
-            );
-        }
-         */
-    }
-}
-
 pub struct PresenceDiscoveryRequestBuilder {
     priority: i32,
     conditions: Vec<PresenceDiscoveryCondition>,
@@ -116,7 +83,6 @@ pub unsafe extern "C" fn presence_engine_new(
     info!("presence_engine_new.");
     // Channel for Providers to send events to Engine.
     let (provider_event_tx, provider_event_rx) = mpsc::channel::<ProviderEvent>(100);
-    let mut ble_provider_boxed = Box::new(PresenceBleProviderCpp::new());
     let engine_ptr = Box::into_raw(Box::new(PresenceEngine::new(
         provider_event_tx,
         provider_event_rx,
