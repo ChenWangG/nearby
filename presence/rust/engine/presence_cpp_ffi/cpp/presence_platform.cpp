@@ -9,7 +9,7 @@ struct PresenceEngine* engine_ptr;
 
 BleScanCallback ble_scan_callback;
 
-void presence_platform_init(void* platform, struct PresenceEngine* engine) {
+void presence_platform_init(PresencePlatform* platform, struct PresenceEngine* engine) {
     platform_ptr = (PresencePlatform*) platform;
     engine_ptr = engine;
 }

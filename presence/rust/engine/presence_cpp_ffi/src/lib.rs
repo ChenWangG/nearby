@@ -110,7 +110,7 @@ unsafe extern "C" fn ble_scan_callback(engine: *mut PresenceEngine, priority: i3
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_new(
-    platform: *mut ::std::os::raw::c_void,
+    platform:  *mut PresencePlatform,
     presence_discovery_callback: PresenceDiscoveryCallback,
 ) -> *mut PresenceEngine {
     env_logger::init();
