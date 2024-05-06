@@ -1,4 +1,5 @@
 // FFI the platform C APIs to Rust.
+#include "../presence_enums.h"
 
 // Forward declaration of structs already defined in Rust while opaque to C.
 /// <div rustbindgen hide></div>
@@ -20,5 +21,5 @@ void presence_start_ble_scan(struct PresenceBleScanRequest* request,
                              BleScanCallback cb);
 
 // Build discovery result for the client.
-struct PresenceDiscoveryResult* presence_discovery_result_new();
+struct PresenceDiscoveryResult* presence_discovery_result_new(enum PresenceMedium medium);
 }

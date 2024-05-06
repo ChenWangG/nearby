@@ -34,7 +34,7 @@ void presence_start_ble_scan(struct PresenceBleScanRequest *request, BleScanCall
     platform_ptr->start_ble_scan(request, platform_ble_scan_callback);
 }
 
-struct PresenceDiscoveryResult* presence_discovery_result_new() {
+struct PresenceDiscoveryResult* presence_discovery_result_new(enum PresenceMedium medium) {
     // struct PresenceDevice presence_device = { .actions = NULL, .actions_size = 20 };
     PresenceDiscoveryResult *result = (PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
     result->medium = PRESENCE_MEDIUM_BLE;

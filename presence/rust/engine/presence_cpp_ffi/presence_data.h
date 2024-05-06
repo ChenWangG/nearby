@@ -2,13 +2,7 @@
 #ifndef presence_data_h
 #define presence_data_h
 
-typedef enum PresenceMedium {
-    RRESENCE_MEDIUM_UNKNOWN = 0,
-    PRESENCE_MEDIUM_BLE,
-    PRESENCE_MEDIUM_WIFI_RTT,
-    PRESENCE_MEDIUM_UWB,
-    PRESENCE_MEDIUM_MDNS,
-} PresenceMedium;
+#include "presence_enums.h"
 
 typedef struct {
     int* actions;
@@ -16,7 +10,7 @@ typedef struct {
 } PresenceDevice;
 
 struct PresenceDiscoveryResult {
-   PresenceMedium medium;
+   enum PresenceMedium medium;
    PresenceDevice device;
 };
 

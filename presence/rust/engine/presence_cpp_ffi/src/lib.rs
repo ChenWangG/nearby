@@ -4,21 +4,20 @@ include!(concat!(env!("OUT_DIR"), "/presence_platform.rs"));
 use log::info;
 use tokio::sync::mpsc;
 
-use presence_core::client_provider::{PresenceClientProvider, DiscoveryCallback};
-use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, BleScanResult};
+use presence_core::ble_scan_provider::{BleScanProvider, BleScanResult, BleScanner};
+use presence_core::client_provider::{DiscoveryCallback, PresenceClientProvider};
 
-pub use presence_core::{
-    PresenceDiscoveryCondition, PresenceDiscoveryRequest,
-    PresenceIdentityType, PresenceMeasurementAccuracy,
-};
 use presence_core::{DiscoveryResult, PresenceEngine, ProviderEvent};
+pub use presence_core::{
+    PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
+    PresenceMeasurementAccuracy,
+};
 
 pub struct PresenceBleProviderCpp {}
 
 impl PresenceBleProviderCpp {
     fn new() -> Self {
-        Self {
-        }
+        Self {}
     }
 
     fn ble_scan_callback(&self, priority: i32) {
@@ -31,10 +30,7 @@ impl PresenceBleProviderCpp {
 }
 
 impl PresenceBleProviderCpp {
-    fn start_ble_scan(
-        &mut self,
-        request: &PresenceDiscoveryRequest,
-    ) {
+    fn start_ble_scan(&mut self, request: &PresenceDiscoveryRequest) {
         println!("Rust Provider: start ble scan.");
         /*
         self.discovery_callback = Some(discovery_callback);
@@ -77,13 +73,15 @@ impl PresenceDiscoveryRequestBuilder {
 
 pub type PresenceDiscoveryCallback = fn(*mut PresenceDiscoveryResult);
 struct DiscoveryCallbackCpp {
-     presence_discovery_callback: PresenceDiscoveryCallback,
+    presence_discovery_callback: PresenceDiscoveryCallback,
 }
 
 impl DiscoveryCallback for DiscoveryCallbackCpp {
     fn on_device_updated(&self, result: DiscoveryResult) {
         unsafe {
-            (self.presence_discovery_callback)(presence_discovery_result_new());
+            (self.presence_discovery_callback)(presence_discovery_result_new(
+                PresenceMedium_RRESENCE_MEDIUM_UNKNOWN,
+            ));
         }
     }
 }
@@ -104,13 +102,15 @@ impl BleScanner for BleScannerCpp {
 
 unsafe extern "C" fn ble_scan_callback(engine: *mut PresenceEngine, priority: i32) {
     info!("ble_scan_callback");
-    (*engine).get_ble_scan_provider().on_scan_result(BleScanResult {priority});
+    (*engine)
+        .get_ble_scan_provider()
+        .on_scan_result(BleScanResult { priority });
     // let _provider = (*engine).get_ble_scan_provider();
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_new(
-    platform:  *mut PresencePlatform,
+    platform: *mut PresencePlatform,
     presence_discovery_callback: PresenceDiscoveryCallback,
 ) -> *mut PresenceEngine {
     env_logger::init();
@@ -121,7 +121,9 @@ pub unsafe extern "C" fn presence_engine_new(
     let engine_ptr = Box::into_raw(Box::new(PresenceEngine::new(
         provider_event_tx,
         provider_event_rx,
-        Box::new(DiscoveryCallbackCpp { presence_discovery_callback }),
+        Box::new(DiscoveryCallbackCpp {
+            presence_discovery_callback,
+        }),
         Box::new(BleScannerCpp {}),
     )));
     presence_platform_init(platform, engine_ptr);
