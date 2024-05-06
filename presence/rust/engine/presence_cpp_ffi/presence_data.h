@@ -3,10 +3,10 @@
 #define presence_data_h
 
 #include "presence_enums.h"
+#include <vector>
 
 typedef struct {
-    int* actions;
-    int  actions_size;
+    std::vector<int> actions;
 } PresenceDevice;
 
 struct PresenceDiscoveryResult {

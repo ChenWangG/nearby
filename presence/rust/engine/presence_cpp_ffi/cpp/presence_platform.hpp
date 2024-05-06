@@ -22,4 +22,5 @@ void presence_start_ble_scan(struct PresenceBleScanRequest* request,
 
 // Build discovery result for the client.
 struct PresenceDiscoveryResult* presence_discovery_result_new(enum PresenceMedium medium);
+void presence_discovery_result_add_action(PresenceDiscoveryResult* result,  int action);
 }

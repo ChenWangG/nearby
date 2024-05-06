@@ -79,9 +79,9 @@ struct DiscoveryCallbackCpp {
 impl DiscoveryCallback for DiscoveryCallbackCpp {
     fn on_device_updated(&self, result: DiscoveryResult) {
         unsafe {
-            (self.presence_discovery_callback)(presence_discovery_result_new(
-                PresenceMedium_RRESENCE_MEDIUM_UNKNOWN,
-            ));
+            let result = presence_discovery_result_new(PresenceMedium_RRESENCE_MEDIUM_UNKNOWN);
+            presence_discovery_result_add_action(result, 103);
+            (self.presence_discovery_callback)(result);
         }
     }
 }

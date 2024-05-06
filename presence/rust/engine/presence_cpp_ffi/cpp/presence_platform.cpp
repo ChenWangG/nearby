@@ -36,7 +36,12 @@ void presence_start_ble_scan(struct PresenceBleScanRequest *request, BleScanCall
 
 struct PresenceDiscoveryResult* presence_discovery_result_new(enum PresenceMedium medium) {
     // struct PresenceDevice presence_device = { .actions = NULL, .actions_size = 20 };
-    PresenceDiscoveryResult *result = (PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
-    result->medium = PRESENCE_MEDIUM_BLE;
+    // PresenceDiscoveryResult *result = (PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
+    PresenceDiscoveryResult *result = new PresenceDiscoveryResult();
+    result->medium = medium;
     return result;
+}
+
+void presence_discovery_result_add_action(PresenceDiscoveryResult* result,  int action) {
+   result->device.actions.push_back(action);
 }
