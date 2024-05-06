@@ -58,8 +58,12 @@ impl BleScanner for BleScannerCpp {
     fn start_ble_scan(&self, request: PresenceDiscoveryRequest) {
         info!("BleScanner start ble scan with request {:?}.", request);
         unsafe {
+            let scan_request =  presence_ble_scan_request_new(request.priority);
+            for condition in request.conditions {
+                presence_ble_scan_request_add_action(scan_request, condition.action);
+            }
             presence_start_ble_scan(
-                presence_ble_scan_request_new(request.priority),
+                scan_request,
                 Some(ble_scan_callback),
             );
         }
@@ -67,6 +71,15 @@ impl BleScanner for BleScannerCpp {
 }
 
 unsafe extern "C" fn ble_scan_callback(engine: *mut PresenceEngine, priority: i32) {
+    info!("ble_scan_callback");
+    (*engine)
+        .get_ble_scan_provider()
+        .on_scan_result(BleScanResult { priority });
+    // let _provider = (*engine).get_ble_scan_provider();
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn presence_ble_scan_callback(engine: *mut PresenceEngine, priority: i32) {
     info!("ble_scan_callback");
     (*engine)
         .get_ble_scan_provider()
@@ -120,7 +133,7 @@ pub extern "C" fn presence_request_builder_new(
 #[no_mangle]
 pub unsafe extern "C" fn presence_request_builder_add_condition(
     builder: *mut PresenceDiscoveryRequestBuilder,
-    action: u32,
+    action: i32,
     identity_type: PresenceIdentityType,
     measurement_accuracy: PresenceMeasurementAccuracy,
 ) {

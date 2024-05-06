@@ -27,7 +27,7 @@ pub enum PresenceMeasurementAccuracy {
 /// Struct to hold an action, identity type and their associated discovery condition.
 #[derive(Clone, Copy, Debug)]
 pub struct PresenceDiscoveryCondition {
-    pub action: u32,
+    pub action: i32,
     pub identity_type: PresenceIdentityType,
     pub measurement_accuracy: PresenceMeasurementAccuracy,
 }

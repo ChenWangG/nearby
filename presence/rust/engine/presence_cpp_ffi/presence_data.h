@@ -3,6 +3,7 @@
 #define presence_data_h
 
 #include "presence_enums.h"
+#include <cstdint>
 #include <vector>
 
 typedef struct {
@@ -15,7 +16,8 @@ struct PresenceDiscoveryResult {
 };
 
 struct PresenceBleScanRequest {
-   int priority;
+    int priority;
+    std::vector<uint32_t> actions;
 };
 
 // Struct to hook system APIs from different platforms.

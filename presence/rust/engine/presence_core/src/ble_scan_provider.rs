@@ -20,6 +20,7 @@ impl BleScanProvider {
     pub fn new(provider_event_tx: mpsc::Sender<ProviderEvent>, ble_scanner: Box<dyn BleScanner>) -> Self {
         Self { provider_event_tx, ble_scanner }
     }
+    // TODO: replace PresenceDiscoveryRequest with BleScanRequest.
     pub fn start_ble_scan(&self, request: PresenceDiscoveryRequest) {
         info!("BLE Scan Provider starts BLE scan.");
         self.ble_scanner.start_ble_scan(request);

@@ -17,6 +17,8 @@ extern "C" {
 void presence_platform_init(PresencePlatform* platform, struct PresenceEngine* engine);
 
 struct PresenceBleScanRequest* presence_ble_scan_request_new(int priority);
+void presence_ble_scan_request_add_action(PresenceBleScanRequest* request, int action);
+
 void presence_start_ble_scan(struct PresenceBleScanRequest* request,
                              BleScanCallback cb);
 

@@ -24,6 +24,10 @@ struct PresenceBleScanRequest* presence_ble_scan_request_new(int priority) {
   return request;
 }
 
+void presence_ble_scan_request_add_action(PresenceBleScanRequest* request, int action) {
+   request->actions.push_back(action);
+}
+
 void presence_ble_scan_request_free(struct PresenceBleScanRequest* request) {
   delete request;
 }
