@@ -9,8 +9,9 @@ struct PresenceBleScanRequest* presence_ble_scan_request_new(int priority) {
   return request;
 }
 
-void presence_ble_scan_request_add_action(PresenceBleScanRequest* request, int action) {
-   request->actions.push_back(action);
+void presence_ble_scan_request_add_action(PresenceBleScanRequest* request,
+                                          int action) {
+  request->actions.push_back(action);
 }
 
 void presence_ble_scan_request_free(struct PresenceBleScanRequest* request) {
@@ -18,13 +19,14 @@ void presence_ble_scan_request_free(struct PresenceBleScanRequest* request) {
 }
 
 struct PresenceDiscoveryResult* presence_discovery_result_new(enum PresenceMedium medium) {
-    // struct PresenceDevice presence_device = { .actions = NULL, .actions_size = 20 };
-    // PresenceDiscoveryResult *result = (PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
-    PresenceDiscoveryResult *result = new PresenceDiscoveryResult();
-    result->medium = medium;
-    return result;
+  // struct PresenceDevice presence_device = { .actions = NULL, .actions_size = 20 };
+  // PresenceDiscoveryResult *result = (PresenceDiscoveryResult*)malloc(sizeof(PresenceDiscoveryResult));
+  PresenceDiscoveryResult* result = new PresenceDiscoveryResult();
+  result->medium = medium;
+  return result;
 }
 
-void presence_discovery_result_add_action(PresenceDiscoveryResult* result,  int action) {
-   result->device.actions.push_back(action);
+void presence_discovery_result_add_action(PresenceDiscoveryResult* result,
+                                          int action) {
+  result->device.actions.push_back(action);
 }

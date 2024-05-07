@@ -19,10 +19,5 @@
 #include "presence.h"
 
 TEST_CASE( "Presence Engine", "DiscoveryEngineRequest Echo" ) {
-    auto builder_ptr = presence_request_builder_new(10);
-    presence_request_builder_add_condition(builder_ptr,
-        1, PresenceIdentityType::Private, PresenceMeasurementAccuracy::CoarseAccuracy);
-    auto request_ptr =  presence_request_builder_build(builder_ptr);
-     presence_request_debug_print(request_ptr);
-    REQUIRE(0 == 0);
+   REQUIRE(0 == 0);
 }

@@ -1,6 +1,6 @@
+use crate::{PresenceDiscoveryRequest, ProviderEvent};
 use log::info;
 use tokio::sync::mpsc;
-use crate::{PresenceDiscoveryRequest, ProviderEvent};
 
 #[derive(Debug)]
 pub struct PresenceBleScanResult {
@@ -18,8 +18,14 @@ pub struct BleScanProvider {
 }
 
 impl BleScanProvider {
-    pub fn new(provider_event_tx: mpsc::Sender<ProviderEvent>, ble_scanner: Box<dyn BleScanner>) -> Self {
-        Self { provider_event_tx, ble_scanner }
+    pub fn new(
+        provider_event_tx: mpsc::Sender<ProviderEvent>,
+        ble_scanner: Box<dyn BleScanner>,
+    ) -> Self {
+        Self {
+            provider_event_tx,
+            ble_scanner,
+        }
     }
     // TODO: replace PresenceDiscoveryRequest with BleScanRequest.
     pub fn start_ble_scan(&self, request: PresenceDiscoveryRequest) {
@@ -29,7 +35,10 @@ impl BleScanProvider {
 
     pub fn on_scan_result(&self, result: PresenceBleScanResult) {
         info!("on_scan_result");
-        if let Err(e) = self.provider_event_tx.blocking_send(ProviderEvent::BleScanResult(result)) {
+        if let Err(e) = self
+            .provider_event_tx
+            .blocking_send(ProviderEvent::BleScanResult(result))
+        {
             info!("Provider callback send error: {}", e);
         } else {
             info!("Provider callback sent an event.");

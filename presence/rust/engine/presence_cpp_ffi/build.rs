@@ -47,23 +47,6 @@ fn main() {
     println!("cargo:rustc-link-search={}/cpp", link_lib_dir);
     println!("cargo:rustc-link-lib=static=cpp_ffi");
 
-    //let presence_h_path =PathBuf::from(crate_dir.as_str())
-    //    .join("presence_data.h")
-    //    .canonicalize()
-    //    .expect(&*format!("cannot canonicalize path: {}/presence_data.h", crate_dir.as_str()));
-    //let presence_h_path_str = presence_h_path.to_str().expect("");
-
-    //let client_bindings = bindgen::Builder::default()
-    //    .header(presence_h_path_str)
-    //    .generate()
-    //    .expect("Unable to generate client bindings");
-
-    //let presence_out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("presence_client.rs");
-    //client_bindings
-    //    .write_to_file(presence_out_path)
-    //    .expect("Couldn't write bindings!");
-
-
     // Generates C header to access the Rust Engine.
     cbindgen::generate(&crate_dir)
         .unwrap()
