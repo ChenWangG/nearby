@@ -28,7 +28,6 @@ std::mutex callback_mutex;
 std::condition_variable callback_notification;
 PresenceBleScanRequest scan_request;
 
-
 // BLE system API.
 void start_ble_scan(PresenceBleScanRequest* request) {
     spdlog::info("Start BLE scan with Priority: {}",  request->priority);
@@ -66,9 +65,7 @@ void presence_discovery_callback(PresenceDiscoveryResult* result) {
 }
 
 int main(int argc, char **argv) {
-   PresencePlatform platform;
-   platform.start_ble_scan = start_ble_scan;
-   engine = presence_engine_new(&platform, presence_discovery_callback,start_ble_scan);
+   engine = presence_engine_new(presence_discovery_callback, start_ble_scan);
 
    thread engine_thread { [=]() { presence_engine_run(engine); }};
 

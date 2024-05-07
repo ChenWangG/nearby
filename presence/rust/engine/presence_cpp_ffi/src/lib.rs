@@ -104,7 +104,6 @@ pub unsafe extern "C" fn presence_ble_scan_callback(engine: *mut PresenceEngine,
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_new(
-    platform: *mut PresencePlatform,
     presence_discovery_callback: PresenceDiscoveryCallback,
     presence_start_ble_scan: PresenceStartBleScan
 ) -> *mut PresenceEngine {
@@ -120,7 +119,6 @@ pub unsafe extern "C" fn presence_engine_new(
         }),
         Box::new(BleScannerCpp {presence_start_ble_scan}),
     )));
-    presence_platform_init(platform, engine_ptr);
     engine_ptr
 }
 

@@ -54,8 +54,7 @@ typedef void (*PresenceStartBleScan)(PresenceBleScanRequest*);
 void presence_ble_scan_callback(struct PresenceEngine *engine,
                                 struct PresenceBleScanResult *scan_result);
 
-struct PresenceEngine *presence_engine_new(PresencePlatform *platform,
-                                           PresenceDiscoveryCallback presence_discovery_callback,
+struct PresenceEngine *presence_engine_new(PresenceDiscoveryCallback presence_discovery_callback,
                                            PresenceStartBleScan presence_start_ble_scan);
 
 void presence_engine_run(struct PresenceEngine *engine);
