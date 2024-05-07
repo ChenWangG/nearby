@@ -62,20 +62,9 @@ impl BleScanner for BleScannerCpp {
             for condition in request.conditions {
                 presence_ble_scan_request_add_action(scan_request, condition.action);
             }
-            presence_start_ble_scan(
-                scan_request,
-                Some(ble_scan_callback),
-            );
+            presence_start_ble_scan(scan_request);
         }
     }
-}
-
-unsafe extern "C" fn ble_scan_callback(engine: *mut PresenceEngine, priority: i32) {
-    info!("ble_scan_callback");
-    (*engine)
-        .get_ble_scan_provider()
-        .on_scan_result(BleScanResult { priority });
-    // let _provider = (*engine).get_ble_scan_provider();
 }
 
 #[no_mangle]

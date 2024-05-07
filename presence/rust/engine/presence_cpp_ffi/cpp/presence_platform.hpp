@@ -9,8 +9,6 @@ struct PresenceEngine;
 struct PresencePlatform;
 struct PresenceBleScanRequest;
 
-typedef void (*BleScanCallback)(struct PresenceEngine*, int);
-
 extern "C" {
 // Both the platform (for system API) and the engine are glued in the platform
 // C implementation.
@@ -19,8 +17,7 @@ void presence_platform_init(PresencePlatform* platform, struct PresenceEngine* e
 struct PresenceBleScanRequest* presence_ble_scan_request_new(int priority);
 void presence_ble_scan_request_add_action(PresenceBleScanRequest* request, int action);
 
-void presence_start_ble_scan(struct PresenceBleScanRequest* request,
-                             BleScanCallback cb);
+void presence_start_ble_scan(struct PresenceBleScanRequest* request);
 
 // Build discovery result for the client.
 struct PresenceDiscoveryResult* presence_discovery_result_new(enum PresenceMedium medium);
