@@ -20,7 +20,7 @@ add_custom_target(presence ALL
     COMMAND CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} ${CARGO_CMD}
     COMMAND cp ${PRESENCE_ENGINE_A} ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-add_dependencies(presence presence_platform)
+add_dependencies(presence cpp_ffi)
 set_target_properties(presence PROPERTIES BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 add_test(NAME presence_engine_test

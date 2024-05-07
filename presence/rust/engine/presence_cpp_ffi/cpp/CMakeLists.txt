@@ -1,1 +1,1 @@
-add_library(presence_platform ffi.cpp)
+add_library(cpp_ffi ffi.cpp)

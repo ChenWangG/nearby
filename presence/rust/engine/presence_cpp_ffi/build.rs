@@ -38,14 +38,14 @@ fn main() {
         .expect("Unable to generate bindings");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("presence_platform.rs");
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("cpp_ffi.rs");
     bindings
         .write_to_file(out_path)
         .expect("Couldn't write bindings!");
 
     let link_lib_dir = env::var("CARGO_TARGET_DIR").unwrap();
     println!("cargo:rustc-link-search={}/cpp", link_lib_dir);
-    println!("cargo:rustc-link-lib=static=presence_platform");
+    println!("cargo:rustc-link-lib=static=cpp_ffi");
 
     //let presence_h_path =PathBuf::from(crate_dir.as_str())
     //    .join("presence_data.h")
