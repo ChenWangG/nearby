@@ -41,6 +41,16 @@ pub struct PresenceDiscoveryRequest {
 
 pub struct DiscoveryResult {
     pub priority: i32,
+    pub actions: Vec<i32>,
+}
+
+impl DiscoveryResult {
+    fn new(priority: i32) -> Self {
+        Self { priority, actions: Vec::new() }
+    }
+    fn add_action(&mut self, action: i32)  {
+        self.actions.push(action);
+    }
 }
 
 // pub type PresenceDiscoveryCallback = fn(i32);
@@ -94,7 +104,11 @@ impl PresenceEngine {
                     }
                     ProviderEvent::BleScanResult(result)=> {
                         info!("received BLE scan result: {:?}.", result);
-                        self.client_provider.on_device_updated(DiscoveryResult{ priority: result.priority});
+                        let mut discovery_result = DiscoveryResult::new(result.priority);
+                        for action in result.actions {
+                            discovery_result.add_action(action);
+                        }
+                        self.client_provider.on_device_updated(discovery_result);
                     }
                 }
             }
