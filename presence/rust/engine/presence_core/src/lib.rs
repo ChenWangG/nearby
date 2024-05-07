@@ -4,7 +4,7 @@ pub mod ble_scan_provider;
 use tokio::sync::mpsc;
 use tokio::runtime::Builder;
 use log::{info, log};
-use crate::ble_scan_provider::{BleScanner, BleScanProvider, BleScanResult};
+use crate::ble_scan_provider::{BleScanner, BleScanProvider, PresenceBleScanResult};
 use crate::client_provider::{PresenceClientProvider, DiscoveryCallback};
 
 // The enum is annotated by repr(C) to pass through FFI.
@@ -47,7 +47,7 @@ pub struct DiscoveryResult {
 
 pub enum ProviderEvent {
     PresenceDiscoveryRequest(PresenceDiscoveryRequest),
-    BleScanResult(BleScanResult),
+    BleScanResult(PresenceBleScanResult),
 }
 
 pub struct PresenceEngine {

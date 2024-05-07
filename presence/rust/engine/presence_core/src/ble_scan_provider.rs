@@ -3,7 +3,7 @@ use tokio::sync::mpsc;
 use crate::{PresenceDiscoveryRequest, ProviderEvent};
 
 #[derive(Debug)]
-pub struct BleScanResult {
+pub struct PresenceBleScanResult {
     pub priority: i32,
 }
 
@@ -26,7 +26,7 @@ impl BleScanProvider {
         self.ble_scanner.start_ble_scan(request);
     }
 
-    pub fn on_scan_result(&self, result: BleScanResult) {
+    pub fn on_scan_result(&self, result: PresenceBleScanResult) {
         info!("on_scan_result");
         if let Err(e) = self.provider_event_tx.blocking_send(ProviderEvent::BleScanResult(result)) {
             info!("Provider callback send error: {}", e);

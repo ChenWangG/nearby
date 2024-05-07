@@ -3,7 +3,7 @@ include!(concat!(env!("OUT_DIR"), "/presence_platform.rs"));
 use log::info;
 use tokio::sync::mpsc;
 
-use presence_core::ble_scan_provider::{BleScanProvider, BleScanResult, BleScanner};
+use presence_core::ble_scan_provider::{BleScanProvider, PresenceBleScanResult, BleScanner};
 use presence_core::client_provider::{DiscoveryCallback, PresenceClientProvider};
 
 use presence_core::{DiscoveryResult, PresenceEngine, ProviderEvent};
@@ -33,6 +33,22 @@ impl PresenceDiscoveryRequestBuilder {
         PresenceDiscoveryRequest {
             priority: self.priority,
             conditions: self.conditions.to_vec(),
+        }
+    }
+}
+
+struct PresenceBleScanResultBuilder {
+    pub priority: i32,
+}
+
+impl PresenceBleScanResultBuilder {
+    pub fn new(priority: i32) -> Self {
+       Self { priority }
+    }
+
+    pub fn build(&self) -> PresenceBleScanResult {
+        PresenceBleScanResult {
+            priority: self.priority,
         }
     }
 }
@@ -72,7 +88,7 @@ pub unsafe extern "C" fn presence_ble_scan_callback(engine: *mut PresenceEngine,
     info!("ble_scan_callback");
     (*engine)
         .get_ble_scan_provider()
-        .on_scan_result(BleScanResult { priority });
+        .on_scan_result(PresenceBleScanResult { priority });
     // let _provider = (*engine).get_ble_scan_provider();
 }
 
@@ -112,6 +128,8 @@ pub unsafe extern "C" fn presence_engine_set_request(
         .set_request(*Box::from_raw(request));
 }
 
+
+
 #[no_mangle]
 pub extern "C" fn presence_request_builder_new(
     priority: i32,
@@ -140,6 +158,18 @@ pub unsafe extern "C" fn presence_request_builder_build(
     Box::into_raw(Box::new(Box::from_raw(builder).build()))
 }
 
+#[no_mangle]
+pub extern "C" fn presence_ble_scan_result_builder_new(
+    priority: i32,
+) -> *mut PresenceBleScanResultBuilder {
+    Box::into_raw(Box::new(PresenceBleScanResultBuilder::new(priority)))
+}
+#[no_mangle]
+pub unsafe extern "C" fn presence_ble_scan_result_builder_build(
+    builder: *mut PresenceBleScanResultBuilder,
+) -> *mut PresenceBleScanResult {
+    Box::into_raw(Box::new(Box::from_raw(builder).build()))
+}
 #[no_mangle]
 pub unsafe extern "C" fn presence_request_debug_print(request: *const PresenceDiscoveryRequest) {
     println!("Rust FFI Lib: {:?}", *request);

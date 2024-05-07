@@ -34,6 +34,10 @@ typedef enum PresenceMeasurementAccuracy {
   BestAvailable,
 } PresenceMeasurementAccuracy;
 
+typedef struct PresenceBleScanResult PresenceBleScanResult;
+
+typedef struct PresenceBleScanResultBuilder PresenceBleScanResultBuilder;
+
 /**
  * Struct to send a discovery request to the Engine.
  */
@@ -63,6 +67,10 @@ void presence_request_builder_add_condition(struct PresenceDiscoveryRequestBuild
                                             enum PresenceMeasurementAccuracy measurement_accuracy);
 
 struct PresenceDiscoveryRequest *presence_request_builder_build(struct PresenceDiscoveryRequestBuilder *builder);
+
+struct PresenceBleScanResultBuilder *presence_ble_scan_result_builder_new(int32_t priority);
+
+struct PresenceBleScanResult *presence_ble_scan_result_builder_build(struct PresenceBleScanResultBuilder *builder);
 
 void presence_request_debug_print(const struct PresenceDiscoveryRequest *request);
 
