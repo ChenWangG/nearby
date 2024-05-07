@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../presence_data.h"
-#include "presence_platform.hpp"
+#include "ffi.hpp"
 
 struct PresenceBleScanRequest* presence_ble_scan_request_new(int priority) {
   PresenceBleScanRequest* request = new PresenceBleScanRequest();
