@@ -39,16 +39,22 @@ impl PresenceDiscoveryRequestBuilder {
 
 struct PresenceBleScanResultBuilder {
     pub priority: i32,
+    actions: Vec<i32>,
 }
 
 impl PresenceBleScanResultBuilder {
     pub fn new(priority: i32) -> Self {
-       Self { priority }
+       Self { priority, actions: Vec::new() }
+    }
+
+    pub fn add_action(&mut self, action: i32) {
+        self.actions.push(action);
     }
 
     pub fn build(&self) -> PresenceBleScanResult {
         PresenceBleScanResult {
             priority: self.priority,
+            actions: self.actions.to_vec(),
         }
     }
 }
@@ -84,12 +90,11 @@ impl BleScanner for BleScannerCpp {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn presence_ble_scan_callback(engine: *mut PresenceEngine, priority: i32) {
+pub unsafe extern "C" fn presence_ble_scan_callback(engine: *mut PresenceEngine, scan_result: *mut PresenceBleScanResult) {
     info!("ble_scan_callback");
     (*engine)
         .get_ble_scan_provider()
-        .on_scan_result(PresenceBleScanResult { priority });
-    // let _provider = (*engine).get_ble_scan_provider();
+        .on_scan_result(*(Box::from_raw(scan_result)));
 }
 
 #[no_mangle]
@@ -163,6 +168,14 @@ pub extern "C" fn presence_ble_scan_result_builder_new(
     priority: i32,
 ) -> *mut PresenceBleScanResultBuilder {
     Box::into_raw(Box::new(PresenceBleScanResultBuilder::new(priority)))
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn presence_ble_scan_result_builder_add_action(
+    builder: *mut PresenceBleScanResultBuilder,
+    action: i32,
+) {
+    (*builder).add_action(action);
 }
 #[no_mangle]
 pub unsafe extern "C" fn presence_ble_scan_result_builder_build(

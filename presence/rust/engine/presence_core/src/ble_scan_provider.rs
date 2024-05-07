@@ -5,6 +5,7 @@ use crate::{PresenceDiscoveryRequest, ProviderEvent};
 #[derive(Debug)]
 pub struct PresenceBleScanResult {
     pub priority: i32,
+    pub actions: Vec<i32>,
 }
 
 pub trait BleScanner {

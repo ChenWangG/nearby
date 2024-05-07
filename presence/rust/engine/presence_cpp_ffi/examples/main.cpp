@@ -32,7 +32,7 @@ PresenceBleScanRequest scan_request;
 // BLE system API.
 void start_ble_scan(PresenceBleScanRequest* request) {
     spdlog::info("Start BLE scan with Priority: {}",  request->priority);
-    for (auto& action : request->actions) {
+    for (auto action : request->actions) {
       spdlog::info("action: {}",  action);
     }
     {
@@ -48,7 +48,12 @@ void start_ble_scan(PresenceBleScanRequest* request) {
         std::unique_lock<std::mutex> lock(callback_mutex);
         callback_notification.wait(lock);
         spdlog::info("Returns scan result.");
-        presence_ble_scan_callback(engine, scan_request.priority);
+        auto scan_result_builder = presence_ble_scan_result_builder_new(scan_request.priority);
+        for (auto action : scan_request.actions) {
+            presence_ble_scan_result_builder_add_action(scan_result_builder, action);
+        }
+        auto scan_result = presence_ble_scan_result_builder_build(scan_result_builder);
+        presence_ble_scan_callback(engine, scan_result);
      }
  }};
 

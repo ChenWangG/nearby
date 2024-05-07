@@ -49,7 +49,8 @@ typedef struct PresenceEngine PresenceEngine;
 
 typedef void (*PresenceDiscoveryCallback)(PresenceDiscoveryResult*);
 
-void presence_ble_scan_callback(struct PresenceEngine *engine, int32_t priority);
+void presence_ble_scan_callback(struct PresenceEngine *engine,
+                                struct PresenceBleScanResult *scan_result);
 
 struct PresenceEngine *presence_engine_new(PresencePlatform *platform,
                                            PresenceDiscoveryCallback presence_discovery_callback);
@@ -69,6 +70,9 @@ void presence_request_builder_add_condition(struct PresenceDiscoveryRequestBuild
 struct PresenceDiscoveryRequest *presence_request_builder_build(struct PresenceDiscoveryRequestBuilder *builder);
 
 struct PresenceBleScanResultBuilder *presence_ble_scan_result_builder_new(int32_t priority);
+
+void presence_ble_scan_result_builder_add_action(struct PresenceBleScanResultBuilder *builder,
+                                                 int32_t action);
 
 struct PresenceBleScanResult *presence_ble_scan_result_builder_build(struct PresenceBleScanResultBuilder *builder);
 
