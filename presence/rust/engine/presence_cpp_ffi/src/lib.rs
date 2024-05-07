@@ -76,7 +76,10 @@ impl DiscoveryCallback for DiscoveryCallbackCpp {
     }
 }
 
-struct BleScannerCpp {}
+pub type PresenceStartBleScan = fn(*mut PresenceBleScanRequest);
+struct BleScannerCpp {
+    presence_start_ble_scan: PresenceStartBleScan,
+}
 
 impl BleScanner for BleScannerCpp {
     fn start_ble_scan(&self, request: PresenceDiscoveryRequest) {
@@ -86,7 +89,7 @@ impl BleScanner for BleScannerCpp {
             for condition in request.conditions {
                 presence_ble_scan_request_add_action(scan_request, condition.action);
             }
-            presence_start_ble_scan(scan_request);
+            (self.presence_start_ble_scan)(scan_request);
         }
     }
 }
@@ -103,6 +106,7 @@ pub unsafe extern "C" fn presence_ble_scan_callback(engine: *mut PresenceEngine,
 pub unsafe extern "C" fn presence_engine_new(
     platform: *mut PresencePlatform,
     presence_discovery_callback: PresenceDiscoveryCallback,
+    presence_start_ble_scan: PresenceStartBleScan
 ) -> *mut PresenceEngine {
     env_logger::init();
     info!("presence_engine_new.");
@@ -114,7 +118,7 @@ pub unsafe extern "C" fn presence_engine_new(
         Box::new(DiscoveryCallbackCpp {
             presence_discovery_callback,
         }),
-        Box::new(BleScannerCpp {}),
+        Box::new(BleScannerCpp {presence_start_ble_scan}),
     )));
     presence_platform_init(platform, engine_ptr);
     engine_ptr

@@ -68,7 +68,7 @@ void presence_discovery_callback(PresenceDiscoveryResult* result) {
 int main(int argc, char **argv) {
    PresencePlatform platform;
    platform.start_ble_scan = start_ble_scan;
-   engine = presence_engine_new(&platform, presence_discovery_callback);
+   engine = presence_engine_new(&platform, presence_discovery_callback,start_ble_scan);
 
    thread engine_thread { [=]() { presence_engine_run(engine); }};
 
