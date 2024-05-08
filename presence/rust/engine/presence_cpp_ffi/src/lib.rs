@@ -3,14 +3,11 @@ include!(concat!(env!("OUT_DIR"), "/cpp_ffi.rs"));
 use log::{debug, info};
 use tokio::sync::mpsc;
 
-use presence_core::ble_scan_provider::{BleScanProvider, BleScanner, PresenceBleScanResult};
-use presence_core::client_provider::{DiscoveryCallback, PresenceClientProvider};
+use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, PresenceBleScanResult};
+use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, PresenceClientProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy};
 
-use presence_core::{DiscoveryResult, PresenceEngine, ProviderEvent};
-pub use presence_core::{
-    PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
-    PresenceMeasurementAccuracy, PresenceMedium,
-};
+use presence_core::{PresenceEngine, ProviderEvent};
+pub use presence_core::client_provider::PresenceMedium;
 
 pub struct PresenceDiscoveryRequestBuilder {
     priority: i32,
@@ -209,7 +206,8 @@ mod tests {
         presence_request_builder_add_condition, presence_request_builder_build,
         presence_request_builder_new,
     };
-    use presence_core::{PresenceIdentityType, PresenceMeasurementAccuracy};
+    use presence_core::client_provider::PresenceMeasurementAccuracy;
+    use presence_core::client_provider::PresenceIdentityType;
 
     #[test]
     fn test_request_builder() {

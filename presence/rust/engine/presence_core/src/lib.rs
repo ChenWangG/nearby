@@ -3,69 +3,13 @@ pub mod client_provider;
 
 use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceBleScanResult};
 use crate::client_provider::{DiscoveryCallback, PresenceClientProvider};
+use client_provider::{
+    DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
+    PresenceMeasurementAccuracy,
+};
 use log::{info, log};
 use tokio::runtime::Builder;
 use tokio::sync::mpsc;
-
-// The enum is annotated by repr(C) to pass through FFI.
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[repr(C)]
-pub enum PresenceIdentityType {
-    Private = 0,
-    Trusted,
-    Public,
-}
-
-// The enum is annotated by repr(C) to pass through FFI.
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[repr(C)]
-pub enum PresenceMeasurementAccuracy {
-    Unknown = 0,
-    CoarseAccuracy,
-    BestAvailable,
-}
-/// Struct to hold an action, identity type and their associated discovery condition.
-#[derive(Clone, Copy, Debug)]
-pub struct PresenceDiscoveryCondition {
-    pub action: i32,
-    pub identity_type: PresenceIdentityType,
-    pub measurement_accuracy: PresenceMeasurementAccuracy,
-}
-
-#[derive(Debug)]
-/// Struct to send a discovery request to the Engine.
-pub struct PresenceDiscoveryRequest {
-    pub priority: i32,
-    pub conditions: Vec<PresenceDiscoveryCondition>,
-}
-
-// The enum is annotated by repr(C) to pass through FFI.
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[repr(C)]
-pub enum PresenceMedium {
-    Unknown = 0,
-    BLE,
-    WiFiRTT,
-    UWB,
-    MDNS,
-}
-
-pub struct DiscoveryResult {
-    pub priority: i32,
-    pub actions: Vec<i32>,
-}
-
-impl DiscoveryResult {
-    fn new(priority: i32) -> Self {
-        Self {
-            priority,
-            actions: Vec::new(),
-        }
-    }
-    fn add_action(&mut self, action: i32) {
-        self.actions.push(action);
-    }
-}
 
 pub enum ProviderEvent {
     PresenceDiscoveryRequest(PresenceDiscoveryRequest),

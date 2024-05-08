@@ -1,6 +1,7 @@
-use crate::{PresenceDiscoveryRequest, ProviderEvent};
+use crate::ProviderEvent;
 use log::info;
 use tokio::sync::mpsc;
+use crate::client_provider::PresenceDiscoveryRequest;
 
 #[derive(Debug)]
 pub struct PresenceBleScanResult {
