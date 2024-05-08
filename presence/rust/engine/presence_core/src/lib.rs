@@ -72,7 +72,7 @@ impl PresenceEngine {
                         for action in result.actions {
                             discovery_result.add_action(action);
                         }
-                        self.client_provider.on_device_updated(discovery_result);
+                        self.client_provider.on_device_update(discovery_result);
                     }
                 }
             }

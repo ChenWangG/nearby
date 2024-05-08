@@ -65,7 +65,7 @@ struct DiscoveryCallbackCpp {
 }
 
 impl DiscoveryCallback for DiscoveryCallbackCpp {
-    fn on_device_updated(&self, result: DiscoveryResult) {
+    fn on_device_update(&self, result: DiscoveryResult) {
         unsafe {
             let presence_result = presence_discovery_result_new(PresenceMedium::Unknown);
             for action in result.actions {

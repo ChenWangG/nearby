@@ -3,7 +3,7 @@ use log::info;
 use tokio::sync::mpsc;
 
 pub trait DiscoveryCallback {
-    fn on_device_updated(&self, result: DiscoveryResult);
+    fn on_device_update(&self, result: DiscoveryResult);
 }
 
 pub struct PresenceClientProvider {
@@ -32,9 +32,9 @@ impl PresenceClientProvider {
         }
     }
 
-    pub fn on_device_updated(&self, result: DiscoveryResult) {
+    pub fn on_device_update(&self, result: DiscoveryResult) {
         info!("on_device_updated.");
-        self.discovery_callback.on_device_updated(result);
+        self.discovery_callback.on_device_update(result);
     }
 }
 
