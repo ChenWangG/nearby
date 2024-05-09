@@ -4,7 +4,7 @@ use log::{debug, info};
 use tokio::sync::mpsc;
 
 use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, PresenceBleScanResult};
-use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, PresenceClientProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy};
+use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, ClientProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy};
 
 use presence_core::{PresenceEngine, ProviderEvent};
 pub use presence_core::client_provider::PresenceMedium;
@@ -35,14 +35,14 @@ impl PresenceDiscoveryRequestBuilder {
 }
 
 struct PresenceBleScanResultBuilder {
-    pub priority: i32,
+    pub medium: PresenceMedium,
     actions: Vec<i32>,
 }
 
 impl PresenceBleScanResultBuilder {
-    pub fn new(priority: i32) -> Self {
+    pub fn new(medium: PresenceMedium) -> Self {
         Self {
-            priority,
+            medium,
             actions: Vec::new(),
         }
     }
@@ -53,7 +53,7 @@ impl PresenceBleScanResultBuilder {
 
     pub fn build(&self) -> PresenceBleScanResult {
         PresenceBleScanResult {
-            priority: self.priority,
+            medium: self.medium,
             actions: self.actions.to_vec(),
         }
     }
@@ -67,7 +67,7 @@ struct DiscoveryCallbackCpp {
 impl DiscoveryCallback for DiscoveryCallbackCpp {
     fn on_device_update(&self, result: DiscoveryResult) {
         unsafe {
-            let presence_result = presence_discovery_result_new(PresenceMedium::Unknown);
+            let presence_result = presence_discovery_result_new(result.medium);
             for action in result.actions {
                 presence_discovery_result_add_action(presence_result, action);
             }
@@ -128,7 +128,7 @@ pub unsafe extern "C" fn presence_engine_set_request(
 ) {
     (*engine)
         .get_client_provider()
-        .set_request(*Box::from_raw(request));
+        .set_discovery_request(*Box::from_raw(request));
 }
 
 #[no_mangle]
@@ -172,9 +172,9 @@ pub unsafe extern "C" fn presence_request_builder_build(
 
 #[no_mangle]
 pub extern "C" fn presence_ble_scan_result_builder_new(
-    priority: i32,
+    medium: PresenceMedium,
 ) -> *mut PresenceBleScanResultBuilder {
-    Box::into_raw(Box::new(PresenceBleScanResultBuilder::new(priority)))
+    Box::into_raw(Box::new(PresenceBleScanResultBuilder::new(medium)))
 }
 
 #[no_mangle]
@@ -184,12 +184,14 @@ pub unsafe extern "C" fn presence_ble_scan_result_builder_add_action(
 ) {
     (*builder).add_action(action);
 }
+
 #[no_mangle]
 pub unsafe extern "C" fn presence_ble_scan_result_builder_build(
     builder: *mut PresenceBleScanResultBuilder,
 ) -> *mut PresenceBleScanResult {
     Box::into_raw(Box::new(Box::from_raw(builder).build()))
 }
+
 #[no_mangle]
 pub unsafe extern "C" fn presence_request_debug_print(request: *const PresenceDiscoveryRequest) {
     println!("Rust FFI Lib: {:?}", *request);

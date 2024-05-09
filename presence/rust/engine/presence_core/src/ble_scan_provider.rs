@@ -1,12 +1,18 @@
 use crate::ProviderEvent;
-use log::info;
+use log::{debug, error, info};
 use tokio::sync::mpsc;
-use crate::client_provider::PresenceDiscoveryRequest;
+use crate::client_provider::{PresenceDiscoveryRequest, PresenceMedium};
 
 #[derive(Debug)]
 pub struct PresenceBleScanResult {
-    pub priority: i32,
+    pub medium: PresenceMedium,
     pub actions: Vec<i32>,
+}
+
+impl PresenceBleScanResult {
+    pub fn new(medium: PresenceMedium, actions: Vec<i32>) -> Self {
+        Self {medium, actions}
+    }
 }
 
 pub trait BleScanner {
@@ -30,19 +36,18 @@ impl BleScanProvider {
     }
     // TODO: replace PresenceDiscoveryRequest with BleScanRequest.
     pub fn start_ble_scan(&self, request: PresenceDiscoveryRequest) {
-        info!("BLE Scan Provider starts BLE scan.");
+        debug!("BLE Scan Provider starts BLE scan.");
         self.ble_scanner.start_ble_scan(request);
     }
 
     pub fn on_scan_result(&self, result: PresenceBleScanResult) {
-        info!("on_scan_result");
         if let Err(e) = self
             .provider_event_tx
             .blocking_send(ProviderEvent::BleScanResult(result))
         {
-            info!("Provider callback send error: {}", e);
+            error!("BLE scan Provider callback send error: {}", e);
         } else {
-            info!("Provider callback sent an event.");
+            debug!("BLE scan Provider callback sent an event.");
         }
     }
 }

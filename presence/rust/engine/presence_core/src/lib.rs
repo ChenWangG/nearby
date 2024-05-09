@@ -2,7 +2,7 @@ pub mod ble_scan_provider;
 pub mod client_provider;
 
 use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceBleScanResult};
-use crate::client_provider::{DiscoveryCallback, PresenceClientProvider};
+use crate::client_provider::{DiscoveryCallback, ClientProvider};
 use client_provider::{
     DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
     PresenceMeasurementAccuracy,
@@ -19,7 +19,7 @@ pub enum ProviderEvent {
 pub struct PresenceEngine {
     // Receive events from Providers.
     provider_rx: mpsc::Receiver<ProviderEvent>,
-    client_provider: PresenceClientProvider,
+    client_provider: ClientProvider,
     ble_scan_provider: BleScanProvider,
 }
 
@@ -30,7 +30,7 @@ impl PresenceEngine {
         discovery_callback: Box<dyn DiscoveryCallback>,
         ble_scanner: Box<dyn BleScanner>,
     ) -> Self {
-        let client_provider = PresenceClientProvider::new(provider_tx.clone(), discovery_callback);
+        let client_provider = ClientProvider::new(provider_tx.clone(), discovery_callback);
         let ble_scan_provider = BleScanProvider::new(provider_tx, ble_scanner);
         Self {
             provider_rx,
@@ -39,7 +39,7 @@ impl PresenceEngine {
         }
     }
 
-    pub fn get_client_provider(&self) -> &PresenceClientProvider {
+    pub fn get_client_provider(&self) -> &ClientProvider {
         &self.client_provider
     }
 
@@ -68,7 +68,7 @@ impl PresenceEngine {
                     }
                     ProviderEvent::BleScanResult(result) => {
                         info!("received BLE scan result: {:?}.", result);
-                        let mut discovery_result = DiscoveryResult::new(result.priority);
+                        let mut discovery_result = DiscoveryResult::new(result.medium);
                         for action in result.actions {
                             discovery_result.add_action(action);
                         }

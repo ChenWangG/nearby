@@ -78,7 +78,7 @@ void presence_request_builder_add_condition(PresenceDiscoveryRequestBuilder *bui
 
 PresenceDiscoveryRequest *presence_request_builder_build(PresenceDiscoveryRequestBuilder *builder);
 
-PresenceBleScanResultBuilder *presence_ble_scan_result_builder_new(int32_t priority);
+PresenceBleScanResultBuilder *presence_ble_scan_result_builder_new(PresenceMedium medium);
 
 void presence_ble_scan_result_builder_add_action(PresenceBleScanResultBuilder *builder,
                                                  int32_t action);
