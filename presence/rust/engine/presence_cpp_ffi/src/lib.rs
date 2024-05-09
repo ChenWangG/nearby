@@ -3,10 +3,10 @@ include!(concat!(env!("OUT_DIR"), "/cpp_ffi.rs"));
 use log::{debug, info};
 use tokio::sync::mpsc;
 
-use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, PresenceBleScanResult};
+use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, PresenceScanResult};
 use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, ClientProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy};
 
-use presence_core::{PresenceEngine, ProviderEvent};
+use presence_core::{PresenceEngine};
 pub use presence_core::client_provider::PresenceMedium;
 
 pub struct PresenceDiscoveryRequestBuilder {
@@ -51,8 +51,8 @@ impl PresenceBleScanResultBuilder {
         self.actions.push(action);
     }
 
-    pub fn build(&self) -> PresenceBleScanResult {
-        PresenceBleScanResult {
+    pub fn build(&self) -> PresenceScanResult {
+        PresenceScanResult {
             medium: self.medium,
             actions: self.actions.to_vec(),
         }
@@ -100,12 +100,7 @@ pub unsafe extern "C" fn presence_engine_new(
     presence_start_ble_scan: PresenceStartBleScan,
 ) -> *mut PresenceEngine {
     env_logger::init();
-    info!("presence_engine_new.");
-    // Channel for Providers to send events to Engine.
-    let (provider_event_tx, provider_event_rx) = mpsc::channel::<ProviderEvent>(100);
     let engine_ptr = Box::into_raw(Box::new(PresenceEngine::new(
-        provider_event_tx,
-        provider_event_rx,
         Box::new(DiscoveryCallbackCpp {
             presence_discovery_callback,
         }),
@@ -118,28 +113,22 @@ pub unsafe extern "C" fn presence_engine_new(
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_run(engine: *mut PresenceEngine) {
-    println!("start engine.");
     (*engine).run();
 }
 #[no_mangle]
-pub unsafe extern "C" fn presence_engine_set_request(
+pub unsafe extern "C" fn presence_engine_set_discovery_request(
     engine: *mut PresenceEngine,
     request: *mut PresenceDiscoveryRequest,
 ) {
-    (*engine)
-        .get_client_provider()
-        .set_discovery_request(*Box::from_raw(request));
+    (*engine).set_discovery_request(*Box::from_raw(request));
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn presence_ble_scan_callback(
+pub unsafe extern "C" fn presence_on_scan_result(
     engine: *mut PresenceEngine,
-    scan_result: *mut PresenceBleScanResult,
+    scan_result: *mut PresenceScanResult,
 ) {
-    info!("ble_scan_callback");
-    (*engine)
-        .get_ble_scan_provider()
-        .on_scan_result(*(Box::from_raw(scan_result)));
+    (*engine).on_scan_result(*(Box::from_raw(scan_result)));
 }
 
 #[no_mangle]
@@ -188,7 +177,7 @@ pub unsafe extern "C" fn presence_ble_scan_result_builder_add_action(
 #[no_mangle]
 pub unsafe extern "C" fn presence_ble_scan_result_builder_build(
     builder: *mut PresenceBleScanResultBuilder,
-) -> *mut PresenceBleScanResult {
+) -> *mut PresenceScanResult {
     Box::into_raw(Box::new(Box::from_raw(builder).build()))
 }
 

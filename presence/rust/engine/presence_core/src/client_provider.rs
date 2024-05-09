@@ -24,7 +24,7 @@ impl ClientProvider {
     pub fn set_discovery_request(&self, request: PresenceDiscoveryRequest) {
         if let Err(e) = self
             .provider_event_tx
-            .blocking_send(ProviderEvent::PresenceDiscoveryRequest(request))
+            .blocking_send(ProviderEvent::DiscoveryRequest(request))
         {
             error!("Provider callback send error: {}", e);
         } else {

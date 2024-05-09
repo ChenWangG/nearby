@@ -4,12 +4,12 @@ use tokio::sync::mpsc;
 use crate::client_provider::{PresenceDiscoveryRequest, PresenceMedium};
 
 #[derive(Debug)]
-pub struct PresenceBleScanResult {
+pub struct PresenceScanResult {
     pub medium: PresenceMedium,
     pub actions: Vec<i32>,
 }
 
-impl PresenceBleScanResult {
+impl PresenceScanResult {
     pub fn new(medium: PresenceMedium, actions: Vec<i32>) -> Self {
         Self {medium, actions}
     }
@@ -40,7 +40,7 @@ impl BleScanProvider {
         self.ble_scanner.start_ble_scan(request);
     }
 
-    pub fn on_scan_result(&self, result: PresenceBleScanResult) {
+    pub fn on_scan_result(&self, result: PresenceScanResult) {
         if let Err(e) = self
             .provider_event_tx
             .blocking_send(ProviderEvent::BleScanResult(result))

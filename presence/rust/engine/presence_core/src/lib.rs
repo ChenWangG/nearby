@@ -1,19 +1,19 @@
 pub mod ble_scan_provider;
 pub mod client_provider;
 
-use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceBleScanResult};
-use crate::client_provider::{DiscoveryCallback, ClientProvider};
+use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceScanResult};
+use crate::client_provider::{ClientProvider, DiscoveryCallback};
 use client_provider::{
     DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
     PresenceMeasurementAccuracy,
 };
-use log::{info, log};
+use log::{debug, info, log};
 use tokio::runtime::Builder;
 use tokio::sync::mpsc;
 
-pub enum ProviderEvent {
-    PresenceDiscoveryRequest(PresenceDiscoveryRequest),
-    BleScanResult(PresenceBleScanResult),
+enum ProviderEvent {
+    DiscoveryRequest(PresenceDiscoveryRequest),
+    BleScanResult(PresenceScanResult),
 }
 
 pub struct PresenceEngine {
@@ -25,29 +25,28 @@ pub struct PresenceEngine {
 
 impl PresenceEngine {
     pub fn new(
-        provider_tx: mpsc::Sender<ProviderEvent>,
-        provider_rx: mpsc::Receiver<ProviderEvent>,
         discovery_callback: Box<dyn DiscoveryCallback>,
         ble_scanner: Box<dyn BleScanner>,
     ) -> Self {
-        let client_provider = ClientProvider::new(provider_tx.clone(), discovery_callback);
-        let ble_scan_provider = BleScanProvider::new(provider_tx, ble_scanner);
+        info!("Create Presence Engine.");
+        let (provider_tx, provider_rx) = mpsc::channel::<ProviderEvent>(100);
         Self {
             provider_rx,
-            client_provider,
-            ble_scan_provider,
+            client_provider: ClientProvider::new(provider_tx.clone(), discovery_callback),
+            ble_scan_provider: BleScanProvider::new(provider_tx, ble_scanner),
         }
     }
 
-    pub fn get_client_provider(&self) -> &ClientProvider {
-        &self.client_provider
+    pub fn set_discovery_request(&self, request: PresenceDiscoveryRequest) {
+        self.client_provider.set_discovery_request(request);
     }
 
-    pub fn get_ble_scan_provider(&self) -> &BleScanProvider {
-        &self.ble_scan_provider
+    pub fn on_scan_result(&self, result: PresenceScanResult) {
+        self.ble_scan_provider.on_scan_result(result);
     }
+
     pub fn run(&mut self) {
-        info!("Presence Engine run.");
+        info!("Run Presence Engine.");
         Builder::new_current_thread()
             .build()
             .unwrap()
@@ -59,15 +58,14 @@ impl PresenceEngine {
     async fn poll_providers(&mut self) {
         // loop to receive events from Providers and process the event according to its type.
         loop {
-            info!("loop to receive provider events.");
             if let Some(event) = self.provider_rx.recv().await {
                 match event {
-                    ProviderEvent::PresenceDiscoveryRequest(request) => {
-                        info!("received discovery request: {:?}.", request);
+                    ProviderEvent::DiscoveryRequest(request) => {
+                        debug!("received a discovery request: {:?}.", request);
                         self.ble_scan_provider.start_ble_scan(request);
                     }
                     ProviderEvent::BleScanResult(result) => {
-                        info!("received BLE scan result: {:?}.", result);
+                        debug!("received a BLE scan result: {:?}.", result);
                         let mut discovery_result = DiscoveryResult::new(result.medium);
                         for action in result.actions {
                             discovery_result.add_action(action);

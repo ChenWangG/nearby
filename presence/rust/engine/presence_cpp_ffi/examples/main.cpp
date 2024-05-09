@@ -67,7 +67,7 @@ thread platform_thread{[]() {
     }
     auto scan_result =
         presence_ble_scan_result_builder_build(scan_result_builder);
-    presence_ble_scan_callback(engine, scan_result);
+    presence_on_scan_result(engine, scan_result);
   }
 }};
 
@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
   auto request = presence_request_builder_build(request_builder);
 
   std::unique_lock<std::mutex> lock(discovery_mutex);
-  presence_engine_set_request(engine, request);
+  presence_engine_set_discovery_request(engine, request);
   discovery_notification.wait(lock);
   // TODO: add engine.stop() for graceful shutdown.
 }

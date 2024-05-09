@@ -42,8 +42,6 @@ enum class PresenceMedium {
   MDNS,
 };
 
-struct PresenceBleScanResult;
-
 struct PresenceBleScanResultBuilder;
 
 /// Struct to send a discovery request to the Engine.
@@ -52,6 +50,8 @@ struct PresenceDiscoveryRequest;
 struct PresenceDiscoveryRequestBuilder;
 
 struct PresenceEngine;
+
+struct PresenceScanResult;
 
 using PresenceDiscoveryCallback = void(*)(PresenceDiscoveryResult*);
 
@@ -65,9 +65,10 @@ PresenceEngine *presence_engine_new(PresenceDiscoveryCallback presence_discovery
 
 void presence_engine_run(PresenceEngine *engine);
 
-void presence_engine_set_request(PresenceEngine *engine, PresenceDiscoveryRequest *request);
+void presence_engine_set_discovery_request(PresenceEngine *engine,
+                                           PresenceDiscoveryRequest *request);
 
-void presence_ble_scan_callback(PresenceEngine *engine, PresenceBleScanResult *scan_result);
+void presence_on_scan_result(PresenceEngine *engine, PresenceScanResult *scan_result);
 
 PresenceDiscoveryRequestBuilder *presence_request_builder_new(int32_t priority);
 
@@ -83,7 +84,7 @@ PresenceBleScanResultBuilder *presence_ble_scan_result_builder_new(PresenceMediu
 void presence_ble_scan_result_builder_add_action(PresenceBleScanResultBuilder *builder,
                                                  int32_t action);
 
-PresenceBleScanResult *presence_ble_scan_result_builder_build(PresenceBleScanResultBuilder *builder);
+PresenceScanResult *presence_ble_scan_result_builder_build(PresenceBleScanResultBuilder *builder);
 
 void presence_request_debug_print(const PresenceDiscoveryRequest *request);
 
