@@ -3,7 +3,7 @@ include!(concat!(env!("OUT_DIR"), "/cpp_ffi.rs"));
 use log::{debug, info};
 use tokio::sync::mpsc;
 
-use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, PresenceScanResult};
+use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, PresenceScanResult, ScanRequest};
 use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, ClientProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy};
 
 use presence_core::{PresenceEngine};
@@ -82,14 +82,14 @@ struct BleScannerCpp {
 }
 
 impl BleScanner for BleScannerCpp {
-    fn start_ble_scan(&self, request: PresenceDiscoveryRequest) {
+    fn start_ble_scan(&self, request: ScanRequest) {
         info!("BleScanner start ble scan with request {:?}.", request);
         unsafe {
-            let scan_request = presence_ble_scan_request_new(request.priority);
-            for condition in request.conditions {
-                presence_ble_scan_request_add_action(scan_request, condition.action);
+            let ble_scan_request = presence_ble_scan_request_new(request.priority);
+            for action in request.actions {
+                presence_ble_scan_request_add_action(ble_scan_request, action);
             }
-            (self.presence_start_ble_scan)(scan_request);
+            (self.presence_start_ble_scan)(ble_scan_request);
         }
     }
 }

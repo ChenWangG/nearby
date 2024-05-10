@@ -1,7 +1,19 @@
+use crate::client_provider::{PresenceDiscoveryRequest, PresenceMedium};
 use crate::ProviderEvent;
 use log::{debug, error, info};
 use tokio::sync::mpsc;
-use crate::client_provider::{PresenceDiscoveryRequest, PresenceMedium};
+
+#[derive(Debug)]
+pub struct ScanRequest {
+    pub priority: i32,
+    pub actions: Vec<i32>,
+}
+
+impl ScanRequest {
+    pub fn new(priority: i32, actions: Vec<i32>) -> Self {
+        Self { priority, actions }
+    }
+}
 
 #[derive(Debug)]
 pub struct PresenceScanResult {
@@ -11,12 +23,12 @@ pub struct PresenceScanResult {
 
 impl PresenceScanResult {
     pub fn new(medium: PresenceMedium, actions: Vec<i32>) -> Self {
-        Self {medium, actions}
+        Self { medium, actions }
     }
 }
 
 pub trait BleScanner {
-    fn start_ble_scan(&self, request: PresenceDiscoveryRequest);
+    fn start_ble_scan(&self, request: ScanRequest);
 }
 
 pub struct BleScanProvider {
@@ -35,7 +47,7 @@ impl BleScanProvider {
         }
     }
     // TODO: replace PresenceDiscoveryRequest with BleScanRequest.
-    pub fn start_ble_scan(&self, request: PresenceDiscoveryRequest) {
+    pub fn start_ble_scan(&self, request: ScanRequest) {
         debug!("BLE Scan Provider starts BLE scan.");
         self.ble_scanner.start_ble_scan(request);
     }

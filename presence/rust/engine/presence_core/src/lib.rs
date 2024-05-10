@@ -1,7 +1,7 @@
 pub mod ble_scan_provider;
 pub mod client_provider;
 
-use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceScanResult};
+use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceScanResult, ScanRequest};
 use crate::client_provider::{ClientProvider, DiscoveryCallback};
 use client_provider::{
     DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
@@ -62,7 +62,13 @@ impl PresenceEngine {
                 match event {
                     ProviderEvent::DiscoveryRequest(request) => {
                         debug!("received a discovery request: {:?}.", request);
-                        self.ble_scan_provider.start_ble_scan(request);
+                        let actions = request
+                            .conditions
+                            .iter()
+                            .map(|condition| condition.action)
+                            .collect();
+                        self.ble_scan_provider
+                            .start_ble_scan(ScanRequest::new(request.priority, actions));
                     }
                     ProviderEvent::BleScanResult(result) => {
                         debug!("received a BLE scan result: {:?}.", result);
