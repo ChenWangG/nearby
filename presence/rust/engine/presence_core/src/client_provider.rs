@@ -2,10 +2,14 @@ use crate::ProviderEvent;
 use log::{debug, error, info};
 use tokio::sync::mpsc;
 
+// Implemented by the client to receive discovery results.
 pub trait DiscoveryCallback {
     fn on_device_update(&self, result: DiscoveryResult);
 }
 
+// Bridge a client with the Engine.
+// Receives discovery requests through set_discovery_request().
+// Returns discovery results through the discovery_callback.
 pub struct ClientProvider {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
     discovery_callback: Box<dyn DiscoveryCallback>,
@@ -69,6 +73,15 @@ pub struct PresenceDiscoveryCondition {
 pub struct PresenceDiscoveryRequest {
     pub priority: i32,
     pub conditions: Vec<PresenceDiscoveryCondition>,
+}
+
+impl PresenceDiscoveryRequest {
+    pub fn new(priority: i32, conditions: Vec<PresenceDiscoveryCondition>) -> Self {
+        Self {
+            priority,
+            conditions,
+        }
+    }
 }
 
 // The enum is annotated by repr(C) to pass through FFI.

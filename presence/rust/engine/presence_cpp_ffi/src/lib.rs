@@ -3,11 +3,16 @@ include!(concat!(env!("OUT_DIR"), "/cpp_ffi.rs"));
 use log::{debug, info};
 use tokio::sync::mpsc;
 
-use presence_core::ble_scan_provider::{BleScanner, BleScanProvider, PresenceScanResult, ScanRequest};
-use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, ClientProvider, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy};
+use presence_core::ble_scan_provider::{
+    BleScanProvider, BleScanner, PresenceScanResult, ScanRequest,
+};
+use presence_core::client_provider::{
+    ClientProvider, DiscoveryCallback, DiscoveryResult, PresenceDiscoveryCondition,
+    PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy,
+};
 
-use presence_core::{PresenceEngine};
 pub use presence_core::client_provider::PresenceMedium;
+use presence_core::PresenceEngine;
 
 pub struct PresenceDiscoveryRequestBuilder {
     priority: i32,
@@ -26,11 +31,9 @@ impl PresenceDiscoveryRequestBuilder {
         self.conditions.push(condition);
     }
 
-    pub fn build(&self) -> PresenceDiscoveryRequest {
-        PresenceDiscoveryRequest {
-            priority: self.priority,
-            conditions: self.conditions.to_vec(),
-        }
+    // Builder itself is consumed to the result.
+    pub fn build(self) -> PresenceDiscoveryRequest {
+        PresenceDiscoveryRequest::new(self.priority, self.conditions)
     }
 }
 
@@ -197,8 +200,8 @@ mod tests {
         presence_request_builder_add_condition, presence_request_builder_build,
         presence_request_builder_new,
     };
-    use presence_core::client_provider::PresenceMeasurementAccuracy;
     use presence_core::client_provider::PresenceIdentityType;
+    use presence_core::client_provider::PresenceMeasurementAccuracy;
 
     #[test]
     fn test_request_builder() {
