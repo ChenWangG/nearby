@@ -2,7 +2,7 @@ pub mod ble_scan_provider;
 pub mod client_provider;
 
 use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceScanResult, ScanRequest};
-use crate::client_provider::{ClientProvider, DiscoveryCallback};
+use crate::client_provider::{ClientProvider, Device, DiscoveryCallback};
 use client_provider::{
     DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
     PresenceMeasurementAccuracy,
@@ -13,7 +13,7 @@ use tokio::sync::mpsc;
 
 enum ProviderEvent {
     DiscoveryRequest(PresenceDiscoveryRequest),
-    BleScanResult(PresenceScanResult),
+    ScanResult(PresenceScanResult),
 }
 
 pub struct PresenceEngine {
@@ -70,13 +70,13 @@ impl PresenceEngine {
                         self.ble_scan_provider
                             .start_ble_scan(ScanRequest::new(request.priority, actions));
                     }
-                    ProviderEvent::BleScanResult(result) => {
-                        debug!("received a BLE scan result: {:?}.", result);
-                        let mut discovery_result = DiscoveryResult::new(result.medium);
-                        for action in result.actions {
-                            discovery_result.add_action(action);
-                        }
-                        self.client_provider.on_device_update(discovery_result);
+                    ProviderEvent::ScanResult(scan_result) => {
+                        debug!("received a BLE scan result: {:?}.", scan_result);
+                        let discovery_result =
+                            self.client_provider.on_device_update(DiscoveryResult::new(
+                                scan_result.medium,
+                                Device::new(scan_result.actions),
+                            ));
                     }
                 }
             }

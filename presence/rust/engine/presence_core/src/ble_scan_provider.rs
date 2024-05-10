@@ -55,7 +55,7 @@ impl BleScanProvider {
     pub fn on_scan_result(&self, result: PresenceScanResult) {
         if let Err(e) = self
             .provider_event_tx
-            .blocking_send(ProviderEvent::BleScanResult(result))
+            .blocking_send(ProviderEvent::ScanResult(result))
         {
             error!("BLE scan Provider callback send error: {}", e);
         } else {
