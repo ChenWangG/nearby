@@ -11,6 +11,8 @@ use log::{debug, info, log};
 use tokio::runtime::Builder;
 use tokio::sync::mpsc;
 
+const PROVIDER_EVENT_CHANNEL_BUF_SIZE: usize = 100;
+
 enum ProviderEvent {
     DiscoveryRequest(PresenceDiscoveryRequest),
     ScanResult(PresenceScanResult),
@@ -29,7 +31,8 @@ impl PresenceEngine {
         ble_scanner: Box<dyn BleScanner>,
     ) -> Self {
         info!("Create Presence Engine.");
-        let (provider_tx, provider_rx) = mpsc::channel::<ProviderEvent>(100);
+        let (provider_tx, provider_rx) =
+            mpsc::channel::<ProviderEvent>(PROVIDER_EVENT_CHANNEL_BUF_SIZE);
         Self {
             provider_rx,
             client_provider: ClientProvider::new(provider_tx.clone(), discovery_callback),
@@ -57,29 +60,32 @@ impl PresenceEngine {
 
     async fn poll_providers(&mut self) {
         // loop to receive events from Providers and process the event according to its type.
-        loop {
-            if let Some(event) = self.provider_rx.recv().await {
-                match event {
-                    ProviderEvent::DiscoveryRequest(request) => {
-                        debug!("received a discovery request: {:?}.", request);
-                        let actions = request
-                            .conditions
-                            .iter()
-                            .map(|condition| condition.action)
-                            .collect();
-                        self.ble_scan_provider
-                            .start_ble_scan(ScanRequest::new(request.priority, actions));
-                    }
-                    ProviderEvent::ScanResult(scan_result) => {
-                        debug!("received a BLE scan result: {:?}.", scan_result);
-                        let discovery_result =
-                            self.client_provider.on_device_update(DiscoveryResult::new(
-                                scan_result.medium,
-                                Device::new(scan_result.actions),
-                            ));
-                    }
+        while let Some(event) = self.provider_rx.recv().await {
+            match event {
+                ProviderEvent::DiscoveryRequest(request) => {
+                    self.process_discovery_request(request).await
                 }
+                ProviderEvent::ScanResult(result) => self.process_scan_result(result).await,
             }
         }
+    }
+
+    async fn process_discovery_request(&self, request: PresenceDiscoveryRequest) {
+        debug!("received a discovery request: {:?}.", request);
+        let actions = request
+            .conditions
+            .iter()
+            .map(|condition| condition.action)
+            .collect();
+        self.ble_scan_provider
+            .start_ble_scan(ScanRequest::new(request.priority, actions));
+    }
+
+    async fn process_scan_result(&self, scan_result: PresenceScanResult) {
+        debug!("received a BLE scan result: {:?}.", scan_result);
+        let discovery_result = self.client_provider.on_device_update(DiscoveryResult::new(
+            scan_result.medium,
+            Device::new(scan_result.actions),
+        ));
     }
 }
