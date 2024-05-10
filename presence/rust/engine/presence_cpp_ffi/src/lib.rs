@@ -68,7 +68,7 @@ impl DiscoveryCallback for DiscoveryCallbackCpp {
     fn on_device_update(&self, result: DiscoveryResult) {
         unsafe {
             let presence_result = presence_discovery_result_new(result.medium);
-            for action in result.actions {
+            for action in result.device.actions {
                 presence_discovery_result_add_action(presence_result, action);
             }
             (self.presence_discovery_callback)(presence_result);

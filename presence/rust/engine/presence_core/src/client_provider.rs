@@ -82,19 +82,24 @@ pub enum PresenceMedium {
     MDNS,
 }
 
+pub struct Device {
+    pub actions: Vec<i32>,
+}
 pub struct DiscoveryResult {
     pub medium: PresenceMedium,
-    pub actions: Vec<i32>,
+    pub device: Device,
 }
 
 impl DiscoveryResult {
     pub fn new(medium: PresenceMedium) -> Self {
         Self {
             medium,
-            actions: Vec::new(),
+            device: Device {
+                actions: Vec::new(),
+            },
         }
     }
     pub fn add_action(&mut self, action: i32) {
-        self.actions.push(action);
+        self.device.actions.push(action);
     }
 }
