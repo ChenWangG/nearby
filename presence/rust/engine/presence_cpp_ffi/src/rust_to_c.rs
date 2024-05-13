@@ -1,9 +1,10 @@
-// Data structures passed from Rust to C.
+// Construct data structures passed from Rust to C.
 include!(concat!(env!("OUT_DIR"), "/cpp_ffi.rs"));
 
 use presence_core::ble_scan_provider::ScanRequest;
 use presence_core::client_provider::{DiscoveryResult, PresenceMedium};
 
+// Convert ScanRequest to *PresenceBleScanRequest, which can be parsed by C codes.
 impl PresenceBleScanRequest {
     pub fn from_scan_request(scan_request: ScanRequest) -> *mut Self {
         unsafe {
@@ -16,6 +17,7 @@ impl PresenceBleScanRequest {
     }
 }
 
+// Convert DiscoveryResult to *PresenceDiscoveryResult, which can be parsed by C codes.
 impl PresenceDiscoveryResult {
     pub fn from_discovery_result(result: DiscoveryResult) -> *mut Self {
         unsafe {
