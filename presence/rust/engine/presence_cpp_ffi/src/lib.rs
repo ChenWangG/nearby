@@ -1,9 +1,10 @@
-mod data;
-mod discovery_callback_cpp;
 mod ble_scanner_cpp;
+mod c_to_rust;
+mod discovery_callback_cpp;
+mod rust_to_c;
 
+use c_to_rust::{PresenceBleScanResultBuilder, PresenceDiscoveryRequestBuilder};
 use log::{debug, info};
-use tokio::sync::mpsc;
 
 use presence_core::ble_scan_provider::{
     BleScanProvider, BleScanner, PresenceScanResult, ScanRequest,
@@ -13,60 +14,10 @@ use presence_core::client_provider::{
     PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy,
 };
 
-pub use presence_core::client_provider::PresenceMedium;
-use presence_core::PresenceEngine;
 use crate::ble_scanner_cpp::{BleScannerCpp, PresenceStartBleScan};
 use crate::discovery_callback_cpp::{DiscoveryCallbackCpp, PresenceDiscoveryCallback};
-
-pub struct PresenceDiscoveryRequestBuilder {
-    priority: i32,
-    conditions: Vec<PresenceDiscoveryCondition>,
-}
-
-impl PresenceDiscoveryRequestBuilder {
-    pub fn new(priority: i32) -> Self {
-        Self {
-            priority,
-            conditions: Vec::new(),
-        }
-    }
-
-    pub fn add_condition(&mut self, condition: PresenceDiscoveryCondition) {
-        self.conditions.push(condition);
-    }
-
-    // Builder itself is consumed to the result.
-    pub fn build(self) -> PresenceDiscoveryRequest {
-        PresenceDiscoveryRequest::new(self.priority, self.conditions)
-    }
-}
-
-struct PresenceBleScanResultBuilder {
-    pub medium: PresenceMedium,
-    actions: Vec<i32>,
-}
-
-impl PresenceBleScanResultBuilder {
-    pub fn new(medium: PresenceMedium) -> Self {
-        Self {
-            medium,
-            actions: Vec::new(),
-        }
-    }
-
-    pub fn add_action(&mut self, action: i32) {
-        self.actions.push(action);
-    }
-
-    pub fn build(&self) -> PresenceScanResult {
-        PresenceScanResult {
-            medium: self.medium,
-            actions: self.actions.to_vec(),
-        }
-    }
-}
-
-
+pub use presence_core::client_provider::PresenceMedium;
+use presence_core::PresenceEngine;
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_new(

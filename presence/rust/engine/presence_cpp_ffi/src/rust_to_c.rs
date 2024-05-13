@@ -1,3 +1,4 @@
+// Data structures passed from Rust to C.
 include!(concat!(env!("OUT_DIR"), "/cpp_ffi.rs"));
 
 use presence_core::ble_scan_provider::ScanRequest;

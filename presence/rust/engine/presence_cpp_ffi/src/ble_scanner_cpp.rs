@@ -1,6 +1,6 @@
 use log::{debug, info};
 use presence_core::ble_scan_provider::{BleScanner, ScanRequest};
-use crate::data::PresenceBleScanRequest;
+use crate::rust_to_c::PresenceBleScanRequest;
 
 pub type PresenceStartBleScan = fn(*mut PresenceBleScanRequest);
 pub struct BleScannerCpp {

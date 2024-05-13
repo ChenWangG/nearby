@@ -1,4 +1,4 @@
-use crate::data::PresenceDiscoveryResult;
+use crate::rust_to_c::PresenceDiscoveryResult;
 use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, PresenceMedium};
 
 pub type PresenceDiscoveryCallback = fn(*mut PresenceDiscoveryResult);
