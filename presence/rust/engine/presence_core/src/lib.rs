@@ -16,6 +16,7 @@ const PROVIDER_EVENT_CHANNEL_BUF_SIZE: usize = 100;
 enum ProviderEvent {
     DiscoveryRequest(PresenceDiscoveryRequest),
     ScanResult(PresenceScanResult),
+    Stop,
 }
 
 pub struct PresenceEngine {
@@ -48,6 +49,10 @@ impl PresenceEngine {
         self.ble_scan_provider.on_scan_result(result);
     }
 
+    pub fn stop(&self) {
+        self.client_provider.stop();
+    }
+
     pub fn run(&mut self) {
         info!("Run Presence Engine.");
         Builder::new_current_thread()
@@ -66,6 +71,10 @@ impl PresenceEngine {
                     self.process_discovery_request(request).await
                 }
                 ProviderEvent::ScanResult(result) => self.process_scan_result(result).await,
+                ProviderEvent::Stop => {
+                    info!("Engine stopped");
+                    break;
+                }
             }
         }
     }

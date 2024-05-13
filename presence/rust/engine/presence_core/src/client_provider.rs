@@ -26,19 +26,26 @@ impl ClientProvider {
         }
     }
     pub fn set_discovery_request(&self, request: PresenceDiscoveryRequest) {
-        if let Err(e) = self
-            .provider_event_tx
-            .blocking_send(ProviderEvent::DiscoveryRequest(request))
-        {
-            error!("Provider callback send error: {}", e);
-        } else {
-            debug!("Provider callback sent an event.");
-        }
+        self.send_event(ProviderEvent::DiscoveryRequest(request));
     }
 
     pub fn on_device_update(&self, result: DiscoveryResult) {
         info!("on_device_updated.");
         self.discovery_callback.on_device_update(result);
+    }
+
+    pub fn stop(&self) {
+        self.send_event(ProviderEvent::Stop);
+    }
+    fn send_event(&self, event: ProviderEvent) {
+        if let Err(e) = self
+            .provider_event_tx
+            .blocking_send(event)
+        {
+            error!("Provider callback send error: {}", e);
+        } else {
+            debug!("Provider callback sent an event.");
+        }
     }
 }
 

@@ -65,6 +65,8 @@ PresenceEngine *presence_engine_new(PresenceDiscoveryCallback presence_discovery
 
 void presence_engine_run(PresenceEngine *engine);
 
+void presence_engine_stop(PresenceEngine *engine);
+
 void presence_engine_set_discovery_request(PresenceEngine *engine,
                                            PresenceDiscoveryRequest *request);
 

@@ -32,6 +32,12 @@ pub unsafe extern "C" fn presence_engine_new(
 pub unsafe extern "C" fn presence_engine_run(engine: *mut PresenceEngine) {
     (*engine).run();
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn presence_engine_stop(engine: *mut PresenceEngine) {
+    (*engine).stop();
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_set_discovery_request(
     engine: *mut PresenceEngine,
