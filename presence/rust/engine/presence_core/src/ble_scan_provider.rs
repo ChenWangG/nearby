@@ -1,4 +1,4 @@
-use crate::client_provider::{PresenceDiscoveryRequest, PresenceMedium};
+use crate::client_provider::PresenceMedium;
 use crate::ProviderEvent;
 use log::{debug, error, info};
 use tokio::sync::mpsc;
@@ -46,7 +46,6 @@ impl BleScanProvider {
             ble_scanner,
         }
     }
-    // TODO: replace PresenceDiscoveryRequest with BleScanRequest.
     pub fn start_ble_scan(&self, request: ScanRequest) {
         debug!("BLE Scan Provider starts BLE scan.");
         self.ble_scanner.start_ble_scan(request);

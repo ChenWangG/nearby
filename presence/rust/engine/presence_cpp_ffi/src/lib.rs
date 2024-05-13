@@ -1,4 +1,6 @@
-include!(concat!(env!("OUT_DIR"), "/cpp_ffi.rs"));
+mod data;
+mod discovery_callback_cpp;
+mod ble_scanner_cpp;
 
 use log::{debug, info};
 use tokio::sync::mpsc;
@@ -13,6 +15,8 @@ use presence_core::client_provider::{
 
 pub use presence_core::client_provider::PresenceMedium;
 use presence_core::PresenceEngine;
+use crate::ble_scanner_cpp::{BleScannerCpp, PresenceStartBleScan};
+use crate::discovery_callback_cpp::{DiscoveryCallbackCpp, PresenceDiscoveryCallback};
 
 pub struct PresenceDiscoveryRequestBuilder {
     priority: i32,
@@ -62,40 +66,7 @@ impl PresenceBleScanResultBuilder {
     }
 }
 
-pub type PresenceDiscoveryCallback = fn(*mut PresenceDiscoveryResult);
-struct DiscoveryCallbackCpp {
-    presence_discovery_callback: PresenceDiscoveryCallback,
-}
 
-impl DiscoveryCallback for DiscoveryCallbackCpp {
-    fn on_device_update(&self, result: DiscoveryResult) {
-        unsafe {
-            let presence_result = presence_discovery_result_new(result.medium);
-            for action in result.device.actions {
-                presence_discovery_result_add_action(presence_result, action);
-            }
-            (self.presence_discovery_callback)(presence_result);
-        }
-    }
-}
-
-pub type PresenceStartBleScan = fn(*mut PresenceBleScanRequest);
-struct BleScannerCpp {
-    presence_start_ble_scan: PresenceStartBleScan,
-}
-
-impl BleScanner for BleScannerCpp {
-    fn start_ble_scan(&self, request: ScanRequest) {
-        info!("BleScanner start ble scan with request {:?}.", request);
-        unsafe {
-            let ble_scan_request = presence_ble_scan_request_new(request.priority);
-            for action in request.actions {
-                presence_ble_scan_request_add_action(ble_scan_request, action);
-            }
-            (self.presence_start_ble_scan)(ble_scan_request);
-        }
-    }
-}
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_new(
