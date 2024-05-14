@@ -24,8 +24,10 @@ add_dependencies(presence cpp_ffi)
 set_target_properties(presence PROPERTIES BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 add_test(NAME presence_engine_test
-    COMMAND cargo test
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    COMMAND cargo test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-#add_subdirectory(tests)
+set_tests_properties(presence_engine_test PROPERTIES DEPENDS presence)
+set_tests_properties(presence_engine_test PROPERTIES ENVIRONMENT CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR})
+# add_subdirectory(tests)
+
 add_subdirectory(examples)
