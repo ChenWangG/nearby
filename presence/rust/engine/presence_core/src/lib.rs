@@ -1,13 +1,15 @@
 pub mod ble_scan_provider;
 pub mod client_provider;
 
+use log::{debug, info, log};
+
 use crate::ble_scan_provider::{BleScanProvider, BleScanner, PresenceScanResult, ScanRequest};
 use crate::client_provider::{ClientProvider, Device, DiscoveryCallback};
 use client_provider::{
     DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
     PresenceMeasurementAccuracy,
 };
-use log::{debug, info, log};
+
 use tokio::runtime::Builder;
 use tokio::sync::mpsc;
 
@@ -68,7 +70,7 @@ impl PresenceEngine {
         while let Some(event) = self.provider_rx.recv().await {
             match event {
                 ProviderEvent::DiscoveryRequest(request) => {
-                    self.process_discovery_request(request).await
+                    self.process_discovery_request(request);
                 }
                 ProviderEvent::ScanResult(result) => self.process_scan_result(result).await,
                 ProviderEvent::Stop => {
@@ -79,7 +81,7 @@ impl PresenceEngine {
         }
     }
 
-    async fn process_discovery_request(&self, request: PresenceDiscoveryRequest) {
+    fn process_discovery_request(&self, request: PresenceDiscoveryRequest) {
         debug!("received a discovery request: {:?}.", request);
         let actions = request
             .conditions
@@ -96,5 +98,45 @@ impl PresenceEngine {
             scan_result.medium,
             Device::new(scan_result.actions),
         ));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ble_scan_provider::{BleScanner, ScanRequest};
+    use crate::client_provider::{
+        DiscoveryCallback, DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest,
+        PresenceIdentityType, PresenceMeasurementAccuracy,
+    };
+    use crate::PresenceEngine;
+
+    struct MockDiscoveryCallback {}
+
+    impl DiscoveryCallback for MockDiscoveryCallback {
+        fn on_device_update(&self, result: DiscoveryResult) {}
+    }
+
+    struct MockBleScanner {}
+
+    impl BleScanner for MockBleScanner {
+        fn start_ble_scan(&self, request: ScanRequest) {
+            assert_eq!(request.priority, 1);
+            assert_eq!(request.actions.len(), 1);
+            assert_eq!(request.actions[0], 100);
+        }
+    }
+    #[test]
+    fn test_process_discovery_request() {
+        let engine = PresenceEngine::new(
+            Box::new(MockDiscoveryCallback {}),
+            Box::new(MockBleScanner {}),
+        );
+        let condition = PresenceDiscoveryCondition {
+            action: 100,
+            identity_type: PresenceIdentityType::Private,
+            measurement_accuracy: PresenceMeasurementAccuracy::Unknown,
+        };
+        let request = PresenceDiscoveryRequest::new(1, Vec::from([condition]));
+        engine.process_discovery_request(request);
     }
 }
