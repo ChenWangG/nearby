@@ -29,27 +29,27 @@ pub unsafe extern "C" fn presence_engine_new(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn presence_engine_run(engine: *mut PresenceEngine) {
-    (*engine).run();
+pub unsafe extern "C" fn presence_engine_run(presence_engine: *mut PresenceEngine) {
+    (*presence_engine).engine.run();
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn presence_engine_stop(engine: *mut PresenceEngine) {
-    (*engine).stop();
+pub unsafe extern "C" fn presence_engine_stop(presence_engine: *mut PresenceEngine) {
+    (*presence_engine).client_provider.stop();
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_engine_set_discovery_request(
-    engine: *mut PresenceEngine,
+    presence_engine: *mut PresenceEngine,
     request: *mut PresenceDiscoveryRequest,
 ) {
-    (*engine).set_discovery_request(*Box::from_raw(request));
+    (*presence_engine).client_provider.set_discovery_request(*Box::from_raw(request));
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn presence_on_scan_result(
-    engine: *mut PresenceEngine,
+    presence_engine: *mut PresenceEngine,
     scan_result: *mut PresenceScanResult,
 ) {
-    (*engine).on_scan_result(*(Box::from_raw(scan_result)));
+    (*presence_engine).ble_scan_callback.on_scan_result(*(Box::from_raw(scan_result)));
 }
