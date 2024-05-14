@@ -33,7 +33,6 @@ pub trait BleScanner {
 
 pub struct BleScanProvider {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
-    ble_scanner: Box<dyn BleScanner>,
 }
 
 impl BleScanProvider {
@@ -43,14 +42,8 @@ impl BleScanProvider {
     ) -> Self {
         Self {
             provider_event_tx,
-            ble_scanner,
         }
     }
-    pub fn start_ble_scan(&self, request: ScanRequest) {
-        debug!("BLE Scan Provider starts BLE scan.");
-        self.ble_scanner.start_ble_scan(request);
-    }
-
     pub fn on_scan_result(&self, result: PresenceScanResult) {
         if let Err(e) = self
             .provider_event_tx

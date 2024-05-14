@@ -22,11 +22,12 @@ enum ProviderEvent {
 }
 
 pub struct PresenceEngine {
-    // Receive events from Providers.
-    provider_rx: mpsc::Receiver<ProviderEvent>,
-    client_provider: ClientProvider,
-    ble_scan_provider: BleScanProvider,
+    pub engine: Engine,
+    pub client_provider: ClientProvider,
+    pub ble_scan_provider: BleScanProvider,
 }
+
+unsafe impl Send for PresenceEngine {}
 
 impl PresenceEngine {
     pub fn new(
@@ -37,30 +38,33 @@ impl PresenceEngine {
         let (provider_tx, provider_rx) =
             mpsc::channel::<ProviderEvent>(PROVIDER_EVENT_CHANNEL_BUF_SIZE);
         Self {
-            provider_rx,
-            client_provider: ClientProvider::new(provider_tx.clone(), discovery_callback),
-            ble_scan_provider: BleScanProvider::new(provider_tx, ble_scanner),
+            engine: Engine::new(provider_rx, discovery_callback, ble_scanner),
+            client_provider: ClientProvider::new(provider_tx.clone()),
+            ble_scan_provider: BleScanProvider::new(provider_tx),
         }
     }
+}
+pub struct Engine {
+    // Receive events from Providers.
+    provider_rx: mpsc::Receiver<ProviderEvent>,
+    discovery_callback: Box<dyn DiscoveryCallback>,
+    ble_scanner: Box<dyn BleScanner>,
+}
 
-    pub fn set_discovery_request(&self, request: PresenceDiscoveryRequest) {
-        self.client_provider.set_discovery_request(request);
+impl Engine {
+    pub fn new(
+        provider_rx: mpsc::Receiver<ProviderEvent>,
+        discovery_callback: Box<dyn DiscoveryCallback>,
+        ble_scanner: Box<dyn BleScanner>
+    ) -> Self {
+       Self {provider_rx, discovery_callback, ble_scanner}
     }
-
-    pub fn on_scan_result(&self, result: PresenceScanResult) {
-        self.ble_scan_provider.on_scan_result(result);
-    }
-
-    pub fn stop(&self) {
-        self.client_provider.stop();
-    }
-
     pub fn run(&mut self) {
         info!("Run Presence Engine.");
         Builder::new_current_thread()
             .build()
             .unwrap()
-            .block_on(async move {
+            .block_on(async {
                 self.poll_providers().await;
             });
     }
@@ -88,13 +92,12 @@ impl PresenceEngine {
             .iter()
             .map(|condition| condition.action)
             .collect();
-        self.ble_scan_provider
-            .start_ble_scan(ScanRequest::new(request.priority, actions));
+        self.ble_scanner.start_ble_scan(ScanRequest::new(request.priority, actions));
     }
 
     async fn process_scan_result(&self, scan_result: PresenceScanResult) {
         debug!("received a BLE scan result: {:?}.", scan_result);
-        let discovery_result = self.client_provider.on_device_update(DiscoveryResult::new(
+        let discovery_result = self.discovery_callback.on_device_update(DiscoveryResult::new(
             scan_result.medium,
             Device::new(scan_result.actions),
         ));

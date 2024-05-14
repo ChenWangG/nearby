@@ -1,6 +1,7 @@
 use crate::ProviderEvent;
 use log::{debug, error, info};
 use tokio::sync::mpsc;
+use crate::ble_scan_provider::BleScanner;
 
 // Implemented by the client to receive discovery results.
 pub trait DiscoveryCallback {
@@ -12,7 +13,6 @@ pub trait DiscoveryCallback {
 // Returns discovery results through the discovery_callback.
 pub struct ClientProvider {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
-    discovery_callback: Box<dyn DiscoveryCallback>,
 }
 
 impl ClientProvider {
@@ -22,16 +22,10 @@ impl ClientProvider {
     ) -> Self {
         Self {
             provider_event_tx,
-            discovery_callback,
         }
     }
     pub fn set_discovery_request(&self, request: PresenceDiscoveryRequest) {
         self.send_event(ProviderEvent::DiscoveryRequest(request));
-    }
-
-    pub fn on_device_update(&self, result: DiscoveryResult) {
-        info!("on_device_updated.");
-        self.discovery_callback.on_device_update(result);
     }
 
     pub fn stop(&self) {
