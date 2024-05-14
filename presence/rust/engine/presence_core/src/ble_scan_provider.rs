@@ -31,18 +31,13 @@ pub trait BleScanner {
     fn start_ble_scan(&self, request: ScanRequest);
 }
 
-pub struct BleScanProvider {
+pub struct BleScanCallback {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
 }
 
-impl BleScanProvider {
-    pub fn new(
-        provider_event_tx: mpsc::Sender<ProviderEvent>,
-        ble_scanner: Box<dyn BleScanner>,
-    ) -> Self {
-        Self {
-            provider_event_tx,
-        }
+impl BleScanCallback {
+    pub fn new(provider_event_tx: mpsc::Sender<ProviderEvent>) -> Self {
+        Self { provider_event_tx }
     }
     pub fn on_scan_result(&self, result: PresenceScanResult) {
         if let Err(e) = self

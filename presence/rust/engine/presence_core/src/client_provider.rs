@@ -1,7 +1,7 @@
+use crate::ble_scan_provider::BleScanner;
 use crate::ProviderEvent;
 use log::{debug, error, info};
 use tokio::sync::mpsc;
-use crate::ble_scan_provider::BleScanner;
 
 // Implemented by the client to receive discovery results.
 pub trait DiscoveryCallback {
@@ -16,15 +16,11 @@ pub struct ClientProvider {
 }
 
 impl ClientProvider {
-    pub fn new(
-        provider_event_tx: mpsc::Sender<ProviderEvent>,
-        discovery_callback: Box<dyn DiscoveryCallback>,
-    ) -> Self {
-        Self {
-            provider_event_tx,
-        }
+    pub fn new(provider_event_tx: mpsc::Sender<ProviderEvent>) -> Self {
+        Self { provider_event_tx }
     }
     pub fn set_discovery_request(&self, request: PresenceDiscoveryRequest) {
+        println!("set discovery request.");
         self.send_event(ProviderEvent::DiscoveryRequest(request));
     }
 
@@ -32,10 +28,7 @@ impl ClientProvider {
         self.send_event(ProviderEvent::Stop);
     }
     fn send_event(&self, event: ProviderEvent) {
-        if let Err(e) = self
-            .provider_event_tx
-            .blocking_send(event)
-        {
+        if let Err(e) = self.provider_event_tx.blocking_send(event) {
             error!("Provider callback send error: {}", e);
         } else {
             debug!("Provider callback sent an event.");
@@ -96,6 +89,7 @@ pub enum PresenceMedium {
     MDNS,
 }
 
+#[derive(Debug)]
 pub struct Device {
     pub actions: Vec<i32>,
 }
@@ -105,6 +99,7 @@ impl Device {
         Self { actions }
     }
 }
+#[derive(Debug)]
 pub struct DiscoveryResult {
     pub medium: PresenceMedium,
     pub device: Device,
