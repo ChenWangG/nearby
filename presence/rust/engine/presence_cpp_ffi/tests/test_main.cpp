@@ -19,5 +19,5 @@
 #include "presence.h"
 
 TEST_CASE( "Presence Engine", "DiscoveryEngineRequest Echo" ) {
-   REQUIRE(0 == 0);
+   REQUIRE(1 == 1);
 }
