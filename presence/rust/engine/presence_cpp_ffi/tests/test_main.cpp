@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Test Presence Engine C APIs from Discovery request to result.
+
 #include "presence.h"
 
 // Provide a main() by Catch - only one main per cpp file
@@ -67,7 +69,7 @@ void ble_scan_callback() {
   presence_on_scan_result(engine, scan_result);
 }
 
-// Sends a BLE scan result in a separated thread.
+// Call ble_scan_callback in a separated thread.
 thread platform_thread{[]() {
   while (true) {
     std::unique_lock<std::mutex> lock(scan_mutex);
