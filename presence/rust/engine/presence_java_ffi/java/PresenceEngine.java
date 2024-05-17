@@ -13,7 +13,19 @@ public class PresenceEngine {
 
   public static void main(String[] args) {
     System.out.println("Hello World");
-    long engine = PresenceEngineNew();
-    PresenceEngineDebug(engine);
+    PresenceEngine engine = new PresenceEngine();
+    engine.Debug();
   }
+
+  public PresenceEngine() {
+    rust_engine_ptr = PresenceEngineNew();
+  }
+
+  public void Debug() {
+    PresenceEngineDebug(rust_engine_ptr);
+  }
+
+  // Memory address of Rust Engine.
+  // Opaque pointer to be passed back and forth between Rust and Java.
+  private final long rust_engine_ptr;
 }
