@@ -11,12 +11,6 @@ public class PresenceEngine {
     public static native long PresenceEngineNew();
     public static native void PresenceEngineDebug(long engine);
 
-  public static void main(String[] args) {
-    System.out.println("Hello World");
-    PresenceEngine engine = new PresenceEngine();
-    engine.Debug();
-  }
-
   public PresenceEngine() {
     rust_engine_ptr = PresenceEngineNew();
   }
