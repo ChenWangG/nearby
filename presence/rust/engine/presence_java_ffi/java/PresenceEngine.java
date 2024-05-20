@@ -2,25 +2,34 @@ package com.google.nearby.presence.engine;
 
 // To generate JNI header, run
 //    javac -h . PresenceEngine.java
+
+// Presence Engine in Java Wrapping the Rust implementation.
 public class PresenceEngine {
 
   static {
     System.loadLibrary("presence_java");
   }
 
-  // No need to pass callbacks.
+  /* ========== Native methods implemented in Rust. ========== */
   private static native long presenceEngineNew();
 
-  private static native long presenceEngineRun(long engine, PresenceEngine callbacks);
+  // TODO: move cllabacks to New.
+  private static native long presenceEngineRun(long engine,  PresenceEngine object);
 
   private static native void presenceEngineDebug(long engine);
 
   private static native void presenceEngineFree(long engine);
 
+  /* ========== Callbacks called from Rust. ========== */
+  public static void getDiscoveryResultBuilder(int medium) {
+    System.out.println("getDiscoveryResultBuilder with medium: " + medium);
+  }
   public void onDiscovery(int res) {
     System.out.println("onDiscovery: res = " + res);
   }
 
+
+  /* ========== Standard Java APIs wrapping the native methods. ========== */
   public PresenceEngine() {
     rust_engine_ptr = presenceEngineNew();
   }

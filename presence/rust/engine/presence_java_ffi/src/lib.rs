@@ -31,13 +31,18 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_pre
 #[allow(non_snake_case)]
 pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_presenceEngineRun(
     env: JNIEnv,
-    _class: JClass,
+    class: JClass,
     engine: jlong,
-    callbacks: JObject,
+    object: JObject,
 ) {
     let res: jint = 32;
-    env.call_method(callbacks, "onDiscovery", "(I)V", &[res.into()])
+    env.call_method(object, "onDiscovery", "(I)V", &[res.into()])
         .unwrap();
+
+    let medium: jint = 20;
+    env.call_static_method(class, "getDiscoveryResultBuilder", "(I)V", &[medium.into()])
+        .unwrap();
+
     unsafe {
         let engine_ptr = engine as *mut PresenceTestEngine;
         (*engine_ptr).run();
