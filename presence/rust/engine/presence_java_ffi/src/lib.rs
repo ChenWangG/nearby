@@ -46,7 +46,6 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_pre
     unsafe {
         let engine_ptr = engine as *mut PresenceTestEngine;
         (*engine_ptr).run();
-        (*engine_ptr).run();
     }
 }
 

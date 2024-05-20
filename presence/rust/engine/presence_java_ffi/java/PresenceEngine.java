@@ -23,6 +23,7 @@ public class PresenceEngine {
   /* ========== Callbacks called from Rust. ========== */
   public static void getDiscoveryResultBuilder(int medium) {
     System.out.println("getDiscoveryResultBuilder with medium: " + medium);
+    PresenceDiscoveryResult.build(medium);
   }
   public void onDiscovery(int res) {
     System.out.println("onDiscovery: res = " + res);
