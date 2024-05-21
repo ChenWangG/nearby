@@ -8,8 +8,7 @@ use jni::objects::{JClass, JObject};
 use jni::sys::{jint, jlong};
 use jni::JNIEnv;
 
-use discovery_result::discovery_result_builder_new;
-use crate::discovery_result::discovery_result_builder_add_action;
+use crate::discovery_result::DiscoveryResultBuilder;
 
 pub struct PresenceTestEngine {
     id: i32,
@@ -40,15 +39,14 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_pre
     engine: jlong,
     object: JObject,
 ) {
+    let mut builder = DiscoveryResultBuilder::new(&mut env, 19);
+    builder.add_action(&mut env, 20);
+    builder.add_action(&mut env, 21);
+    builder.debug(&mut env);
 
     let res: jint = 32;
     env.call_method(object, "onDiscovery", "(I)V", &[res.into()])
         .unwrap();
-
-    let medium: jint = 20;
-    let builder = discovery_result_builder_new(&mut env, medium);
-    let action: jint = 21;
-    discovery_result_builder_add_action(&mut env, action, builder);
 
     unsafe {
         let engine_ptr = engine as *mut PresenceTestEngine;
