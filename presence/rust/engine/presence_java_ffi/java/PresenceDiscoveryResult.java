@@ -1,7 +1,14 @@
 package com.google.nearby.presence.engine;
 public class PresenceDiscoveryResult {
-  public static void build(int medium) {
-    System.out.println("PresenceDiscoveryResult build with medium: " + medium);
+  public static class Builder {
+    public PresenceDiscoveryResult build() {
+      System.out.println("PresenceDiscoveryResult build.");
+      return new PresenceDiscoveryResult();
+    }
+  }
+
+  public static Builder toBuilder() {
+    return new Builder();
   }
 }
 

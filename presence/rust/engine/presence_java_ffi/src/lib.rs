@@ -1,10 +1,14 @@
 //! JNI bindings for the presence_core crate.
 //!
+mod discovery_result;
+
 extern crate jni;
 
 use jni::objects::{JClass, JObject};
 use jni::sys::{jint, jlong};
 use jni::JNIEnv;
+
+use discovery_result::discovery_result_builder_new;
 
 pub struct PresenceTestEngine {
     id: i32,
@@ -30,18 +34,18 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_pre
 #[no_mangle]
 #[allow(non_snake_case)]
 pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_presenceEngineRun(
-    env: JNIEnv,
-    class: JClass,
+    mut env: JNIEnv,
+    _class: JClass,
     engine: jlong,
     object: JObject,
 ) {
+
     let res: jint = 32;
     env.call_method(object, "onDiscovery", "(I)V", &[res.into()])
         .unwrap();
 
     let medium: jint = 20;
-    env.call_static_method(class, "getDiscoveryResultBuilder", "(I)V", &[medium.into()])
-        .unwrap();
+    let _builder = discovery_result_builder_new(&mut env, medium);
 
     unsafe {
         let engine_ptr = engine as *mut PresenceTestEngine;
