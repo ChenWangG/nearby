@@ -21,14 +21,9 @@ public class PresenceEngine {
   private static native void presenceEngineFree(long engine);
 
   /* ========== Callbacks called from Rust. ========== */
-  public static PresenceDiscoveryResult.Builder getDiscoveryResultBuilder(int medium) {
-    System.out.println("getDiscoveryResultBuilder with medium: " + medium);
-    return PresenceDiscoveryResult.toBuilder();
-  }
   public void onDiscovery(int res) {
     System.out.println("onDiscovery: res = " + res);
   }
-
 
   /* ========== Standard Java APIs wrapping the native methods. ========== */
   public PresenceEngine() {

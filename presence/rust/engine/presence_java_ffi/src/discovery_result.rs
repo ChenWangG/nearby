@@ -1,14 +1,17 @@
+use jni::objects::JObject;
+use jni::sys::jint;
 use jni::JNIEnv;
-use jni::objects::{JClass, JObject, JValue};
-use jni::sys::{JavaVM, jint};
 
-static CLASS_ENGINE: &str = "com/google/nearby/presence/engine/PresenceEngine";
+static CLASS_ENGINE: &str = "com/google/nearby/presence/engine/PresenceDiscoveryResult";
 
 pub fn discovery_result_builder_new<'a>(env: &mut JNIEnv<'a>, medium: jint) -> JObject<'a> {
     env.call_static_method(
         CLASS_ENGINE,
-        "getDiscoveryResultBuilder",
+        "toBuilder",
         "(I)Lcom/google/nearby/presence/engine/PresenceDiscoveryResult$Builder;",
         &[medium.into()],
-    ).unwrap().l().unwrap()
+    )
+    .unwrap()
+    .l()
+    .unwrap()
 }
