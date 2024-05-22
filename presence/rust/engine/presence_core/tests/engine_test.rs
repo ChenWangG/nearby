@@ -11,12 +11,13 @@ use presence_core::PresenceEngine;
 const EXPECTED_PRIORITY: i32 = 99;
 const EXPECTED_ACTION: i32 = 100;
 
+struct Platform {}
 struct MockDiscoveryCallback {
     pub discovery_result_tx: mpsc::Sender<DiscoveryResult>,
 }
 
-impl DiscoveryCallback for MockDiscoveryCallback {
-    fn on_device_update(&self, result: DiscoveryResult) {
+impl DiscoveryCallback<Platform> for MockDiscoveryCallback {
+    fn on_device_update(&self, platform: &mut Platform, result: DiscoveryResult) {
         println!("DiscoveryCallback on device update.");
         self.discovery_result_tx.send(result).unwrap();
     }
@@ -39,6 +40,7 @@ fn test_engine() {
     let (scan_request_tx, scan_request_rx) = mpsc::channel();
     let (discovery_result_tx, discovery_result_rx) = mpsc::channel();
     let mut presence_engine = PresenceEngine::new(
+        Platform{},
         Box::new(MockDiscoveryCallback {
             discovery_result_tx,
         }),

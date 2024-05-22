@@ -18,43 +18,49 @@ pub enum ProviderEvent {
     Stop,
 }
 
-pub struct PresenceEngine {
-    pub engine: Engine,
+pub struct PresenceEngine<T> {
+    pub engine: Engine<T>,
     pub client_provider: ClientProvider,
     pub ble_scan_callback: BleScanCallback,
 }
 
-impl PresenceEngine {
+impl<T> PresenceEngine<T> {
     pub fn new(
-        discovery_callback: Box<dyn DiscoveryCallback>,
+        platform: T,
+        discovery_callback: Box<dyn DiscoveryCallback<T>>,
         ble_scanner: Box<dyn BleScanner>,
     ) -> Self {
         info!("Create Presence Engine.");
         let (provider_tx, provider_rx) =
             mpsc::channel::<ProviderEvent>(PROVIDER_EVENT_CHANNEL_BUF_SIZE);
         Self {
-            engine: Engine::new(provider_rx, discovery_callback, ble_scanner),
+            engine: Engine::new(platform, provider_rx, discovery_callback, ble_scanner),
             client_provider: ClientProvider::new(provider_tx.clone()),
             ble_scan_callback: BleScanCallback::new(provider_tx),
         }
     }
 }
-pub struct Engine {
+pub struct Engine<T> {
+    // The platform is Platform specific and opaque to core.
+    // It s passed through the core from client to platform system APIs.
+    platform: T,
     // Receive events from Providers.
     provider_rx: mpsc::Receiver<ProviderEvent>,
-    discovery_callback: Box<dyn DiscoveryCallback>,
+    discovery_callback: Box<dyn DiscoveryCallback<T>>,
     ble_scanner: Box<dyn BleScanner>,
 }
 // TODO: make Engine moveable.
-unsafe impl Send for Engine {}
+unsafe impl<T> Send for Engine<T> {}
 
-impl Engine {
+impl<T> Engine<T> {
     pub fn new(
+        platform: T,
         provider_rx: mpsc::Receiver<ProviderEvent>,
-        discovery_callback: Box<dyn DiscoveryCallback>,
+        discovery_callback: Box<dyn DiscoveryCallback<T>>,
         ble_scanner: Box<dyn BleScanner>,
     ) -> Self {
         Self {
+            platform,
             provider_rx,
             discovery_callback,
             ble_scanner,
@@ -98,10 +104,10 @@ impl Engine {
             .start_ble_scan(ScanRequest::new(request.priority, actions));
     }
 
-    fn process_scan_result(&self, scan_result: PresenceScanResult) {
+    fn process_scan_result(&mut self, scan_result: PresenceScanResult) {
         debug!("received a BLE scan result: {:?}.", scan_result);
         self.discovery_callback
-            .on_device_update(DiscoveryResult::new(
+            .on_device_update(&mut (self.platform), DiscoveryResult::new(
                 scan_result.medium,
                 Device::new(scan_result.actions),
             ));
@@ -117,10 +123,12 @@ mod tests {
     };
     use crate::PresenceEngine;
 
+    struct Platform {}
+
     struct MockDiscoveryCallback {}
 
-    impl DiscoveryCallback for MockDiscoveryCallback {
-        fn on_device_update(&self, result: DiscoveryResult) {}
+    impl DiscoveryCallback<Platform> for MockDiscoveryCallback {
+        fn on_device_update(&self, platform: &mut Platform, result: DiscoveryResult) {}
     }
 
     struct MockBleScanner {}
@@ -135,6 +143,7 @@ mod tests {
     #[test]
     fn test_process_discovery_request() {
         let presence_engine = PresenceEngine::new(
+            Platform{},
             Box::new(MockDiscoveryCallback {}),
             Box::new(MockBleScanner {}),
         );
