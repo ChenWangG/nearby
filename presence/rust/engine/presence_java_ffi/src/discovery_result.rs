@@ -1,9 +1,11 @@
-use jni::objects::JObject;
+use jni::objects::{JObject, JValue};
 use jni::sys::jint;
 use jni::JNIEnv;
 
-static CLASS_ENGINE: &str =  "com/google/nearby/presence/engine/PresenceDiscoveryResult";
-static TO_BUILDER_SIGNATURE: &str = "(I)Lcom/google/nearby/presence/engine/PresenceDiscoveryResult$Builder;";
+static CLASS_ENGINE: &str = "com/google/nearby/presence/engine/PresenceDiscoveryResult";
+static TO_BUILDER_SIGNATURE: &str =
+    "(I)Lcom/google/nearby/presence/engine/PresenceDiscoveryResult$Builder;";
+static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;";
 pub struct DiscoveryResultBuilder<'a> {
     builder: JObject<'a>,
 }
@@ -18,8 +20,16 @@ impl<'a> DiscoveryResultBuilder<'a> {
         discovery_result_builder_add_action(env, action as jint, &self.builder);
     }
 
+    pub fn build(&mut self, env: &mut JNIEnv<'a>) -> JObject<'a> {
+        let empty: [JValue; 0] = [];
+        env.call_method(&self.builder, "build", BUILD_SIGNATURE, &empty)
+            .unwrap()
+            .l()
+            .unwrap()
+    }
+
     pub fn debug(&mut self, env: &mut JNIEnv<'a>) {
-        discovery_result_builder_debug(env, &self.builder);
+        jobject_debug(env, &self.builder);
     }
 }
 
@@ -44,8 +54,8 @@ pub fn discovery_result_builder_add_action<'a>(
         .unwrap();
 }
 
-pub fn discovery_result_builder_debug<'a>(env: &mut JNIEnv<'a>, builder: &JObject<'a>) {
-    let no_use: jint = 32;
-    env.call_method(builder, "debug", "(I)V", &[no_use.into()])
+pub fn jobject_debug<'a>(env: &mut JNIEnv<'a>, jobject: &JObject<'a>) {
+    let empty: [JValue; 0] = [];
+    env.call_method(jobject, "debug", "()V", &empty)
         .unwrap();
 }
