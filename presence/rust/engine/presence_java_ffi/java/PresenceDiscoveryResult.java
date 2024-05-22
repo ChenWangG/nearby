@@ -18,10 +18,17 @@ public class PresenceDiscoveryResult {
       this.actions.add(action);
     }
 
+    @Override
+    public String toString() {
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append("Builder[").append("medium=").append(this.medium);
+      stringBuilder.append(", actions=").append(this.actions.toString());
+      stringBuilder.append("]");
+      return stringBuilder.toString();
+    }
+
     public void debug() {
-      System.out.println(
-          "Debug PresenceDiscoveryResult Builder. medium: " + this.medium + ", actions: "
-              + this.actions);
+      System.out.println("Debug PresenceDiscoveryResult Builder = " + this);
     }
 
     public PresenceDiscoveryResult build() {
@@ -42,10 +49,20 @@ public class PresenceDiscoveryResult {
     this.actions = (Integer[]) actions.toArray(new Integer[0]);
   }
 
+  @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("PresenceDiscoveryResult[").append("medium=").append(this.medium);
+    stringBuilder.append(", actions=").append(Arrays.toString(this.actions));
+    stringBuilder.append("]");
+    return stringBuilder.toString();
+  }
+
   public void debug() {
-    System.out.println(
-        "Debug PresenceDiscoveryResult. medium: " + this.medium + ", actions:" + Arrays.toString(
-            this.actions));
+    System.out.println("Debug " + this);
+    //System.out.println(
+    //    "Debug PresenceDiscoveryResult. medium: " + this.medium + ", actions:" + Arrays.toString(
+    //        this.actions));
   }
 
   final int medium;

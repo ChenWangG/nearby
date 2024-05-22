@@ -11,7 +11,7 @@ public class PresenceEngine {
   }
 
   /* ========== Native methods implemented in Rust. ========== */
-  private static native long presenceEngineNew();
+  private static native long build();
 
   // TODO: move cllabacks to New.
   private static native long presenceEngineRun(long engine,  PresenceEngine object);
@@ -21,13 +21,13 @@ public class PresenceEngine {
   private static native void presenceEngineFree(long engine);
 
   /* ========== Callbacks called from Rust. ========== */
-  public void onDiscovery(int res) {
+  public void onDiscovery(PresenceDiscoveryResult res) {
     System.out.println("onDiscovery: res = " + res);
   }
 
   /* ========== Standard Java APIs wrapping the native methods. ========== */
   public PresenceEngine() {
-    rust_engine_ptr = presenceEngineNew();
+    rust_engine_ptr = build();
   }
 
   public void run() {

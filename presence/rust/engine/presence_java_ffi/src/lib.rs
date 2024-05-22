@@ -4,11 +4,13 @@ mod discovery_result;
 
 extern crate jni;
 
-use jni::objects::{JClass, JObject};
+use jni::objects::{JClass, JObject, JValue, JValueGen};
 use jni::sys::{jint, jlong};
 use jni::JNIEnv;
 
 use crate::discovery_result::{DiscoveryResultBuilder, jobject_debug};
+
+static ON_DISCOVERY_SIGNATURE: &str = "(Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;)V";
 
 pub struct PresenceTestEngine {
     id: i32,
@@ -23,7 +25,7 @@ impl PresenceTestEngine {
 /// JNI bindings for `PresenceEngineNew` method in `com.google.nearby.presence.engine`.
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_presenceEngineNew(
+pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_build(
     _env: JNIEnv,
     _class: JClass,
 ) -> jlong {
@@ -46,8 +48,7 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_pre
     let result = builder.build(&mut env);
     jobject_debug(&mut env, &result);
 
-    let res: jint = 32;
-    env.call_method(object, "onDiscovery", "(I)V", &[res.into()])
+    env.call_method(object, "onDiscovery",ON_DISCOVERY_SIGNATURE, &[JValue::Object(&result)])
         .unwrap();
 
     unsafe {
