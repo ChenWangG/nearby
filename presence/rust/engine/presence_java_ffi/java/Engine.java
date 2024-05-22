@@ -14,7 +14,7 @@ public class PresenceEngine {
   private static native long build();
 
   // TODO: move cllabacks to New.
-  private static native long presenceEngineRun(long engine,  PresenceEngine object);
+  private static native long run(long engine,  PresenceEngine object);
 
   private static native void presenceEngineDebug(long engine);
 
@@ -31,7 +31,7 @@ public class PresenceEngine {
   }
 
   public void run() {
-    presenceEngineRun(rust_engine_ptr, this);
+    run(rust_engine_ptr, this);
   }
 
   public void free() {
