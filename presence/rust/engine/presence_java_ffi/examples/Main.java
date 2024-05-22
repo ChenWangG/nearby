@@ -1,9 +1,9 @@
-import com.google.nearby.presence.engine.PresenceEngine;
+import com.google.nearby.presence.engine.Engine;
 
 public class Main {
   public static void main(String[] args) {
     System.out.println("Hello World");
-    PresenceEngine engine = new PresenceEngine();
+    Engine engine = new Engine();
     engine.run();
     engine.debug();
     engine.free();

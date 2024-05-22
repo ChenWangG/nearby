@@ -6,7 +6,7 @@ extern crate jni;
 
 use jni::objects::{JClass, JObject, JValue, JValueGen};
 use jni::sys::{jint, jlong};
-use jni::JNIEnv;
+use jni::{JavaVM, JNIEnv};
 
 use crate::discovery_result::{DiscoveryResultBuilder, jobject_debug};
 
@@ -25,7 +25,7 @@ impl PresenceTestEngine {
 /// JNI bindings for `PresenceEngineNew` method in `com.google.nearby.presence.engine`.
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_build(
+pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_build(
     _env: JNIEnv,
     _class: JClass,
 ) -> jlong {
@@ -35,7 +35,7 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_bui
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_presenceEngineRun(
+pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_run(
     mut env: JNIEnv,
     _class: JClass,
     engine: jlong,
@@ -59,7 +59,7 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_pre
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_presenceEngineDebug(
+pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_debug(
     _env: JNIEnv,
     _class: JClass,
     engine: jlong,
@@ -72,7 +72,7 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_pre
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "system" fn Java_com_google_nearby_presence_engine_PresenceEngine_presenceEngineFree(
+pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_free(
     _env: JNIEnv,
     _class: JClass,
     engine: jlong,

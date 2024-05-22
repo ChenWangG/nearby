@@ -4,7 +4,7 @@ package com.google.nearby.presence.engine;
 //    javac -h . PresenceEngine.java
 
 // Presence Engine in Java Wrapping the Rust implementation.
-public class PresenceEngine {
+public class Engine {
 
   static {
     System.loadLibrary("presence_java");
@@ -14,11 +14,11 @@ public class PresenceEngine {
   private static native long build();
 
   // TODO: move cllabacks to New.
-  private static native long run(long engine,  PresenceEngine object);
+  private static native long run(long engine,  Engine object);
 
-  private static native void presenceEngineDebug(long engine);
+  private static native void debug(long engine);
 
-  private static native void presenceEngineFree(long engine);
+  private static native void free(long engine);
 
   /* ========== Callbacks called from Rust. ========== */
   public void onDiscovery(PresenceDiscoveryResult res) {
@@ -26,7 +26,7 @@ public class PresenceEngine {
   }
 
   /* ========== Standard Java APIs wrapping the native methods. ========== */
-  public PresenceEngine() {
+  public Engine() {
     rust_engine_ptr = build();
   }
 
@@ -35,11 +35,11 @@ public class PresenceEngine {
   }
 
   public void free() {
-    presenceEngineFree(rust_engine_ptr);
+    free(rust_engine_ptr);
   }
 
   public void debug() {
-    presenceEngineDebug(rust_engine_ptr);
+    debug(rust_engine_ptr);
 
   }
 
