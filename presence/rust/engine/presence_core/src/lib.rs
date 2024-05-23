@@ -4,7 +4,7 @@ pub mod client_provider;
 use log::{debug, info};
 
 use crate::ble_scan_provider::{BleScanCallback, BleScanner, PresenceScanResult, ScanRequest};
-use crate::client_provider::{ClientProvider, Device, DiscoveryCallback};
+use crate::client_provider::{ClientProvider, Device, DiscoveryCallback, PresenceMedium};
 use client_provider::{DiscoveryResult, PresenceDiscoveryRequest};
 
 use tokio::runtime::Builder;
@@ -43,6 +43,12 @@ impl<T> PresenceEngine<T> {
 pub struct Engine<T> {
     // The platform is Platform specific and opaque to core.
     // It s passed through the core from client to platform system APIs.
+    // TODO: we have to consume T here and pass &T into discovery_callback.on_device_update().
+    // We cannot pass &'a T directly in presence_java_ffi when discovery_callback is boxed
+    // since reference lifetime in boxed object need to be static.
+    // Consider using generic instead of trait here to define the callback interfaces.
+    // i.e. discovery_callback is a type D which implements the DiscoveryCallback trait.
+    // This way, discovery_callback is not boxed any more and should take &'a T.
     platform: T,
     // Receive events from Providers.
     provider_rx: mpsc::Receiver<ProviderEvent>,
@@ -53,6 +59,11 @@ pub struct Engine<T> {
 unsafe impl<T> Send for Engine<T> {}
 
 impl<T> Engine<T> {
+    pub fn test_discovery_callback(&mut self) {
+       self.discovery_callback.on_device_update(
+           &mut self.platform,
+           DiscoveryResult::new(PresenceMedium::BLE, client_provider::Device::new(Vec::from([100]))));
+    }
     pub fn new(
         platform: T,
         provider_rx: mpsc::Receiver<ProviderEvent>,

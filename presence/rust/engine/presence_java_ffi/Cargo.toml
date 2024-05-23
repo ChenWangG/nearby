@@ -8,6 +8,7 @@ name = "presence_java"
 crate-type = ["cdylib"]
 
 [dependencies]
+presence_core = { path = "../presence_core" }
 jni = "0.21.1"
 log = "0.3.0"
 android_logger = "0.3.0"
