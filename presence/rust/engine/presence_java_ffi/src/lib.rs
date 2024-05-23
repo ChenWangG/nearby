@@ -108,12 +108,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_star
         &[addr.into()],
     ).unwrap();
 
-    /*
-    unsafe {
-        let engine_ptr = engine as *mut PresenceTestEngine;
-        (*engine_ptr).run();
-    }
-     */
+    (*engine_ptr).engine.run();
 }
 
 #[no_mangle]

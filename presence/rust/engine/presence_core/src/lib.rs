@@ -85,7 +85,7 @@ impl<T> Engine<T> {
         Builder::new_current_thread()
             .build()
             .unwrap()
-            .block_on(async {
+            .block_on(async move {
                 self.poll_providers().await;
             });
     }
@@ -142,7 +142,7 @@ mod tests {
     struct MockDiscoveryCallback {}
 
     impl DiscoveryCallback<Platform> for MockDiscoveryCallback {
-        fn on_device_update(&self, platform: &mut Platform, result: DiscoveryResult) {}
+        fn on_device_update(&self, platform: &Platform, result: DiscoveryResult) {}
     }
 
     struct MockBleScanner {}

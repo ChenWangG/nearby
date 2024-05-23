@@ -20,6 +20,7 @@ public class Main {
 
     engine.start(Executors.newSingleThreadExecutor());
     engine.debug();
-    engine.free();
+    // Never do this.
+    // engine.free();
   }
 }
