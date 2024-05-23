@@ -5,6 +5,9 @@ package com.google.nearby.presence.engine;
 // To get method signatures:
 //    javac *.java && javap -s *.class
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
 // Presence Engine in Java Wrapping the Rust implementation.
 public class Engine {
 
@@ -36,17 +39,22 @@ public class Engine {
     rust_engine_ptr = build();
   }
 
-  public void start() {
-    start(rust_engine_ptr, this);
+  public void start(ExecutorService executor) {
+    executor.execute(() -> { start(this.rust_engine_ptr, this); });
+    try {
+      TimeUnit.MILLISECONDS.sleep(300);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   public void free() {
-    free(rust_engine_ptr);
+    free(this.rust_engine_ptr);
   }
 
   public void debug() {
     System.out.println("debug");
-    debug(rust_engine_ptr);
+    debug(this.rust_engine_ptr);
 
   }
 
