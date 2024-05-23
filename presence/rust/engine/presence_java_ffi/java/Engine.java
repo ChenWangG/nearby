@@ -20,7 +20,7 @@ public class Engine {
 
   /* ========== Native methods implemented in Rust. ========== */
   // TODO: move cllabacks to New.
-  private static native long start(long engine, Engine object);
+  private static native long start(Engine object);
 
   private static native void debug(long engine);
 
@@ -43,7 +43,7 @@ public class Engine {
   }
 
   synchronized public void start(ExecutorService executor) {
-    executor.execute(() -> { start(this.rust_engine_ptr, this); });
+    executor.execute(() -> { start(this); });
     try {
       while (!isStarted) {
         wait();

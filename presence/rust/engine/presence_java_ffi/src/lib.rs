@@ -55,7 +55,6 @@ impl DiscoveryCallback<Platform<'_>> for JavaDiscoveryCallback {
 pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_start(
     mut env: JNIEnv,
     _class: JClass,
-    engine: jlong,
     object: JObject,
 ) {
     println!("Engine Run.");
