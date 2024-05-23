@@ -17,29 +17,6 @@ static ON_DISCOVERY_SIGNATURE: &str =
     "(Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;)V";
 static ON_START_SIGNATURE: &str = "(J)V";
 
-pub struct PresenceTestEngine {
-    pub id: i32,
-}
-
-impl PresenceTestEngine {
-    pub fn run(&mut self) {
-        println!("Engine run!")
-    }
-}
-
-/// JNI bindings for `PresenceEngineNew` method in `com.google.nearby.presence.engine`.
-#[no_mangle]
-#[allow(non_snake_case)]
-pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_build(
-    _env: JNIEnv,
-    _class: JClass,
-) -> jlong {
-    let mut engine = PresenceTestEngine { id: 101 };
-    Box::into_raw(Box::new(engine)) as jlong
-    //let engine_addr = &mut engine as *mut PresenceTestEngine;
-    //engine_addr as jlong
-}
-
 struct Platform<'a> {
     jvm: JavaVM,
     j_object: &'a JObject<'a>,

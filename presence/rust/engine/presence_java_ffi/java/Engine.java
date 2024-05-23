@@ -19,8 +19,6 @@ public class Engine {
   }
 
   /* ========== Native methods implemented in Rust. ========== */
-  private static native long build();
-
   // TODO: move cllabacks to New.
   private static native long start(long engine, Engine object);
 
@@ -41,7 +39,6 @@ public class Engine {
 
   /* ========== Standard Java APIs wrapping the native methods. ========== */
   public Engine(Callbacks callbacks) {
-    rust_engine_ptr = build();
     this.callbacks = callbacks;
   }
 
