@@ -79,7 +79,6 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_run(
     object: JObject,
 ) {
     println!("Engine Run.");
-    let jvm = env.get_java_vm().unwrap();
     let platform = Platform {
         jvm: env.get_java_vm().unwrap(),
         j_object: &object,

@@ -14,13 +14,15 @@ public class Engine {
   private static native long build();
 
   // TODO: move cllabacks to New.
-  private static native long run(long engine,  Engine object);
+  private static native long run(long engine, Engine object);
 
   private static native void debug(long engine);
 
   private static native void free(long engine);
 
   /* ========== Callbacks called from Rust. ========== */
+  public void onStart(long rust_engine_ptr) {
+  }
   public void onDiscovery(PresenceDiscoveryResult res) {
     System.out.println("onDiscovery: res = " + res);
   }
