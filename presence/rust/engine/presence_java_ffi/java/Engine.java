@@ -10,6 +10,10 @@ import java.util.concurrent.TimeUnit;
 
 // Presence Engine in Java Wrapping the Rust implementation.
 public class Engine {
+  public interface Callbacks {
+    public void onStart();
+    public void onDiscovery(PresenceDiscoveryResult result);
+  }
 
   static {
     System.loadLibrary("presence_java");
@@ -29,14 +33,16 @@ public class Engine {
   public void onStart(long rust_engine_ptr) {
     System.out.println("onStart.");
     this.rust_engine_ptr = rust_engine_ptr;
+    this.callbacks.onStart();
   }
-  public void onDiscovery(PresenceDiscoveryResult res) {
-    System.out.println("onDiscovery: res = " + res);
+  public void onDiscovery(PresenceDiscoveryResult result) {
+    this.callbacks.onDiscovery(result);
   }
 
   /* ========== Standard Java APIs wrapping the native methods. ========== */
-  public Engine() {
+  public Engine(Callbacks callbacks) {
     rust_engine_ptr = build();
+    this.callbacks = callbacks;
   }
 
   public void start(ExecutorService executor) {
@@ -61,4 +67,5 @@ public class Engine {
   // Memory address of Rust Engine.
   // Opaque pointer to be passed back and forth between Rust and Java.
   private long rust_engine_ptr;
+  private final Callbacks callbacks;
 }
