@@ -93,14 +93,13 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_star
         Box::new(JavaBleScanner {}),
     );
 
-    // TODO: return raw pointer below such that the PresenceEngine's lifetime is
-    // bounded within this function. This guarantees JVM and JObject valid.
-    // let engine_raw_ptr = &mut presence_engine as *mut PresenceEngine<Platform>
-    let engine_ptr = Box::into_raw(Box::new(presence_engine));
 
-    (*engine_ptr).engine.test_discovery_callback();
+    presence_engine.engine.test_discovery_callback();
 
-    let addr = engine_ptr as jlong;
+    // Note, Box::into_raw() below also works while it holds the Engine in heap forever,
+    // which violates the lifetime annotation within this function.
+    // let engine_ptr = Box::into_raw(Box::new(presence_engine));
+    let addr = &mut presence_engine as *mut PresenceEngine<Platform> as jlong;
     env.call_method(
         &object,
         "onStart",
@@ -108,7 +107,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_star
         &[addr.into()],
     ).unwrap();
 
-    (*engine_ptr).engine.run();
+    presence_engine.engine.run();
 }
 
 #[no_mangle]

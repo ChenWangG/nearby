@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 // Presence Engine in Java Wrapping the Rust implementation.
 public class Engine {
   public interface Callbacks {
-    public void onStart();
     public void onDiscovery(PresenceDiscoveryResult result);
   }
 
@@ -30,12 +29,13 @@ public class Engine {
   private static native void free(long engine);
 
   /* ========== Callbacks called from Rust. ========== */
-  public void onStart(long rust_engine_ptr) {
+  synchronized public void onStart(long rust_engine_ptr) {
     System.out.println("onStart.");
     this.rust_engine_ptr = rust_engine_ptr;
-    this.callbacks.onStart();
+    isStarted = true;
+    notify();
   }
-  public void onDiscovery(PresenceDiscoveryResult result) {
+  synchronized public void onDiscovery(PresenceDiscoveryResult result) {
     this.callbacks.onDiscovery(result);
   }
 
@@ -45,27 +45,30 @@ public class Engine {
     this.callbacks = callbacks;
   }
 
-  public void start(ExecutorService executor) {
+  synchronized public void start(ExecutorService executor) {
     executor.execute(() -> { start(this.rust_engine_ptr, this); });
     try {
-      TimeUnit.MILLISECONDS.sleep(300);
+      while (!isStarted) {
+        wait();
+      }
+      // TimeUnit.MILLISECONDS.sleep(300);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
   }
 
-  public void free() {
+  synchronized public void free() {
     free(this.rust_engine_ptr);
   }
 
-  public void debug() {
+  synchronized public void debug() {
     System.out.println("debug");
     debug(this.rust_engine_ptr);
-
   }
 
   // Memory address of Rust Engine.
   // Opaque pointer to be passed back and forth between Rust and Java.
   private long rust_engine_ptr;
   private final Callbacks callbacks;
+  boolean isStarted = false;
 }
