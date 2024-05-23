@@ -4,16 +4,17 @@ mod discovery_result;
 
 extern crate jni;
 
-use jni::objects::{JClass, JObject};
+use jni::objects::{JClass, JObject, JValue};
 use jni::sys::{jint, jlong};
-use jni::{JavaVM, JNIEnv};
+use jni::{JNIEnv, JavaVM};
 use presence_core::ble_scan_provider::{BleScanner, ScanRequest};
 use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult};
 use presence_core::PresenceEngine;
 
-use crate::discovery_result::{DiscoveryResultBuilder, jobject_debug};
+use crate::discovery_result::{jobject_debug, DiscoveryResultBuilder};
 
-static ON_DISCOVERY_SIGNATURE: &str = "(Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;)V";
+static ON_DISCOVERY_SIGNATURE: &str =
+    "(Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;)V";
 
 pub struct PresenceTestEngine {
     id: i32,
@@ -35,63 +36,64 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_build(
     let engine = PresenceTestEngine { id: 101 };
     Box::into_raw(Box::new(engine)) as jlong
 }
-struct JavaBleScanner {
+
+struct Platform<'a> {
+    jvm: JavaVM,
+    j_object: &'a JObject<'a>,
 }
+struct JavaBleScanner {}
 
 impl BleScanner for JavaBleScanner {
     fn start_ble_scan(&self, request: ScanRequest) {
         println!("BleScanner start ble scan.");
     }
 }
-struct JavaDiscoveryCallback {
-}
+struct JavaDiscoveryCallback {}
 
-impl DiscoveryCallback<JavaVM> for JavaDiscoveryCallback {
-    fn on_device_update(&self, platform: &JavaVM, result: DiscoveryResult) {
+impl DiscoveryCallback<Platform<'_>> for JavaDiscoveryCallback {
+    fn on_device_update(&self, platform: &Platform, result: DiscoveryResult) {
         // let mut env = platform.attach_current_thread().unwrap();
-        let mut env = platform.get_env().unwrap();
         println!("DiscoveryCallback on device update.");
-        let mut builder = DiscoveryResultBuilder::new(platform, 19);
+        let mut builder = DiscoveryResultBuilder::new(&platform.jvm, 19);
         builder.add_action(20);
         builder.add_action(21);
-        builder.debug(&mut env);
         let result = builder.build();
+        let mut env = platform.jvm.get_env().unwrap();
         jobject_debug(&mut env, &result);
+        env.call_method(
+            platform.j_object,
+            "onDiscovery",
+            ON_DISCOVERY_SIGNATURE,
+            &[JValue::Object(&result)],
+        )
+        .unwrap();
     }
 }
 
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_run(
-    mut env_1: JNIEnv,
+    mut env: JNIEnv,
     _class: JClass,
     engine: jlong,
     object: JObject,
 ) {
     println!("Engine Run.");
-    let jvm = env_1.get_java_vm().unwrap();
+    let jvm = env.get_java_vm().unwrap();
+    let platform = Platform {
+        jvm: env.get_java_vm().unwrap(),
+        j_object: &object,
+    };
 
     let mut presence_engine = PresenceEngine::new(
-        jvm, Box::new( JavaDiscoveryCallback{}), Box::new(JavaBleScanner{}));
+        platform,
+        Box::new(JavaDiscoveryCallback {}),
+        Box::new(JavaBleScanner {}),
+    );
 
     presence_engine.engine.test_discovery_callback();
 
     /*
-    let jvm_ref = &jvm;
-    let mut env = jvm_ref.get_env().unwrap();
-
-    let mut builder = DiscoveryResultBuilder::new(&mut env, 19);
-    builder.add_action(&mut env, 20);
-    builder.add_action(&mut env, 21);
-    builder.debug(&mut env);
-    let result = builder.build(&mut env);
-    jobject_debug(&mut env, &result);
-     */
-
-    /*
-    env.call_method(object, "onDiscovery",ON_DISCOVERY_SIGNATURE, &[JValue::Object(&result)])
-        .unwrap();
-
     unsafe {
         let engine_ptr = engine as *mut PresenceTestEngine;
         (*engine_ptr).run();
