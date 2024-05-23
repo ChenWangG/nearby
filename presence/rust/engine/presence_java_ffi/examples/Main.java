@@ -4,7 +4,7 @@ public class Main {
   public static void main(String[] args) {
     System.out.println("Hello World");
     Engine engine = new Engine();
-    engine.run();
+    engine.start();
     engine.debug();
     engine.free();
   }

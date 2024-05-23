@@ -19,6 +19,8 @@ pub enum ProviderEvent {
 }
 
 pub struct PresenceEngine<T> {
+    // TODO: delete later after developing and debugging Java FFI only.
+    pub id: i32,
     pub engine: Engine<T>,
     pub client_provider: ClientProvider,
     pub ble_scan_callback: BleScanCallback,
@@ -34,6 +36,7 @@ impl<T> PresenceEngine<T> {
         let (provider_tx, provider_rx) =
             mpsc::channel::<ProviderEvent>(PROVIDER_EVENT_CHANNEL_BUF_SIZE);
         Self {
+            id: 121,
             engine: Engine::new(platform, provider_rx, discovery_callback, ble_scanner),
             client_provider: ClientProvider::new(provider_tx.clone()),
             ble_scan_callback: BleScanCallback::new(provider_tx),

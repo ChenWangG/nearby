@@ -15,9 +15,10 @@ use crate::discovery_result::{jobject_debug, DiscoveryResultBuilder};
 
 static ON_DISCOVERY_SIGNATURE: &str =
     "(Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;)V";
+static ON_START_SIGNATURE: &str = "(J)V";
 
 pub struct PresenceTestEngine {
-    id: i32,
+    pub id: i32,
 }
 
 impl PresenceTestEngine {
@@ -33,8 +34,10 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_build(
     _env: JNIEnv,
     _class: JClass,
 ) -> jlong {
-    let engine = PresenceTestEngine { id: 101 };
+    let mut engine = PresenceTestEngine { id: 101 };
     Box::into_raw(Box::new(engine)) as jlong
+    //let engine_addr = &mut engine as *mut PresenceTestEngine;
+    //engine_addr as jlong
 }
 
 struct Platform<'a> {
@@ -72,7 +75,7 @@ impl DiscoveryCallback<Platform<'_>> for JavaDiscoveryCallback {
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_run(
+pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_start(
     mut env: JNIEnv,
     _class: JClass,
     engine: jlong,
@@ -90,7 +93,20 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_run(
         Box::new(JavaBleScanner {}),
     );
 
-    presence_engine.engine.test_discovery_callback();
+    // TODO: return raw pointer below such that the PresenceEngine's lifetime is
+    // bounded within this function. This guarantees JVM and JObject valid.
+    // let engine_raw_ptr = &mut presence_engine as *mut PresenceEngine<Platform>
+    let engine_ptr = Box::into_raw(Box::new(presence_engine));
+
+    (*engine_ptr).engine.test_discovery_callback();
+
+    let addr = engine_ptr as jlong;
+    env.call_method(
+        &object,
+        "onStart",
+        ON_START_SIGNATURE,
+        &[addr.into()],
+    ).unwrap();
 
     /*
     unsafe {
@@ -108,7 +124,7 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_debug(
     engine: jlong,
 ) {
     unsafe {
-        let engine_ptr = engine as *mut PresenceTestEngine;
+        let engine_ptr = engine as *mut PresenceEngine<Platform>;
         println!("Engine id {}", (*engine_ptr).id);
     }
 }
@@ -121,6 +137,6 @@ pub extern "system" fn Java_com_google_nearby_presence_engine_Engine_free(
     engine: jlong,
 ) {
     unsafe {
-        let _ = Box::from_raw(engine as *mut PresenceTestEngine);
+        let _ = Box::from_raw(engine as *mut PresenceEngine<Platform>);
     }
 }

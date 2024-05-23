@@ -2,6 +2,8 @@ package com.google.nearby.presence.engine;
 
 // To generate JNI header, run
 //    javac -h . PresenceEngine.java
+// To get method signatures:
+//    javac *.java && javap -s *.class
 
 // Presence Engine in Java Wrapping the Rust implementation.
 public class Engine {
@@ -14,7 +16,7 @@ public class Engine {
   private static native long build();
 
   // TODO: move cllabacks to New.
-  private static native long run(long engine, Engine object);
+  private static native long start(long engine, Engine object);
 
   private static native void debug(long engine);
 
@@ -22,6 +24,8 @@ public class Engine {
 
   /* ========== Callbacks called from Rust. ========== */
   public void onStart(long rust_engine_ptr) {
+    System.out.println("onStart.");
+    this.rust_engine_ptr = rust_engine_ptr;
   }
   public void onDiscovery(PresenceDiscoveryResult res) {
     System.out.println("onDiscovery: res = " + res);
@@ -32,8 +36,8 @@ public class Engine {
     rust_engine_ptr = build();
   }
 
-  public void run() {
-    run(rust_engine_ptr, this);
+  public void start() {
+    start(rust_engine_ptr, this);
   }
 
   public void free() {
@@ -41,11 +45,12 @@ public class Engine {
   }
 
   public void debug() {
+    System.out.println("debug");
     debug(rust_engine_ptr);
 
   }
 
   // Memory address of Rust Engine.
   // Opaque pointer to be passed back and forth between Rust and Java.
-  private final long rust_engine_ptr;
+  private long rust_engine_ptr;
 }
