@@ -51,11 +51,11 @@ impl DiscoveryCallback<JavaVM> for JavaDiscoveryCallback {
         // let mut env = platform.attach_current_thread().unwrap();
         let mut env = platform.get_env().unwrap();
         println!("DiscoveryCallback on device update.");
-        let mut builder = DiscoveryResultBuilder::new(&mut env, 19);
-        builder.add_action(&mut env, 20);
-        builder.add_action(&mut env, 21);
+        let mut builder = DiscoveryResultBuilder::new(platform, 19);
+        builder.add_action(20);
+        builder.add_action(21);
         builder.debug(&mut env);
-        let result = builder.build(&mut env);
+        let result = builder.build();
         jobject_debug(&mut env, &result);
     }
 }
