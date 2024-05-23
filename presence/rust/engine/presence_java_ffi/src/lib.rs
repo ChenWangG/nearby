@@ -47,7 +47,7 @@ struct JavaDiscoveryCallback {
 }
 
 impl DiscoveryCallback<JavaVM> for JavaDiscoveryCallback {
-    fn on_device_update(&self, platform: &mut JavaVM, result: DiscoveryResult) {
+    fn on_device_update(&self, platform: &JavaVM, result: DiscoveryResult) {
         // let mut env = platform.attach_current_thread().unwrap();
         let mut env = platform.get_env().unwrap();
         println!("DiscoveryCallback on device update.");

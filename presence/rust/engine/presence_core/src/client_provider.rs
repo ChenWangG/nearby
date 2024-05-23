@@ -4,7 +4,7 @@ use tokio::sync::mpsc;
 
 // Implemented by the client to receive discovery results.
 pub trait DiscoveryCallback<T> {
-    fn on_device_update(&self, platform: &mut T, result: DiscoveryResult);
+    fn on_device_update(&self, platform: &T, result: DiscoveryResult);
 }
 
 // Bridge a client with the Engine.
