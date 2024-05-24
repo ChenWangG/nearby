@@ -1,6 +1,7 @@
 //! JNI bindings for the presence_core crate.
 //!
-mod discovery_result;
+mod presence_discovery_result_builder;
+mod presence_scan_request_builder;
 
 extern crate jni;
 
@@ -11,7 +12,7 @@ use presence_core::ble_scan_provider::{BleScanner, ScanRequest};
 use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, PresenceDiscoveryRequest};
 use presence_core::PresenceEngine;
 
-use crate::discovery_result::{jobject_debug, DiscoveryResultBuilder};
+use crate::presence_discovery_result_builder::{jobject_debug, PresenceDiscoveryResultBuilder};
 
 static ON_DISCOVERY_SIGNATURE: &str =
     "(Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;)V";
@@ -42,7 +43,7 @@ impl DiscoveryCallback<Platform<'_>> for JavaDiscoveryCallback {
     fn on_device_update(&self, platform: &Platform, result: DiscoveryResult) {
         // let mut env = platform.attach_current_thread().unwrap();
         println!("DiscoveryCallback on device update.");
-        let mut builder = DiscoveryResultBuilder::new(&platform.jvm, 19);
+        let mut builder = PresenceDiscoveryResultBuilder::new(&platform.jvm, 19);
         builder.add_action(20);
         builder.add_action(21);
         let result = builder.build();

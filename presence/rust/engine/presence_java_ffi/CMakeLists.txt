@@ -23,7 +23,7 @@ add_custom_target(presence_java_ffi ALL
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(presence_java_ffi PROPERTIES BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
-add_jar(PresenceEngine java/Engine.java java/PresenceDiscoveryResult.java)
+add_jar(PresenceEngine java/Engine.java java/PresenceDiscoveryResult.java java/PresenceBleScanRequest.java)
 get_target_property(_engineJarFile PresenceEngine JAR_FILE)
 message(STATUS "Jar file ${_engineJarFile}")
 

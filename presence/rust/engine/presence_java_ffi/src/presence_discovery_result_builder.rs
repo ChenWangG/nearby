@@ -6,13 +6,13 @@ static CLASS_ENGINE: &str = "com/google/nearby/presence/engine/PresenceDiscovery
 static TO_BUILDER_SIGNATURE: &str =
     "(I)Lcom/google/nearby/presence/engine/PresenceDiscoveryResult$Builder;";
 static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/presence/engine/PresenceDiscoveryResult;";
-pub struct DiscoveryResultBuilder<'a> {
+pub struct PresenceDiscoveryResultBuilder<'a> {
     jvm: &'a JavaVM,
     builder: JObject<'a>,
 }
 
-impl<'a> DiscoveryResultBuilder<'a> {
-    pub fn new(jvm: &'a JavaVM, medium: i32) -> DiscoveryResultBuilder<'a> {
+impl<'a> PresenceDiscoveryResultBuilder<'a> {
+    pub fn new(jvm: &'a JavaVM, medium: i32) -> PresenceDiscoveryResultBuilder<'a> {
         let mut env = jvm.get_env().unwrap();
         let builder = discovery_result_builder_new(&mut env, medium as jint);
         Self { jvm, builder }
