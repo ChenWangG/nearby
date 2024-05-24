@@ -5,8 +5,7 @@ import java.util.concurrent.Executors;
 class PresenceCallbacks implements Engine.Callbacks {
    @Override
    synchronized public void onDiscovery(PresenceDiscoveryResult result) {
-     System.out.println("PresenceCallbacks onDiscovery.");
-     System.out.println("onDiscovery: result = " + result);
+     System.out.println("PresenceCallbacks onDiscovery result: " + result);
    }
 }
 
@@ -15,6 +14,7 @@ public class Main {
     System.out.println("Example to demo Presence Rust Engine Java API.");
     Engine engine = new Engine(new PresenceCallbacks());
     engine.start(Executors.newSingleThreadExecutor());
+    engine.setDiscoveryRequest();
     engine.debug();
     // Never do this.
     // engine.free();

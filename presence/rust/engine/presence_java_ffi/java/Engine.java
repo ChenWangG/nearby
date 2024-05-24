@@ -19,12 +19,10 @@ public class Engine {
   }
 
   /* ========== Native methods implemented in Rust. ========== */
-  // TODO: move cllabacks to New.
   private native long start();
-
-  private static native void debug(long engine);
-
-  private static native void free(long engine);
+  private static native long setDiscoveryRequest(long engine);
+  private static native void debug(long rust_engine_ptr);
+  private static native void free(long rust_engine_ptr);
 
   /* ========== Callbacks called from Rust. ========== */
   synchronized public void onStart(long rust_engine_ptr) {
@@ -48,12 +46,15 @@ public class Engine {
       while (!isStarted) {
         wait();
       }
-      // TimeUnit.MILLISECONDS.sleep(300);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
   }
 
+  synchronized public void setDiscoveryRequest() {
+    System.out.println("setDiscoveryRequest");
+    setDiscoveryRequest(this.rust_engine_ptr);
+  }
   synchronized public void free() {
     free(this.rust_engine_ptr);
   }

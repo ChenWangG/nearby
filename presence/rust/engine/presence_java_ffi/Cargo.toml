@@ -12,3 +12,4 @@ presence_core = { path = "../presence_core" }
 jni = "0.21.1"
 log = "0.3.0"
 android_logger = "0.3.0"
+env_logger = "0.11.3"

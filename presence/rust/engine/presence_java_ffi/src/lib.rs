@@ -8,7 +8,7 @@ use jni::objects::{JClass, JObject, JValue};
 use jni::sys::{jint, jlong};
 use jni::{JNIEnv, JavaVM};
 use presence_core::ble_scan_provider::{BleScanner, ScanRequest};
-use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult};
+use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, PresenceDiscoveryRequest};
 use presence_core::PresenceEngine;
 
 use crate::discovery_result::{jobject_debug, DiscoveryResultBuilder};
@@ -25,7 +25,7 @@ struct JavaBleScanner {}
 
 impl BleScanner for JavaBleScanner {
     fn start_ble_scan(&self, request: ScanRequest) {
-        println!("BleScanner start ble scan.");
+        println!("BleScanner start ble scan with ScanRequest: {:?}.", request);
     }
 }
 struct JavaDiscoveryCallback {}
@@ -57,6 +57,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_star
     object: JObject,
 ) {
     println!("Engine Run.");
+    env_logger::init();
     let platform = Platform {
         jvm: env.get_java_vm().unwrap(),
         j_object: &object,
@@ -68,21 +69,29 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_star
         Box::new(JavaBleScanner {}),
     );
 
-
     presence_engine.engine.test_discovery_callback();
 
     // Note, Box::into_raw() below also works while it holds the Engine in heap forever,
     // which violates the lifetime annotation within this function.
     // let engine_ptr = Box::into_raw(Box::new(presence_engine));
     let addr = &mut presence_engine as *mut PresenceEngine<Platform> as jlong;
-    env.call_method(
-        &object,
-        "onStart",
-        ON_START_SIGNATURE,
-        &[addr.into()],
-    ).unwrap();
+    env.call_method(&object, "onStart", ON_START_SIGNATURE, &[addr.into()])
+        .unwrap();
 
     presence_engine.engine.run();
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_Engine_setDiscoveryRequest(
+    _env: JNIEnv,
+    _class: JClass,
+    engine: jlong,
+) {
+    let engine_ptr = engine as *mut PresenceEngine<Platform>;
+    println!("Set Discovery request with Engine id {}", (*engine_ptr).id);
+    let request = PresenceDiscoveryRequest::new(101, Vec::new());
+    (*engine_ptr).client_provider.set_discovery_request(request);
 }
 
 #[no_mangle]
