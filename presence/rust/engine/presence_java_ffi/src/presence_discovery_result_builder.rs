@@ -1,6 +1,8 @@
 use jni::objects::{JObject, JValue};
 use jni::sys::jint;
 use jni::{JNIEnv, JavaVM};
+use presence_core::client_provider::DiscoveryResult;
+use crate::presence_scan_request_builder::PresenceScanRequestBuilder;
 
 static CLASS_ENGINE: &str = "com/google/nearby/presence/engine/PresenceDiscoveryResult";
 static TO_BUILDER_SIGNATURE: &str =
@@ -24,6 +26,14 @@ impl<'a> PresenceDiscoveryResultBuilder<'a> {
             action as jint,
             &self.builder,
         );
+    }
+
+    pub fn from_discovery_result(jvm: &'a JavaVM, discovery_result: DiscoveryResult) -> Self {
+        let mut builder = PresenceDiscoveryResultBuilder::new(jvm, discovery_result.medium as i32);
+        for action in discovery_result.device.actions {
+            builder.add_action(action);
+        }
+        builder
     }
 
     pub fn build(&mut self) -> JObject<'a> {
