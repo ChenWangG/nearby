@@ -23,8 +23,8 @@ struct Platform<'a> {
 }
 struct JavaBleScanner {}
 
-impl BleScanner for JavaBleScanner {
-    fn start_ble_scan(&self, request: ScanRequest) {
+impl<T> BleScanner<T> for JavaBleScanner {
+    fn start_ble_scan(&self, platform: &T, request: ScanRequest) {
         println!("BleScanner start ble scan with ScanRequest: {:?}.", request);
     }
 }
