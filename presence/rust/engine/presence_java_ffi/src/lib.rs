@@ -2,6 +2,8 @@
 //!
 mod presence_discovery_result_builder;
 mod presence_scan_request_builder;
+mod presence_discovery_request_builder;
+mod presence_scan_result_builder;
 
 extern crate jni;
 

@@ -31,6 +31,7 @@ pub trait BleScanner<T> {
     fn start_ble_scan(&self, platform: &T, request: ScanRequest);
 }
 
+#[derive(Debug)]
 pub struct BleScanCallback {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
 }

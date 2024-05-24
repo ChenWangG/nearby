@@ -16,6 +16,7 @@ public class Main {
     engine.start(Executors.newSingleThreadExecutor());
     engine.setDiscoveryRequest();
     engine.debug();
+
     // Never do this.
     // engine.free();
   }

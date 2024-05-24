@@ -10,6 +10,7 @@ pub trait DiscoveryCallback<T> {
 // Bridge a client with the Engine.
 // Receives discovery requests through set_discovery_request().
 // Returns discovery results through the discovery_callback.
+#[derive(Debug)]
 pub struct ClientProvider {
     provider_event_tx: mpsc::Sender<ProviderEvent>,
 }
@@ -39,9 +40,20 @@ impl ClientProvider {
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
 pub enum PresenceIdentityType {
-    Private = 0,
+    Private = 1,
     Trusted,
     Public,
+}
+
+impl PresenceIdentityType {
+    pub fn from_i32(value: i32) -> PresenceIdentityType {
+        match value {
+            1 => PresenceIdentityType::Private,
+            2 => PresenceIdentityType::Trusted,
+            3 => PresenceIdentityType::Public,
+            _ => panic!("Unknown PresenceIdentityType value: {}", value),
+        }
+    }
 }
 
 // The enum is annotated by repr(C) to pass through FFI.
@@ -52,6 +64,17 @@ pub enum PresenceMeasurementAccuracy {
     CoarseAccuracy,
     BestAvailable,
 }
+impl PresenceMeasurementAccuracy {
+    pub fn from_i32(value: i32) -> PresenceMeasurementAccuracy {
+        match value {
+            0 => PresenceMeasurementAccuracy::Unknown,
+            1 => PresenceMeasurementAccuracy::CoarseAccuracy,
+            2 => PresenceMeasurementAccuracy::BestAvailable,
+            _ => panic!("Unknown PresenceMeasurementAccuracy value: {}", value),
+        }
+    }
+}
+
 
 /// Struct to hold an action, identity type and their associated discovery condition.
 #[derive(Clone, Copy, Debug)]
@@ -86,6 +109,19 @@ pub enum PresenceMedium {
     WiFiRTT,
     UWB,
     MDNS,
+}
+
+impl  PresenceMedium {
+    pub fn from_i32(value: i32) -> PresenceMedium {
+        match value {
+            0 => PresenceMedium::Unknown,
+            1 => PresenceMedium::BLE,
+            2 => PresenceMedium::WiFiRTT,
+            3 => PresenceMedium::UWB,
+            4 => PresenceMedium::MDNS,
+            _ => panic!("Unknown PresenceMedium value: {}", value),
+        }
+    }
 }
 
 #[derive(Debug)]
