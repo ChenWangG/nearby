@@ -1,11 +1,15 @@
 use jni::objects::{JObject, JValue};
 use jni::sys::jint;
 use jni::{JNIEnv, JavaVM};
+use presence_core::ble_scan_provider::ScanRequest;
+use presence_core::client_provider::PresenceDiscoveryRequest;
 
 static CLASS_ENGINE: &str = "com/google/nearby/presence/engine/PresenceBleScanRequest";
 static TO_BUILDER_SIGNATURE: &str =
     "(I)Lcom/google/nearby/presence/engine/PresenceBleScanRequest$Builder;";
 static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/presence/engine/PresenceBleScanRequest;";
+
+
 pub struct PresenceScanRequestBuilder<'a> {
     jvm: &'a JavaVM,
     builder: JObject<'a>,
@@ -32,6 +36,7 @@ impl<'a> PresenceScanRequestBuilder<'a> {
             .unwrap();
     }
 
+
     pub fn build(&mut self) -> JObject<'a> {
         self.jvm
             .get_env()
@@ -40,5 +45,13 @@ impl<'a> PresenceScanRequestBuilder<'a> {
             .unwrap()
             .l()
             .unwrap()
+    }
+
+    pub fn from_scan_request(jvm: &'a JavaVM, scan_request: ScanRequest) -> Self {
+        let mut builder = PresenceScanRequestBuilder::new(jvm, scan_request.priority);
+        for action in scan_request.actions {
+            builder.add_action(action) ;
+        }
+        builder
     }
 }

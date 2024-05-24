@@ -14,13 +14,18 @@ public class Engine {
     public void onDiscovery(PresenceDiscoveryResult result);
   }
 
+  public interface SystemApis {
+    public void startBleScan();
+  }
+
   static {
     System.loadLibrary("presence_java");
   }
 
   /* ========== Native methods implemented in Rust. ========== */
   private native long start();
-  private static native long setDiscoveryRequest(long engine);
+  private static native long setDiscoveryRequest(long engine, long request);
+  private static native long onScanResult(long engine, long result);
   private static native void debug(long rust_engine_ptr);
   private static native void free(long rust_engine_ptr);
 
@@ -35,8 +40,10 @@ public class Engine {
     this.callbacks.onDiscovery(result);
   }
 
-  synchronized public void startBleScan() {
-    System.out.println("startBleScan.");
+  synchronized public void startBleScan(PresenceBleScanRequest request) {
+    System.out.println("Java Engine startBleScan." + request);
+    Thread thread = new Thread(() -> { onScanResult(testBuildScanResult()); } );
+    thread.start();
   }
 
   /* ========== Standard Java APIs wrapping the native methods. ========== */
@@ -52,17 +59,17 @@ public class Engine {
     PresenceDiscoveryRequestBuilder.debugResult(result);
   }
 
-  static void testBuildScanResult() {
+  static long testBuildScanResult() {
     long builderInRust = PresenceScanResultBuilder.create(1);
     PresenceScanResultBuilder.addAction(builderInRust, 101);
     PresenceScanResultBuilder.debug(builderInRust);
     long result = PresenceScanResultBuilder.build(builderInRust);
     PresenceScanResultBuilder.debugResult(result);
+    return result;
   }
 
   synchronized public void start(ExecutorService executor) {
     System.out.println("Start Engine.");
-    testBuildScanResult();
     executor.execute(() -> { start(); });
     try {
       while (!isStarted) {
@@ -73,9 +80,14 @@ public class Engine {
     }
   }
 
-  synchronized public void setDiscoveryRequest() {
+  synchronized public void setDiscoveryRequest(long request) {
     System.out.println("setDiscoveryRequest");
-    setDiscoveryRequest(this.rust_engine_ptr);
+    setDiscoveryRequest(this.rust_engine_ptr, request);
+  }
+
+  synchronized public void onScanResult(long result) {
+    System.out.println("Java onScanResult");
+    onScanResult(this.rust_engine_ptr, result);
   }
   synchronized public void free() {
     free(this.rust_engine_ptr);
