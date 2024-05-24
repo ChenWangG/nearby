@@ -30,7 +30,7 @@ impl<T> PresenceEngine<T> {
     pub fn new(
         platform: T,
         discovery_callback: Box<dyn DiscoveryCallback<T>>,
-        ble_scanner: Box<dyn BleScanner>,
+        ble_scanner: Box<dyn BleScanner<T>>,
     ) -> Self {
         info!("Create Presence Engine.");
         let (provider_tx, provider_rx) =
@@ -56,7 +56,7 @@ pub struct Engine<T> {
     // Receive events from Providers.
     provider_rx: mpsc::Receiver<ProviderEvent>,
     discovery_callback: Box<dyn DiscoveryCallback<T>>,
-    ble_scanner: Box<dyn BleScanner>,
+    ble_scanner: Box<dyn BleScanner<T>>,
 }
 // TODO: make Engine moveable.
 unsafe impl<T> Send for Engine<T> {}
@@ -71,7 +71,7 @@ impl<T> Engine<T> {
         platform: T,
         provider_rx: mpsc::Receiver<ProviderEvent>,
         discovery_callback: Box<dyn DiscoveryCallback<T>>,
-        ble_scanner: Box<dyn BleScanner>,
+        ble_scanner: Box<dyn BleScanner<T>>,
     ) -> Self {
         Self {
             platform,
@@ -115,13 +115,13 @@ impl<T> Engine<T> {
             .map(|condition| condition.action)
             .collect();
         self.ble_scanner
-            .start_ble_scan(ScanRequest::new(request.priority, actions));
+            .start_ble_scan(&self.platform, ScanRequest::new(request.priority, actions));
     }
 
     fn process_scan_result(&mut self, scan_result: PresenceScanResult) {
         debug!("received a BLE scan result: {:?}.", scan_result);
         self.discovery_callback
-            .on_device_update(&mut (self.platform), DiscoveryResult::new(
+            .on_device_update(&self.platform, DiscoveryResult::new(
                 scan_result.medium,
                 Device::new(scan_result.actions),
             ));
@@ -147,8 +147,8 @@ mod tests {
 
     struct MockBleScanner {}
 
-    impl BleScanner for MockBleScanner {
-        fn start_ble_scan(&self, request: ScanRequest) {
+    impl<T> BleScanner<T> for MockBleScanner {
+        fn start_ble_scan(&self, platform: &T, request: ScanRequest) {
             assert_eq!(request.priority, 1);
             assert_eq!(request.actions.len(), 1);
             assert_eq!(request.actions[0], 100);

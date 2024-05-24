@@ -35,6 +35,10 @@ public class Engine {
     this.callbacks.onDiscovery(result);
   }
 
+  synchronized public void startBleScan() {
+    System.out.println("startBleScan.");
+  }
+
   /* ========== Standard Java APIs wrapping the native methods. ========== */
   public Engine(Callbacks callbacks) {
     this.callbacks = callbacks;

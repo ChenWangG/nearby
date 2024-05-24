@@ -27,8 +27,8 @@ impl PresenceScanResult {
     }
 }
 
-pub trait BleScanner {
-    fn start_ble_scan(&self, request: ScanRequest);
+pub trait BleScanner<T> {
+    fn start_ble_scan(&self, platform: &T, request: ScanRequest);
 }
 
 pub struct BleScanCallback {

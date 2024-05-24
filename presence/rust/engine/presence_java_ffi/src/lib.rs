@@ -23,9 +23,17 @@ struct Platform<'a> {
 }
 struct JavaBleScanner {}
 
-impl<T> BleScanner<T> for JavaBleScanner {
-    fn start_ble_scan(&self, platform: &T, request: ScanRequest) {
+impl BleScanner<Platform<'_>> for JavaBleScanner {
+    fn start_ble_scan(&self, platform: &Platform, request: ScanRequest) {
         println!("BleScanner start ble scan with ScanRequest: {:?}.", request);
+        let mut env = platform.jvm.get_env().unwrap();
+        env.call_method(
+            platform.j_object,
+            "startBleScan",
+            "()V",
+            &[],
+        )
+            .unwrap();
     }
 }
 struct JavaDiscoveryCallback {}
