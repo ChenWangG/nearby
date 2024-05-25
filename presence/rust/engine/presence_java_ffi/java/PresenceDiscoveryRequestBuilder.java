@@ -7,5 +7,19 @@ public class PresenceDiscoveryRequestBuilder {
   public static native long build(long builderInRust);
   public static native void debug(long builderInRust);
   public static native void debugResult(long resultInRust);
+
+  public PresenceDiscoveryRequestBuilder(int priority) {
+    rust_builder_ptr = create(priority);
+  }
+
+  public void addCondition(int action, int identityType, int measurementAccuracy) {
+    addCondition(rust_builder_ptr, action, identityType, measurementAccuracy);
+  }
+
+  public long build() {
+    return build(rust_builder_ptr);
+  }
+
+  private long rust_builder_ptr;
 }
 

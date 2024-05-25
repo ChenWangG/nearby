@@ -58,10 +58,10 @@ public class Main {
     PresenceSystemApis apis = new PresenceSystemApis();
     Engine engine = new Engine(new PresenceCallbacks(), apis);
     engine.start(Executors.newSingleThreadExecutor());
-    long builderInRust = PresenceDiscoveryRequestBuilder.create(Constants.PRIORITY);
-    PresenceDiscoveryRequestBuilder.addCondition(builderInRust, Constants.ACTION_ZERO, 1, 1);
-    PresenceDiscoveryRequestBuilder.addCondition(builderInRust, Constants.ACTION_ONE, 1, 1);
-    long request = PresenceDiscoveryRequestBuilder.build(builderInRust);
+    PresenceDiscoveryRequestBuilder builder = new PresenceDiscoveryRequestBuilder(Constants.PRIORITY);
+    builder.addCondition(Constants.ACTION_ZERO, 1, 1);
+    builder.addCondition(Constants.ACTION_ONE, 1, 1);
+    long request = builder.build();
     engine.setDiscoveryRequest(request);
     long result = apis.waitForResult();
     engine.onScanResult(result);
