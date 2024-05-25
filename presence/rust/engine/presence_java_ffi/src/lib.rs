@@ -8,7 +8,7 @@ mod presence_scan_result_builder;
 extern crate jni;
 
 use jni::objects::{JClass, JObject, JValue};
-use jni::sys::{jint, jlong};
+use jni::sys::jlong;
 use jni::{JNIEnv, JavaVM};
 use presence_core::ble_scan_provider::{BleScanner, PresenceScanResult, ScanRequest};
 use presence_core::client_provider::{
@@ -16,7 +16,7 @@ use presence_core::client_provider::{
 };
 use presence_core::PresenceEngine;
 
-use crate::presence_discovery_result_builder::{jobject_debug, PresenceDiscoveryResultBuilder};
+use crate::presence_discovery_result_builder::PresenceDiscoveryResultBuilder;
 use crate::presence_scan_request_builder::PresenceScanRequestBuilder;
 
 static ON_DISCOVERY_SIGNATURE: &str =

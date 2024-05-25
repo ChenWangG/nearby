@@ -1,11 +1,8 @@
-use crate::Platform;
 use jni::objects::JClass;
 use jni::sys::{jint, jlong};
 use jni::JNIEnv;
-use log::debug;
-use presence_core::ble_scan_provider::{BleScanner, PresenceScanResult, ScanRequest};
-use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, PresenceDiscoveryCondition, PresenceIdentityType, PresenceMeasurementAccuracy, PresenceMedium};
-use presence_core::PresenceEngine;
+use presence_core::ble_scan_provider::PresenceScanResult;
+use presence_core::client_provider::PresenceMedium;
 
 #[derive(Debug)]
 struct PresenceScanResultBuilder {
@@ -26,10 +23,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_PresenceSca
     _class: JClass,
     medium: jint,
 ) -> jlong {
-    println!(
-        "Presence scan result builder with medium: {}",
-        medium
-    );
+    println!("Presence scan result builder with medium: {}", medium);
     Box::into_raw(Box::new(PresenceScanResultBuilder {
         medium,
         actions: Vec::new(),
@@ -46,9 +40,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_PresenceSca
 ) {
     println!("Presence scan result builder add action: {}", action);
     let builder = &mut *(builderInRust as *mut PresenceScanResultBuilder);
-    builder
-        .actions
-        .push(action);
+    builder.actions.push(action);
 }
 
 #[no_mangle]
@@ -92,16 +84,21 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_PresenceSca
 
 #[cfg(test)]
 mod tests {
-    use presence_core::client_provider::{PresenceIdentityType, PresenceMeasurementAccuracy, PresenceMedium};
     use crate::presence_scan_result_builder::PresenceScanResultBuilder;
+    use presence_core::client_provider::{
+        PresenceIdentityType, PresenceMeasurementAccuracy, PresenceMedium,
+    };
 
     #[test]
     fn test_build_discovery_request() {
         assert_eq!(1, 1);
-        let builder = PresenceScanResultBuilder{medium: 1, actions: Vec::from([101])};
+        let builder = PresenceScanResultBuilder {
+            medium: 1,
+            actions: Vec::from([101]),
+        };
         let result = builder.into_result();
         assert_eq!(result.medium, PresenceMedium::BLE);
-        assert_eq!(result.actions.len() ,1);
-        assert_eq!(result.actions[0] ,101);
+        assert_eq!(result.actions.len(), 1);
+        assert_eq!(result.actions[0], 101);
     }
 }

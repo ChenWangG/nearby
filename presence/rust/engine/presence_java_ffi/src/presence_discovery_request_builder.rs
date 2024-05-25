@@ -1,11 +1,10 @@
-use crate::Platform;
 use jni::objects::JClass;
 use jni::sys::{jint, jlong};
 use jni::JNIEnv;
-use log::debug;
-use presence_core::ble_scan_provider::{BleScanner, ScanRequest};
-use presence_core::client_provider::{DiscoveryCallback, DiscoveryResult, PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType, PresenceMeasurementAccuracy};
-use presence_core::PresenceEngine;
+use presence_core::client_provider::{
+    PresenceDiscoveryCondition, PresenceDiscoveryRequest, PresenceIdentityType,
+    PresenceMeasurementAccuracy,
+};
 
 #[derive(Debug)]
 struct PresenceDiscoveryRequestBuilder {
@@ -15,7 +14,8 @@ struct PresenceDiscoveryRequestBuilder {
 
 impl PresenceDiscoveryRequestBuilder {
     pub fn into_request(&self) -> PresenceDiscoveryRequest {
-        let conditions = self.conditions
+        let conditions = self
+            .conditions
             .iter()
             .map(|condition| PresenceDiscoveryCondition {
                 action: condition.0,
@@ -103,19 +103,27 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_engine_PresenceDis
 
 #[cfg(test)]
 mod tests {
-    use presence_core::client_provider::{PresenceIdentityType, PresenceMeasurementAccuracy};
     use crate::presence_discovery_request_builder::PresenceDiscoveryRequestBuilder;
+    use presence_core::client_provider::{PresenceIdentityType, PresenceMeasurementAccuracy};
 
     #[test]
     fn test_build_discovery_request() {
         assert_eq!(1, 1);
-        let builder = PresenceDiscoveryRequestBuilder{priority: 0, conditions: Vec::from([(1, 1, 1)])};
+        let builder = PresenceDiscoveryRequestBuilder {
+            priority: 0,
+            conditions: Vec::from([(1, 1, 1)]),
+        };
         let request = builder.into_request();
         assert_eq!(request.priority, 0);
-        assert_eq!(request.conditions.len() ,1);
+        assert_eq!(request.conditions.len(), 1);
         assert_eq!(request.conditions[0].action, 1);
-        assert_eq!(request.conditions[0].identity_type, PresenceIdentityType::Private);
-        assert_eq!(request.conditions[0].measurement_accuracy, PresenceMeasurementAccuracy::CoarseAccuracy);
+        assert_eq!(
+            request.conditions[0].identity_type,
+            PresenceIdentityType::Private
+        );
+        assert_eq!(
+            request.conditions[0].measurement_accuracy,
+            PresenceMeasurementAccuracy::CoarseAccuracy
+        );
     }
 }
-

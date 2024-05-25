@@ -51,23 +51,6 @@ public class Engine {
     this.systemApis = systemApis;
   }
 
-  static void testBuildDiscoveryRequest() {
-    long builderInRust = PresenceDiscoveryRequestBuilder.create(131);
-    PresenceDiscoveryRequestBuilder.addCondition(builderInRust, 1, 1, 1);
-    PresenceDiscoveryRequestBuilder.debug(builderInRust);
-    long result = PresenceDiscoveryRequestBuilder.build(builderInRust);
-    PresenceDiscoveryRequestBuilder.debugResult(result);
-  }
-
-  static long testBuildScanResult() {
-    long builderInRust = PresenceScanResultBuilder.create(1);
-    PresenceScanResultBuilder.addAction(builderInRust, 101);
-    PresenceScanResultBuilder.debug(builderInRust);
-    long result = PresenceScanResultBuilder.build(builderInRust);
-    PresenceScanResultBuilder.debugResult(result);
-    return result;
-  }
-
   synchronized public void start(ExecutorService executor) {
     System.out.println("Start Engine.");
     executor.execute(() -> { start(); });

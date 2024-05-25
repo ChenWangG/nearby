@@ -1,8 +1,7 @@
-use jni::objects::{JObject, JValue};
+use jni::objects::JObject;
 use jni::sys::jint;
 use jni::{JNIEnv, JavaVM};
 use presence_core::client_provider::DiscoveryResult;
-use crate::presence_scan_request_builder::PresenceScanRequestBuilder;
 
 static CLASS_ENGINE: &str = "com/google/nearby/presence/engine/PresenceDiscoveryResult";
 static TO_BUILDER_SIGNATURE: &str =
@@ -37,7 +36,6 @@ impl<'a> PresenceDiscoveryResultBuilder<'a> {
     }
 
     pub fn build(&mut self) -> JObject<'a> {
-        let empty: [JValue; 0] = [];
         self.jvm
             .get_env()
             .unwrap()
@@ -45,10 +43,6 @@ impl<'a> PresenceDiscoveryResultBuilder<'a> {
             .unwrap()
             .l()
             .unwrap()
-    }
-
-    pub fn debug(&mut self, env: &mut JNIEnv<'a>) {
-        jobject_debug(env, &self.builder);
     }
 }
 
@@ -71,9 +65,4 @@ pub fn discovery_result_builder_add_action<'a>(
 ) {
     env.call_method(builder, "addAction", "(I)V", &[action.into()])
         .unwrap();
-}
-
-pub fn jobject_debug<'a>(env: &mut JNIEnv<'a>, jobject: &JObject<'a>) {
-    let empty: [JValue; 0] = [];
-    env.call_method(jobject, "debug", "()V", &empty).unwrap();
 }
