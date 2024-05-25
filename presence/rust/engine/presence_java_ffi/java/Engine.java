@@ -15,7 +15,7 @@ public class Engine {
   }
 
   public interface SystemApis {
-    public void startBleScan();
+    public void startBleScan(PresenceBleScanRequest request);
   }
 
   static {
@@ -42,13 +42,13 @@ public class Engine {
 
   synchronized public void startBleScan(PresenceBleScanRequest request) {
     System.out.println("Java Engine startBleScan." + request);
-    Thread thread = new Thread(() -> { onScanResult(testBuildScanResult()); } );
-    thread.start();
+    this.systemApis.startBleScan(request);
   }
 
   /* ========== Standard Java APIs wrapping the native methods. ========== */
-  public Engine(Callbacks callbacks) {
+  public Engine(Callbacks callbacks, SystemApis systemApis) {
     this.callbacks = callbacks;
+    this.systemApis = systemApis;
   }
 
   static void testBuildDiscoveryRequest() {
@@ -102,5 +102,6 @@ public class Engine {
   // Opaque pointer to be passed back and forth between Rust and Java.
   private long rust_engine_ptr;
   private final Callbacks callbacks;
+  private final SystemApis systemApis;
   boolean isStarted = false;
 }

@@ -48,6 +48,14 @@ public class PresenceBleScanRequest {
     this.actions = (Integer[]) actions.toArray(new Integer[0]);
   }
 
+  public int getPriority() {
+    return priority;
+  }
+
+  public Integer[] getActions() {
+    return actions;
+  }
+
   @Override
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();

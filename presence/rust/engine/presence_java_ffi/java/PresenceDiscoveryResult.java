@@ -49,6 +49,14 @@ public class PresenceDiscoveryResult {
     this.actions = (Integer[]) actions.toArray(new Integer[0]);
   }
 
+  public int getMedium() {
+    return medium;
+  }
+
+  public Integer[] getActions() {
+    return actions;
+  }
+
   @Override
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
