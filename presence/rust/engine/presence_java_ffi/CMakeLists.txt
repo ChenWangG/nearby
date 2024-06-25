@@ -37,8 +37,10 @@ add_dependencies(Main PresenceEngine)
 get_target_property(_jarFile Main JAR_FILE)
 message(STATUS "Jar file ${_jarFile}")
 
+
+message(STATUS "Load Rust lib from ${CMAKE_CURRENT_BINARY_DIR}")
 add_custom_target(presence_java_example ALL
     COMMAND ${Java_JAVA_EXECUTABLE}
-        -Djava.library.path=${PRESENCE_DIR}
+        -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
         -cp ${_jarFile}:${_engineJarFile} Main)
 add_dependencies(presence_java_example Main PresenceEngine presence_java_ffi)
