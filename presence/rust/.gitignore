@@ -1,3 +1,4 @@
-engine/target/*
+.*
+*/target/*
 rust/build/*
 cmake-build-*

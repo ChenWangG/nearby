@@ -1,0 +1,18 @@
+[package]
+name = "system_api_android"
+version = "0.1.0"
+edition = "2021"
+
+[[example]]
+name = "test_engine"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "main"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+system_api_java_ffi = { path = "../java_ffi" }
+log = "0.4.20"
+jni = "0.21.1"
