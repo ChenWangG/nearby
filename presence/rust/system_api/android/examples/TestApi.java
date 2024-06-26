@@ -12,7 +12,7 @@ public class TestApi {
   }
 
   /* ========== Native methods implemented in Rust. ========== */
-  private static native void start_scan();
+  public static native void startScan();
 
   /* ================= Called from Rust. ==================== */
   public void onScanResult() {
