@@ -21,11 +21,18 @@ add_custom_target(test_api ALL
     COMMAND cp ${TEST_API_SO} ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_jar(Main examples/Main.java)
+add_jar(TestApi
+        examples/TestApi.java)
+get_target_property(_TestApiJarFile TestApi JAR_FILE)
+message(STATUS "TestApi Jar file ${_TestApiJarFile}")
+
+add_jar(Main examples/Main.java INCLUDE_JARS TestApi)
+add_dependencies(Main TestApi)
 get_target_property(_MainJarFile Main JAR_FILE)
 message(STATUS "Main Jar file ${_jarFile}")
 
 add_custom_target(nearby_android_example ALL
     COMMAND ${Java_JAVA_EXECUTABLE}
-        -cp ${_MainJarFile} Main)
-add_dependencies(nearby_android_example Main)
+        -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
+        -cp ${_MainJarFile}:${_TestApiJarFile} Main)
+add_dependencies(nearby_android_example Main TestApi)
