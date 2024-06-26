@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [[example]]
-name = "test_engine"
+name = "test_api"
 crate-type = ["cdylib"]
 
 [[example]]
