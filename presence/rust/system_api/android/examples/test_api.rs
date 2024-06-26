@@ -11,5 +11,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_api_TestApi_startScan(
     object: JObject
 ) {
     println!("Start scan in Rust API.");
+
+
     env.call_method(&object, "onScanResult", "()V", &[]).unwrap();
 }
