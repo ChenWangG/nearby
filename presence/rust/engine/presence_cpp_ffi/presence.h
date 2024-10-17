@@ -23,7 +23,7 @@
 
 
 enum class PresenceIdentityType {
-  Private = 0,
+  Private = 1,
   Trusted,
   Public,
 };
@@ -49,6 +49,7 @@ struct PresenceDiscoveryRequest;
 
 struct PresenceDiscoveryRequestBuilder;
 
+template<typename T = void>
 struct PresenceEngine;
 
 struct PresenceScanResult;
