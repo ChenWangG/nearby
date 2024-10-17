@@ -21,10 +21,10 @@ impl EventLoop {
 
 async fn run_event_loop() {
     let (tx, rx) = mpsc::channel(32);
-    let mut event_loop = EventLoop {rx};
+    let mut event_poller = EventLoop {rx};
     tx.send(1).await.unwrap();
-    spawn(async move {event_loop.start().await}).await;
-    // event_loop.stop().await;
+    spawn(async move {event_poller.start().await}).await;
+    // event_poller.stop().await;
 }
  */
 
