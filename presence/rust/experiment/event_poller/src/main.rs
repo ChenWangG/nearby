@@ -1,4 +1,3 @@
-/*
 use futures::executor::block_on;
 use async_std::task::spawn;
 use tokio::sync::mpsc;
@@ -26,7 +25,6 @@ async fn run_event_loop() {
     spawn(async move {event_poller.start().await}).await;
     // event_poller.stop().await;
 }
- */
 
 trait EventProcessor {
     type Event;
@@ -66,10 +64,13 @@ impl EventPoller<ScanController> {
 
 fn main() {
     println!("Hello, world!");
+    /*
     let scan_controller = ScanController{};
     scan_controller.process(ScanControllerEvent::BLE);
     let poller = EventPoller{ processor: ScanController{} };
     poller.add_ble_scanner();
     poller.start(ScanControllerEvent::BLE);
-    // block_on(run_event_loop());
+
+     */
+    block_on(run_event_loop());
 }
