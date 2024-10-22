@@ -1,6 +1,7 @@
 use tokio::sync::mpsc;
 use event_poller::EventProcessor;
 use event_poller::EventPoller;
+use tokio::sync::mpsc::error::SendError;
 
 struct ScanController {
     echo_sender: mpsc::Sender<i32>,
@@ -23,7 +24,13 @@ async fn test_event_poller() {
         EventPoller::create(ScanController{ echo_sender });
     scan_controller_poller.start();
 
-    scan_controller_writer.write(1).await;
+    let _ = scan_controller_writer.write(1).await;
     let received_number = echo_receiver.recv().await.unwrap();
     assert_eq!(received_number, 1);
+
+    scan_controller_writer.stop().await;
+    scan_controller_writer.write(2).await;
+    let received_number = echo_receiver.recv().await;
+    // Echo sender dropped together with the pawned task.
+    assert_eq!(received_number, None);
 }

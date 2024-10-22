@@ -1,6 +1,6 @@
 use tokio::sync::mpsc;
+use tokio::sync::mpsc::error::SendError;
 use tokio::task;
-
 
 pub trait EventProcessor: Send {
     type Event;
@@ -18,9 +18,10 @@ pub struct EventWriter<E> {
 }
 
 impl<E> EventWriter<E> {
-    pub async fn write(&self, event: E) {
-        if let Ok(permit) = self.sender.reserve().await {
-            permit.send(PollerEvent::Event(event));
+    pub async fn write(&self, event: E) -> Result<(), SendError<()>> {
+        match self.sender.send(PollerEvent::Event(event)).await {
+            Ok(_) =>  Ok(()),
+            Err(_) => Err(SendError(())),
         }
     }
 
