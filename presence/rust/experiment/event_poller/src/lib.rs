@@ -1,4 +1,3 @@
-use std::sync::mpsc::SendError;
 use tokio::sync::mpsc;
 use tokio::task;
 
@@ -20,7 +19,9 @@ pub struct EventWriter<E> {
 
 impl<E> EventWriter<E> {
     pub async fn write(&self, event: E) {
-        self.sender.send(PollerEvent::Event(event)).await;
+        if let Ok(permit) = self.sender.reserve().await {
+            permit.send(PollerEvent::Event(event));
+        }
     }
 
     pub async fn stop(&self) {
@@ -53,7 +54,10 @@ impl<P> EventPoller<P>
         task::spawn(async move {
             while let Some(poller_event) = self.receiver.recv().await {
                 match poller_event {
-                    PollerEvent::Stop => continue,
+                    PollerEvent::Stop => {
+                        self.receiver.close();
+                        break;
+                    }
                     PollerEvent::Event(event) => self.processor.process(event).await,
                 }
             }
