@@ -10,7 +10,6 @@ impl EventLoop {
         println!("Start event loop.");
         while let Some(number) = self.rx.recv().await {
             println!("received: {}", number);
-            return;
         }
     }
     pub async fn stop(&mut self) {
@@ -22,7 +21,10 @@ async fn run_event_loop() {
     let (tx, rx) = mpsc::channel(32);
     let mut event_poller = EventLoop {rx};
     tx.send(1).await.unwrap();
-    spawn(async move {event_poller.start().await}).await;
+    spawn(async move {event_poller.start().await});
+    for i in 1..100 {
+        tx.send(i).await.unwrap();
+    }
     // event_poller.stop().await;
 }
 

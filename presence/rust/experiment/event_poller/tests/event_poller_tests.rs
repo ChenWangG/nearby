@@ -1,82 +1,32 @@
-use async_std::task;
+use async_std::task::spawn;
 use futures::executor::block_on;
 use futures::future::join_all;
 use tokio::sync::mpsc;
+use tokio::sync::mpsc::Sender;
+use tokio::task;
 use event_poller::EventProcessor;
 use event_poller::EventPoller;
-#[derive(Clone)]
-enum ScanEvent {
-    BLE,
-}
 
-#[derive(Clone)]
-enum ScanProviderEvent {}
 struct ScanController {
-    ble_scan_sender: Option<mpsc::Sender<ScanProviderEvent>>,
+    sender: Sender<i32>,
 }
+
 impl EventProcessor for ScanController {
-    type Event = ScanEvent;
+    type Event = i32;
 
-    fn new() -> Self {
-        Self { ble_scan_sender: None}
+    async fn process(&mut self, event: Self::Event) {
+        // Echo the event back.
+        self.sender.send(event).await.unwrap();
     }
-    fn process(&mut self, event: ScanEvent) {
-        println!("Scan Controller process.")
-    }
-}
-
-impl ScanController {
-    fn add_ble_scan_provider(&mut self, writer: mpsc::Sender<ScanProviderEvent>) {
-       self.ble_scan_sender = Some(writer);
-    }
-}
-
-struct BleScanProvider {
-    scan_controller_sender: Option<mpsc::Sender<ScanEvent>>,
-}
-impl EventProcessor for crate::BleScanProvider {
-    type Event = ScanProviderEvent;
-
-    fn new() -> Self {
-        Self {scan_controller_sender: None}
-    }
-    fn process(&mut self, event: ScanProviderEvent) {
-        println!("Scan Provider process.")
-    }
-}
-
-impl BleScanProvider {
-    fn add_scan_controller(&mut self, writer: mpsc::Sender<ScanEvent>) {
-        self.scan_controller_sender = Some(writer);
-    }
-}
-
-fn start() -> async_std::task::JoinHandle<()> {
-    task::spawn(async move { assert_eq!(1, 1); })
-}
-async fn run() {
-    // task::spawn(async move { assert_eq!(1, 1); }).await;
-    assert_eq!(1, 1);
-    start().await
-}
-
-#[tokio::test]
-async fn test_run() {
-    run().await;
 }
 
 #[tokio::test]
 async fn test_event_poller() {
-    let (scan_controller_sender, mut scan_controller_poller) =
-        EventPoller::create(ScanController::new());
-
-    let (ble_scan_provider_sender, mut ble_scan_provider_poller) =
-        EventPoller::create(BleScanProvider::new());
-
-    scan_controller_poller.processor().add_ble_scan_provider(ble_scan_provider_sender);
-    ble_scan_provider_poller.processor().add_scan_controller(scan_controller_sender);
-
-    let tasks = vec![scan_controller_poller.start(), ble_scan_provider_poller.start()];
-
-    // join_all(tasks).await;
+    let(sender, mut receiver) = mpsc::channel(32);
+    let (scan_controller_writer, scan_controller_poller) =
+        EventPoller::create(ScanController{sender});
+    scan_controller_poller.start();
+    scan_controller_writer.write(1).await;
+    let received_number = receiver.recv().await.unwrap();
+    assert_eq!(received_number, 1);
 }
