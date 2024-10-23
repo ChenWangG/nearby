@@ -10,9 +10,13 @@ struct ScanController {
 impl EventProcessor for ScanController {
     type Event = i32;
 
-    async fn process(&mut self, event: Self::Event) {
+    async fn process(&mut self, event: Option<Self::Event>) {
         // Echo the event back.
-        self.echo_sender.send(event).await.expect("Echo send failed.");
+        let echo_event = match event {
+            None => -1,
+            Some(number) => number,
+        };
+        self.echo_sender.send(echo_event).await.expect("Echo send failed.");
     }
 }
 
@@ -29,8 +33,5 @@ async fn test_event_poller() {
     assert_eq!(received_number, 1);
 
     scan_controller_writer.stop().await;
-    scan_controller_writer.write(2).await;
-    let received_number = echo_receiver.recv().await;
-    // Echo sender dropped together with the pawned task.
-    assert_eq!(received_number, None);
+    assert_eq!(echo_receiver.recv().await, Some(-1));
 }

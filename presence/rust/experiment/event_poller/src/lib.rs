@@ -1,11 +1,12 @@
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::error::SendError;
 use tokio::task;
+use tokio::task::JoinHandle;
 
 pub trait EventProcessor: Send {
     type Event;
 
-    fn process(&mut self, event: Self::Event) -> impl std::future::Future<Output = ()> + Send;
+    fn process(&mut self, event: Option<Self::Event>) -> impl std::future::Future<Output = ()> + Send;
 }
 
 enum PollerEvent<E> {
@@ -50,18 +51,19 @@ impl<P> EventPoller<P>
         &mut self.processor
     }
 
-    pub fn start(mut self) {
+    pub fn start(mut self) -> JoinHandle<()> {
         println!("start poll.");
         task::spawn(async move {
-            while let Some(poller_event) = self.receiver.recv().await {
-                match poller_event {
-                    PollerEvent::Stop => {
-                        self.receiver.close();
+            loop {
+                match self.receiver.recv().await {
+                    Some(PollerEvent::Stop) => self.receiver.close(),
+                    Some(PollerEvent::Event(event)) => self.processor.process(Some(event)).await,
+                    None => {
+                        self.processor.process(None).await;
                         break;
                     }
-                    PollerEvent::Event(event) => self.processor.process(event).await,
                 }
             }
-        });
+        })
     }
 }
