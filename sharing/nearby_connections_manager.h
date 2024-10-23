@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "absl/container/flat_hash_set.h"
 #include "absl/strings/string_view.h"
 #include "absl/types/span.h"
 #include "sharing/common/nearby_share_enums.h"
@@ -76,10 +77,12 @@ class NearbyConnectionsManager {
   class PayloadStatusListener
       : public std::enable_shared_from_this<PayloadStatusListener> {
    public:
-    PayloadStatusListener();
-    virtual ~PayloadStatusListener();
+    PayloadStatusListener() = default;
+    virtual ~PayloadStatusListener() = default;
 
-    std::weak_ptr<PayloadStatusListener> GetWeakPtr();
+    std::weak_ptr<PayloadStatusListener> GetWeakPtr() {
+      return weak_from_this();
+    }
 
     // Note: `upgraded_medium` is passed in for use in metrics, and it is
     // absl::nullopt if the bandwidth has not upgraded yet or if the upgrade
@@ -105,6 +108,7 @@ class NearbyConnectionsManager {
                                 IncomingConnectionListener* listener,
                                 PowerLevel power_level,
                                 proto::DataUsage data_usage,
+                                bool use_stable_endpoint_id,
                                 ConnectionsCallback callback) = 0;
 
   // Stops advertising through Nearby Connections.
@@ -138,13 +142,8 @@ class NearbyConnectionsManager {
   virtual void RegisterPayloadStatusListener(
       int64_t payload_id, std::weak_ptr<PayloadStatusListener> listener) = 0;
 
-  // Register a `file_path` for receiving incoming payload with `payload_id`.
-  virtual void RegisterPayloadPath(int64_t payload_id,
-                                   const std::filesystem::path& file_path,
-                                   ConnectionsCallback callback) = 0;
-
   // Gets the payload associated with `payload_id` if available.
-  virtual Payload* GetIncomingPayload(int64_t payload_id) = 0;
+  virtual const Payload* GetIncomingPayload(int64_t payload_id) const = 0;
 
   // Cancels a Payload currently in-flight to or from remote endpoints.
   virtual void Cancel(int64_t payload_id) = 0;
@@ -161,6 +160,10 @@ class NearbyConnectionsManager {
 
   // Sets a custom save path.
   virtual void SetCustomSavePath(absl::string_view custom_save_path) = 0;
+
+  // Gets the file paths to delete and clear the hash set.
+  virtual absl::flat_hash_set<std::filesystem::path>
+  GetAndClearUnknownFilePathsToDelete() = 0;
 
   // Dump internal state for debugging purposes.
   virtual std::string Dump() const = 0;

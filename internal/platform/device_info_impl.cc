@@ -14,10 +14,14 @@
 
 #include "internal/platform/device_info_impl.h"
 
+#include <cstddef>
+#include <filesystem>  // NOLINT
 #include <functional>
 #include <optional>
 #include <string>
-#include <system_error>
+#include "absl/strings/string_view.h"
+#include "internal/base/files.h"
+#include "internal/platform/implementation/device_info.h"
 
 namespace nearby {
 
@@ -39,20 +43,8 @@ api::DeviceInfo::OsType DeviceInfoImpl::GetOsType() const {
   return device_info_impl_->GetOsType();
 }
 
-std::optional<std::string> DeviceInfoImpl::GetFullName() const {
-  return device_info_impl_->GetFullName();
-}
-
 std::optional<std::string> DeviceInfoImpl::GetGivenName() const {
   return device_info_impl_->GetGivenName();
-}
-
-std::optional<std::string> DeviceInfoImpl::GetLastName() const {
-  return device_info_impl_->GetLastName();
-}
-
-std::optional<std::string> DeviceInfoImpl::GetProfileUserName() const {
-  return device_info_impl_->GetProfileUserName();
 }
 
 std::filesystem::path DeviceInfoImpl::GetDownloadPath() const {
@@ -61,7 +53,8 @@ std::filesystem::path DeviceInfoImpl::GetDownloadPath() const {
   if (path.has_value()) {
     return *path;
   }
-  return std::filesystem::temp_directory_path();
+  return nearby::sharing::GetTemporaryDirectory().value_or(
+      nearby::sharing::CurrentDirectory());
 }
 
 std::filesystem::path DeviceInfoImpl::GetAppDataPath() const {
@@ -70,7 +63,8 @@ std::filesystem::path DeviceInfoImpl::GetAppDataPath() const {
   if (path.has_value()) {
     return *path;
   }
-  return std::filesystem::temp_directory_path();
+  return nearby::sharing::GetTemporaryDirectory().value_or(
+      nearby::sharing::CurrentDirectory());
 }
 
 std::filesystem::path DeviceInfoImpl::GetTemporaryPath() const {
@@ -79,7 +73,13 @@ std::filesystem::path DeviceInfoImpl::GetTemporaryPath() const {
   if (path.has_value()) {
     return *path;
   }
-  return std::filesystem::temp_directory_path();
+  return nearby::sharing::GetTemporaryDirectory().value_or(
+      nearby::sharing::CurrentDirectory());
+}
+
+std::filesystem::path DeviceInfoImpl::GetLogPath() const {
+  std::optional<std::filesystem::path> path = device_info_impl_->GetLogPath();
+  return path.value_or(GetTemporaryPath());
 }
 
 std::optional<size_t> DeviceInfoImpl::GetAvailableDiskSpaceInBytes(

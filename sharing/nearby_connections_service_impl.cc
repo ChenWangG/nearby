@@ -34,6 +34,7 @@
 #include "connections/payload.h"
 #include "connections/strategy.h"
 #include "internal/analytics/event_logger.h"
+#include "internal/platform/logging.h"
 #include "sharing/nearby_connections_service.h"
 #include "sharing/nearby_connections_types.h"
 
@@ -75,6 +76,7 @@ void NearbyConnectionsServiceImpl::StartAdvertising(
   options.enable_bluetooth_listening =
       advertising_options.enable_bluetooth_listening;
   options.enable_webrtc_listening = advertising_options.enable_webrtc_listening;
+  options.use_stable_endpoint_id = advertising_options.use_stable_endpoint_id;
   options.fast_advertisement_service_uuid =
       advertising_options.fast_advertisement_service_uuid.uuid;
 
@@ -201,6 +203,8 @@ void NearbyConnectionsServiceImpl::RequestConnection(
     options.remote_bluetooth_mac_address =
         NcByteArray(std::string(mac_address.begin(), mac_address.end()));
   }
+  options.non_disruptive_hotspot_mode =
+      connection_options.non_disruptive_hotspot_mode;
   NcConnectionRequestInfo connection_request_info;
   connection_request_info.endpoint_info =
       NcByteArray(std::string(endpoint_info.begin(), endpoint_info.end()));
@@ -286,7 +290,7 @@ void NearbyConnectionsServiceImpl::AcceptConnection(
               return;
             }
 
-            NEARBY_LOGS(VERBOSE) << "payload callback id=" << payload.GetId();
+            NEARBY_VLOG(1) << "payload callback id=" << payload.GetId();
 
             switch (payload.GetType()) {
               case NcPayloadType::kBytes:
@@ -307,8 +311,7 @@ void NearbyConnectionsServiceImpl::AcceptConnection(
             transfer_update.payload_id = info.payload_id;
             transfer_update.status = static_cast<PayloadStatus>(info.status);
             transfer_update.total_bytes = info.total_bytes;
-            NEARBY_LOGS(VERBOSE)
-                << "payload transfer update id=" << info.payload_id;
+            NEARBY_VLOG(1) << "payload transfer update id=" << info.payload_id;
             auto payload_listener = payload_listeners_.find(endpoint_id);
             if (payload_listener != payload_listeners_.end()) {
               payload_listener->second.payload_progress_cb(endpoint_id,

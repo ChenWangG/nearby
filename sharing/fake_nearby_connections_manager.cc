@@ -29,6 +29,7 @@
 #include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/strings/string_view.h"
+#include "absl/synchronization/mutex.h"
 #include "sharing/common/nearby_share_enums.h"
 #include "sharing/internal/public/logging.h"
 #include "sharing/nearby_connections_manager.h"
@@ -52,11 +53,14 @@ void FakeNearbyConnectionsManager::Shutdown() {
 
 void FakeNearbyConnectionsManager::StartAdvertising(
     std::vector<uint8_t> endpoint_info, IncomingConnectionListener* listener,
-    PowerLevel power_level, DataUsage data_usage,
+    PowerLevel power_level, DataUsage data_usage, bool use_stable_endpoint_id,
     ConnectionsCallback callback) {
   NL_DCHECK(!IsAdvertising());
   is_shutdown_ = false;
-  advertising_listener_ = listener;
+  {
+    absl::MutexLock lock(&listener_mutex_);
+    advertising_listener_ = listener;
+  }
   advertising_data_usage_ = data_usage;
   advertising_power_level_ = power_level;
   advertising_endpoint_info_ = std::move(endpoint_info);
@@ -72,7 +76,10 @@ void FakeNearbyConnectionsManager::StopAdvertising(
     ConnectionsCallback callback) {
   NL_DCHECK(IsAdvertising());
   NL_DCHECK(!is_shutdown());
-  advertising_listener_ = nullptr;
+  {
+    absl::MutexLock lock(&listener_mutex_);
+    advertising_listener_ = nullptr;
+  }
   advertising_data_usage_ = DataUsage::UNKNOWN_DATA_USAGE;
   advertising_power_level_ = PowerLevel::kUnknown;
   advertising_endpoint_info_.reset();
@@ -88,6 +95,7 @@ void FakeNearbyConnectionsManager::StartDiscovery(
     DiscoveryListener* listener, DataUsage data_usage,
     ConnectionsCallback callback) {
   is_shutdown_ = false;
+  absl::MutexLock lock(&listener_mutex_);
   discovery_listener_ = listener;
   std::move(callback)(Status::kSuccess);
 }
@@ -95,6 +103,7 @@ void FakeNearbyConnectionsManager::StartDiscovery(
 void FakeNearbyConnectionsManager::StopDiscovery() {
   NL_DCHECK(IsDiscovering());
   NL_DCHECK(!is_shutdown());
+  absl::MutexLock lock(&listener_mutex_);
   discovery_listener_ = nullptr;
 }
 
@@ -130,24 +139,10 @@ void FakeNearbyConnectionsManager::RegisterPayloadStatusListener(
   payload_status_listeners_[payload_id] = listener;
 }
 
-void FakeNearbyConnectionsManager::RegisterPayloadPath(
-    int64_t payload_id, const std::filesystem::path& file_path,
-    ConnectionsCallback callback) {
+const Payload* FakeNearbyConnectionsManager::GetIncomingPayload(
+    int64_t payload_id) const {
   NL_DCHECK(!is_shutdown());
-
-  registered_payload_paths_[payload_id] = file_path;
-
-  auto it = payload_path_status_.find(payload_id);
-  if (it == payload_path_status_.end()) {
-    std::move(callback)(nearby::sharing::Status::kPayloadUnknown);
-    return;
-  }
-
-  std::move(callback)(it->second);
-}
-
-Payload* FakeNearbyConnectionsManager::GetIncomingPayload(int64_t payload_id) {
-  NL_DCHECK(!is_shutdown());
+  absl::MutexLock lock(&incoming_payloads_mutex_);
   auto it = incoming_payloads_.find(payload_id);
   if (it == incoming_payloads_.end()) return nullptr;
 
@@ -173,6 +168,7 @@ void FakeNearbyConnectionsManager::Cancel(int64_t payload_id) {
 }
 
 void FakeNearbyConnectionsManager::ClearIncomingPayloads() {
+  absl::MutexLock lock(&incoming_payloads_mutex_);
   incoming_payloads_.clear();
   payload_status_listeners_.clear();
 }
@@ -201,23 +197,33 @@ void FakeNearbyConnectionsManager::UpgradeBandwidth(
 void FakeNearbyConnectionsManager::OnEndpointFound(
     absl::string_view endpoint_id,
     std::unique_ptr<DiscoveredEndpointInfo> info) {
-  if (discovery_listener_ == nullptr) return;
-
-  discovery_listener_->OnEndpointDiscovered(endpoint_id, info->endpoint_info);
+  DiscoveryListener* listener = nullptr;
+  {
+    absl::MutexLock lock(&listener_mutex_);
+    listener = discovery_listener_;
+  }
+  if (listener == nullptr) return;
+  listener->OnEndpointDiscovered(endpoint_id, info->endpoint_info);
 }
 
 void FakeNearbyConnectionsManager::OnEndpointLost(
     absl::string_view endpoint_id) {
-  if (!discovery_listener_) return;
-
-  discovery_listener_->OnEndpointLost(endpoint_id);
+  DiscoveryListener* listener = nullptr;
+  {
+    absl::MutexLock lock(&listener_mutex_);
+    listener = discovery_listener_;
+  }
+  if (listener == nullptr) return;
+  listener->OnEndpointLost(endpoint_id);
 }
 
 bool FakeNearbyConnectionsManager::IsAdvertising() const {
+  absl::MutexLock lock(&listener_mutex_);
   return advertising_listener_ != nullptr;
 }
 
 bool FakeNearbyConnectionsManager::IsDiscovering() const {
+  absl::MutexLock lock(&listener_mutex_);
   return discovery_listener_ != nullptr;
 }
 
@@ -225,11 +231,6 @@ bool FakeNearbyConnectionsManager::DidUpgradeBandwidth(
     absl::string_view endpoint_id) const {
   return upgrade_bandwidth_endpoint_ids_.find(endpoint_id) !=
          upgrade_bandwidth_endpoint_ids_.end();
-}
-
-void FakeNearbyConnectionsManager::SetPayloadPathStatus(
-    int64_t payload_id, ConnectionsStatus status) {
-  payload_path_status_[payload_id] = status;
 }
 
 std::weak_ptr<FakeNearbyConnectionsManager::PayloadStatusListener>
@@ -243,6 +244,7 @@ FakeNearbyConnectionsManager::GetRegisteredPayloadStatusListener(
 
 void FakeNearbyConnectionsManager::SetIncomingPayload(
     int64_t payload_id, std::unique_ptr<Payload> payload) {
+  absl::MutexLock lock(&incoming_payloads_mutex_);
   incoming_payloads_[payload_id] = std::move(payload);
 }
 
@@ -251,15 +253,8 @@ bool FakeNearbyConnectionsManager::WasPayloadCanceled(
   return absl::c_linear_search(canceled_payload_ids_, payload_id);
 }
 
-std::optional<std::filesystem::path>
-FakeNearbyConnectionsManager::GetRegisteredPayloadPath(int64_t payload_id) {
-  auto it = registered_payload_paths_.find(payload_id);
-  if (it == registered_payload_paths_.end()) return std::nullopt;
-
-  return it->second;
-}
-
 void FakeNearbyConnectionsManager::CleanupForProcessStopped() {
+  absl::MutexLock lock(&listener_mutex_);
   advertising_listener_ = nullptr;
   advertising_data_usage_ = DataUsage::UNKNOWN_DATA_USAGE;
   advertising_power_level_ = PowerLevel::kUnknown;
@@ -309,6 +304,23 @@ void FakeNearbyConnectionsManager::HandleStopAdvertisingCallback(
 void FakeNearbyConnectionsManager::SetCustomSavePath(
     absl::string_view custom_save_path) {
   custom_save_path_ = custom_save_path;
+}
+
+absl::flat_hash_set<std::filesystem::path>
+FakeNearbyConnectionsManager::GetAndClearUnknownFilePathsToDelete() {
+  absl::flat_hash_set<std::filesystem::path> file_paths_to_delete =
+      file_paths_to_delete_;
+  file_paths_to_delete_.clear();
+  return file_paths_to_delete;
+}
+
+absl::flat_hash_set<std::filesystem::path>
+FakeNearbyConnectionsManager::GetUnknownFilePathsToDeleteForTesting() {
+  return file_paths_to_delete_;
+}
+void FakeNearbyConnectionsManager::AddUnknownFilePathsToDeleteForTesting(
+    std::filesystem::path file_path) {
+  file_paths_to_delete_.insert(file_path);
 }
 
 std::string FakeNearbyConnectionsManager::Dump() const { return ""; }

@@ -95,6 +95,7 @@ class NearbyShareCertificateManagerImplTest
   ~NearbyShareCertificateManagerImplTest() override = default;
 
   void SetUp() override {
+    FakeTaskRunner::ResetPendingTasksCount();
     ON_CALL(mock_sharing_platform_, GetPreferenceManager)
         .WillByDefault(ReturnRef(preference_manager_));
     ON_CALL(mock_sharing_platform_, GetAccountManager)
@@ -116,8 +117,9 @@ class NearbyShareCertificateManagerImplTest
 
     fake_account_manager_.SetAccount(account);
 
-    fake_account_manager_.Login([](AccountManager::Account account) {},
-                                [](absl::Status status) {});
+    fake_account_manager_.Login(
+        "test_client_id", "test_client_secret",
+        [](AccountManager::Account account) {}, [](absl::Status status) {});
 
     NearbyShareSchedulerFactory::SetFactoryForTesting(&scheduler_factory_);
     NearbyShareCertificateStorageImpl::Factory::SetFactoryForTesting(
@@ -207,16 +209,14 @@ class NearbyShareCertificateManagerImplTest
 
   void SetMockBluetoothAddress(absl::string_view bluetooth_mac_address) {
     FakeBluetoothAdapter& bluetooth_adapter =
-        dynamic_cast<FakeBluetoothAdapter&>(
-            fake_context_.GetBluetoothAdapter());
+        *fake_context_.fake_bluetooth_adapter();
     bluetooth_adapter.SetAddress(bluetooth_mac_address);
   }
 
   void SetBluetoothAdapterIsPresent(bool is_present) {
     if (!is_present) {
       FakeBluetoothAdapter& bluetooth_adapter =
-          dynamic_cast<FakeBluetoothAdapter&>(
-              fake_context_.GetBluetoothAdapter());
+          *fake_context_.fake_bluetooth_adapter();
       bluetooth_adapter.SetAddress("");
     }
   }
@@ -465,6 +465,12 @@ class NearbyShareCertificateManagerImplTest
 
 TEST_F(NearbyShareCertificateManagerImplTest,
        EncryptPrivateCertificateMetadataKey) {
+  // No certificates exist for hidden or unspecified visibility.
+  EXPECT_FALSE(cert_manager_->EncryptPrivateCertificateMetadataKey(
+      DeviceVisibility::DEVICE_VISIBILITY_HIDDEN));
+  EXPECT_FALSE(cert_manager_->EncryptPrivateCertificateMetadataKey(
+      DeviceVisibility::DEVICE_VISIBILITY_UNSPECIFIED));
+
   // No valid certificates exist.
   cert_store_->ReplacePrivateCertificates({});
   EXPECT_FALSE(cert_manager_->EncryptPrivateCertificateMetadataKey(
@@ -500,6 +506,21 @@ TEST_F(NearbyShareCertificateManagerImplTest,
   EXPECT_NE(cert_store_->GetPrivateCertificates()->at(0).ToCertificateData(),
             private_certificate.ToCertificateData());
 
+  // Set up valid all-contacts visibility certificate. Then test with everyone
+  // visibility.
+  cert_store_->ReplacePrivateCertificates({private_certificate});
+  FastForward(GetNearbyShareTestNotBefore() +
+              kNearbyShareCertificateValidityPeriod * 0.5 - Now());
+
+  std::optional<NearbyShareEncryptedMetadataKey>
+      encrypted_metadata_key_everyone =
+          cert_manager_->EncryptPrivateCertificateMetadataKey(
+              DeviceVisibility::DEVICE_VISIBILITY_EVERYONE);
+  EXPECT_EQ(GetNearbyShareTestEncryptedMetadataKey().encrypted_key(),
+            encrypted_metadata_key_everyone->encrypted_key());
+  EXPECT_EQ(GetNearbyShareTestEncryptedMetadataKey().salt(),
+            encrypted_metadata_key_everyone->salt());
+
   // No valid certificates exist.
   FastForward(kNearbyShareCertificateValidityPeriod);
   EXPECT_FALSE(cert_manager_->EncryptPrivateCertificateMetadataKey(
@@ -523,9 +544,31 @@ TEST_F(NearbyShareCertificateManagerImplTest, SignWithPrivateCertificate) {
           DeviceVisibility::DEVICE_VISIBILITY_ALL_CONTACTS,
           GetNearbyShareTestPayloadToSign())));
 
+  // Set up valid all-contacts visibility certificate. Then test with everyone
+  // visibility.
+  cert_store_->ReplacePrivateCertificates({private_certificate});
+  FastForward(GetNearbyShareTestNotBefore() +
+              kNearbyShareCertificateValidityPeriod * 0.5 - Now());
+
+  // Perform sign/verify round trip.
+  EXPECT_TRUE(GetNearbyShareTestDecryptedPublicCertificate().VerifySignature(
+      GetNearbyShareTestPayloadToSign(),
+      *cert_manager_->SignWithPrivateCertificate(
+          DeviceVisibility::DEVICE_VISIBILITY_EVERYONE,
+          GetNearbyShareTestPayloadToSign())));
+
   // No selected-contact visibility certificate in storage.
   EXPECT_FALSE(cert_manager_->SignWithPrivateCertificate(
       DeviceVisibility::DEVICE_VISIBILITY_SELECTED_CONTACTS,
+      GetNearbyShareTestPayloadToSign()));
+
+  // No certificates exist for hidden or unspecified visibility.
+  EXPECT_FALSE(cert_manager_->SignWithPrivateCertificate(
+      DeviceVisibility::DEVICE_VISIBILITY_HIDDEN,
+      GetNearbyShareTestPayloadToSign()));
+
+  EXPECT_FALSE(cert_manager_->SignWithPrivateCertificate(
+      DeviceVisibility::DEVICE_VISIBILITY_UNSPECIFIED,
       GetNearbyShareTestPayloadToSign()));
 }
 
@@ -544,9 +587,30 @@ TEST_F(NearbyShareCertificateManagerImplTest,
                 DeviceVisibility::DEVICE_VISIBILITY_ALL_CONTACTS,
                 GetNearbyShareTestPayloadToSign()));
 
+  // Set up valid all-contacts visibility certificate. Then test with everyone
+  // visibility.
+  cert_store_->ReplacePrivateCertificates({private_certificate});
+  FastForward(GetNearbyShareTestNotBefore() +
+              kNearbyShareCertificateValidityPeriod * 0.5 - Now());
+
+  EXPECT_EQ(private_certificate.HashAuthenticationToken(
+                GetNearbyShareTestPayloadToSign()),
+            cert_manager_->HashAuthenticationTokenWithPrivateCertificate(
+                DeviceVisibility::DEVICE_VISIBILITY_EVERYONE,
+                GetNearbyShareTestPayloadToSign()));
+
   // No selected-contact visibility certificate in storage.
   EXPECT_FALSE(cert_manager_->HashAuthenticationTokenWithPrivateCertificate(
       DeviceVisibility::DEVICE_VISIBILITY_SELECTED_CONTACTS,
+      GetNearbyShareTestPayloadToSign()));
+
+  // No certificates exist for hidden or unspecified visibility.
+  EXPECT_FALSE(cert_manager_->HashAuthenticationTokenWithPrivateCertificate(
+      DeviceVisibility::DEVICE_VISIBILITY_HIDDEN,
+      GetNearbyShareTestPayloadToSign()));
+
+  EXPECT_FALSE(cert_manager_->HashAuthenticationTokenWithPrivateCertificate(
+      DeviceVisibility::DEVICE_VISIBILITY_UNSPECIFIED,
       GetNearbyShareTestPayloadToSign()));
 }
 

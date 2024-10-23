@@ -29,6 +29,8 @@
 #include "absl/strings/string_view.h"
 #include "internal/platform/device_info.h"
 #include "internal/platform/mutex.h"
+#include "internal/platform/task_runner.h"
+#include "internal/platform/timer.h"
 #include "sharing/common/nearby_share_enums.h"
 #include "sharing/internal/public/connectivity_manager.h"
 #include "sharing/internal/public/context.h"
@@ -45,7 +47,7 @@ namespace sharing {
 class NearbyConnectionsManagerImpl : public NearbyConnectionsManager {
  public:
   explicit NearbyConnectionsManagerImpl(
-      Context* context,
+      nearby::TaskRunner* connections_callback_task_runner, Context* context,
       nearby::ConnectivityManager& connectivity_manager,
       nearby::DeviceInfo& device_info,
       std::unique_ptr<NearbyConnectionsService> nearby_connections_service);
@@ -59,6 +61,7 @@ class NearbyConnectionsManagerImpl : public NearbyConnectionsManager {
   void StartAdvertising(std::vector<uint8_t> endpoint_info,
                         IncomingConnectionListener* listener,
                         PowerLevel power_level, proto::DataUsage data_usage,
+                        bool use_stable_endpoint_id,
                         ConnectionsCallback callback) override;
   void StopAdvertising(ConnectionsCallback callback) override;
   void StartDiscovery(DiscoveryListener* listener, proto::DataUsage data_usage,
@@ -75,21 +78,32 @@ class NearbyConnectionsManagerImpl : public NearbyConnectionsManager {
   void RegisterPayloadStatusListener(
       int64_t payload_id,
       std::weak_ptr<PayloadStatusListener> listener) override;
-  void RegisterPayloadPath(int64_t payload_id,
-                           const std::filesystem::path& file_path,
-                           ConnectionsCallback callback) override;
-  Payload* GetIncomingPayload(int64_t payload_id) override;
+  const Payload* GetIncomingPayload(int64_t payload_id) const override
+      ABSL_LOCKS_EXCLUDED(mutex_);
   void Cancel(int64_t payload_id) override;
   void ClearIncomingPayloads() override;
   std::optional<std::vector<uint8_t>> GetRawAuthenticationToken(
       absl::string_view endpoint_id) override;
   void UpgradeBandwidth(absl::string_view endpoint_id) override;
   void SetCustomSavePath(absl::string_view custom_save_path) override;
+  absl::flat_hash_set<std::filesystem::path>
+  GetAndClearUnknownFilePathsToDelete() override;
   std::string Dump() const override;
 
   NearbyConnectionsService* GetNearbyConnectionsService() const {
     return nearby_connections_service_.get();
   }
+
+  absl::flat_hash_set<std::filesystem::path>
+  GetUnknownFilePathsToDeleteForTesting();
+  void AddUnknownFilePathsToDeleteForTesting(std::filesystem::path file_path);
+  void ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus status, PayloadContent::Type type,
+      const std::filesystem::path& path);
+  void OnPayloadTransferUpdateForTesting(absl::string_view endpoint_id,
+                                         const PayloadTransferUpdate& update);
+  void OnPayloadReceivedForTesting(absl::string_view endpoint_id,
+                                   Payload& payload);
 
  private:
   // EndpointDiscoveryListener:
@@ -112,6 +126,20 @@ class NearbyConnectionsManagerImpl : public NearbyConnectionsManager {
   void OnConnectionTimedOut(absl::string_view endpoint_id);
   void OnConnectionRequested(absl::string_view endpoint_id,
                              ConnectionsStatus status);
+  void ProcessUnknownFilePathsToDelete(PayloadStatus status,
+                                       PayloadContent::Type type,
+                                       const std::filesystem::path& path);
+  void DeleteUnknownFilePayloadAndCancel(Payload& payload);
+  absl::flat_hash_set<std::filesystem::path> GetUnknownFilePathsToDelete();
+
+  std::optional<std::weak_ptr<PayloadStatusListener>> GetStatusListenerForId(
+      int64_t payload_id) const ABSL_LOCKS_EXCLUDED(mutex_);
+
+  NearbyConnectionImpl* GetConnectionForId(absl::string_view endpoint_id) const
+      ABSL_LOCKS_EXCLUDED(mutex_);
+
+  void RemoveStatusListenerForPayloadId(int64_t payload_id)
+      ABSL_LOCKS_EXCLUDED(mutex_);
 
   void Reset();
 
@@ -120,6 +148,7 @@ class NearbyConnectionsManagerImpl : public NearbyConnectionsManager {
   void SendWithoutDelay(absl::string_view endpoint_id,
                         std::unique_ptr<Payload> payload);
 
+  nearby::TaskRunner* const connections_callback_task_runner_;
   Context* const context_;
   nearby::ConnectivityManager& connectivity_manager_;
   nearby::DeviceInfo& device_info_;
@@ -175,6 +204,10 @@ class NearbyConnectionsManagerImpl : public NearbyConnectionsManager {
 
   // Avoid calling to disconnect on an endpoint multiple times.
   absl::flat_hash_set<std::string> disconnecting_endpoints_
+      ABSL_GUARDED_BY(mutex_);
+
+  // A set of file paths to delete.
+  absl::flat_hash_set<std::filesystem::path> file_paths_to_delete_
       ABSL_GUARDED_BY(mutex_);
 };
 

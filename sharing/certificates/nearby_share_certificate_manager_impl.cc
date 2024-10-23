@@ -23,7 +23,6 @@
 #include <memory>
 #include <optional>
 #include <ostream>
-#include <set>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -296,7 +295,8 @@ void NearbyShareCertificateManagerImpl::CertificateDownloadContext::
                    const absl::StatusOr<ListPublicCertificatesResponse>&
                        response) mutable {
         if (!response.ok()) {
-          NL_LOG(ERROR) << __func__ << ": Failed to download certificates.";
+          NL_LOG(WARNING) << __func__ << ": Failed to download certificates: "
+                          << response.status();
           std::move(download_failure_callback_)();
           return;
         }
@@ -470,6 +470,17 @@ void NearbyShareCertificateManagerImpl::OnStop() {
 std::optional<NearbySharePrivateCertificate>
 NearbyShareCertificateManagerImpl::GetValidPrivateCertificate(
     DeviceVisibility visibility) const {
+  if (visibility == DeviceVisibility::DEVICE_VISIBILITY_UNSPECIFIED ||
+      visibility == DeviceVisibility::DEVICE_VISIBILITY_HIDDEN) {
+    return std::nullopt;
+  }
+
+  // If the user already signed in, setup contacts certificate for everyone
+  // mode to show correct user icon on remote device.
+  if (visibility == DeviceVisibility::DEVICE_VISIBILITY_EVERYONE) {
+    visibility = DeviceVisibility::DEVICE_VISIBILITY_ALL_CONTACTS;
+  }
+
   std::optional<std::vector<NearbySharePrivateCertificate>> certs =
       *certificate_storage_->GetPrivateCertificates();
   for (auto& cert : *certs) {
@@ -493,7 +504,6 @@ void NearbyShareCertificateManagerImpl::UpdatePrivateCertificateInStorage(
 }
 
 void NearbyShareCertificateManagerImpl::OnContactsDownloaded(
-    const std::set<std::string>& allowed_contact_ids,
     const std::vector<nearby::sharing::proto::ContactRecord>& contacts,
     uint32_t num_unreachable_contacts_filtered_out) {
   NL_LOG(INFO) << __func__ << ": Contacts downloaded.";

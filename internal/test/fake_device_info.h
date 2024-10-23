@@ -16,7 +16,7 @@
 #define THIRD_PARTY_NEARBY_INTERNAL_TEST_FAKE_DEVICE_INFO_H_
 
 #include <cstddef>
-#include <filesystem>
+#include <filesystem>  // NOLINT
 #include <functional>
 #include <limits>
 #include <optional>
@@ -40,17 +40,8 @@ class FakeDeviceInfo : public DeviceInfo {
 
   api::DeviceInfo::OsType GetOsType() const override { return os_type_; }
 
-  std::optional<std::string> GetFullName() const override {
-    return full_name_;
-  }
   std::optional<std::string> GetGivenName() const override {
     return given_name_;
-  }
-  std::optional<std::string> GetLastName() const override {
-    return last_name_;
-  }
-  std::optional<std::string> GetProfileUserName() const override {
-    return profile_user_name_;
   }
 
   std::filesystem::path GetDownloadPath() const override {
@@ -62,6 +53,8 @@ class FakeDeviceInfo : public DeviceInfo {
   }
 
   std::filesystem::path GetTemporaryPath() const override { return temp_path_; }
+
+  std::filesystem::path GetLogPath() const override { return temp_path_; }
 
   std::optional<size_t> GetAvailableDiskSpaceInBytes(
       const std::filesystem::path& path) const override {
@@ -103,35 +96,11 @@ class FakeDeviceInfo : public DeviceInfo {
 
   void SetOsType(api::DeviceInfo::OsType os_type) { os_type_ = os_type; }
 
-  void SetFullName(std::optional<std::string> full_name) {
-    if (full_name.has_value() && !full_name->empty()) {
-      full_name_ = full_name;
-    } else {
-      full_name_ = std::nullopt;
-    }
-  }
-
   void SetGivenName(std::optional<std::string> given_name) {
     if (given_name.has_value() && !given_name->empty()) {
       given_name_ = given_name;
     } else {
       given_name_ = std::nullopt;
-    }
-  }
-
-  void SetLastName(std::optional<std::string> last_name) {
-    if (last_name.has_value() && !last_name->empty()) {
-      last_name_ = last_name;
-    } else {
-      last_name_ = std::nullopt;
-    }
-  }
-
-  void SetProfileUserName(std::optional<std::string> profile_user_name) {
-    if (profile_user_name.has_value() && !profile_user_name->empty()) {
-      profile_user_name_ = profile_user_name;
-    } else {
-      profile_user_name_ = std::nullopt;
     }
   }
 
@@ -164,10 +133,7 @@ class FakeDeviceInfo : public DeviceInfo {
   api::DeviceInfo::DeviceType device_type_ =
       api::DeviceInfo::DeviceType::kLaptop;
   api::DeviceInfo::OsType os_type_ = api::DeviceInfo::OsType::kWindows;
-  std::optional<std::string> full_name_ = "Nearby";
   std::optional<std::string> given_name_ = "Nearby";
-  std::optional<std::string> last_name_ = "Nearby";
-  std::optional<std::string> profile_user_name_ = "nearby";
   std::filesystem::path download_path_ = std::filesystem::temp_directory_path();
   std::filesystem::path app_data_path_ = std::filesystem::temp_directory_path();
   std::filesystem::path temp_path_ = std::filesystem::temp_directory_path();

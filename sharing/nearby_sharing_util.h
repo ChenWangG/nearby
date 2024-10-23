@@ -27,15 +27,9 @@
 #include "sharing/advertisement.h"
 #include "sharing/certificates/nearby_share_decrypted_public_certificate.h"
 #include "sharing/common/nearby_share_enums.h"
-#include "sharing/nearby_connections_types.h"
 #include "sharing/nearby_sharing_service.h"
-#include "sharing/transfer_metadata.h"
 
-namespace nearby {
-namespace sharing {
-
-// Checks whether the background scanning feature is enabled or not.
-bool IsBackgroundScanningFeatureEnabled();
+namespace nearby::sharing {
 
 // Checks whether having enough disk space for required storage.
 //
@@ -51,12 +45,8 @@ std::optional<std::vector<uint8_t>> GetBluetoothMacAddressFromCertificate(
 
 // Returns device name based on arguments advertisement and certificate.
 std::optional<std::string> GetDeviceName(
-    const Advertisement* advertisement,
+    const Advertisement& advertisement,
     const std::optional<NearbyShareDecryptedPublicCertificate>& certificate);
-
-// Converts authentication token to four bytes digit string.
-std::optional<std::string> TokenToFourDigitString(
-    const std::optional<std::vector<uint8_t>>& bytes);
 
 std::string ReceiveSurfaceStateToString(
     NearbySharingService::ReceiveSurfaceState state);
@@ -74,13 +64,6 @@ std::string GetDeviceId(
     absl::string_view endpoint_id,
     const std::optional<NearbyShareDecryptedPublicCertificate>& certificate);
 
-::location::nearby::proto::sharing::AttachmentTransmissionStatus
-ConvertToTransmissionStatus(TransferMetadata::Status status);
-
-::location::nearby::proto::sharing::ConnectionLayerStatus
-ConvertToConnectionLayerStatus(Status status);
-
-}  // namespace sharing
-}  // namespace nearby
+}  // namespace nearby::sharing
 
 #endif  // THIRD_PARTY_NEARBY_SHARING_NEARBY_SHARING_UTIL_H_

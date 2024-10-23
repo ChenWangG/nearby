@@ -18,50 +18,46 @@
 #include <filesystem>  // NOLINT(build/c++17)
 #include <functional>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 
+#include "absl/functional/any_invocable.h"
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
 #include "absl/types/span.h"
+#include "internal/base/files.h"
 #include "internal/platform/task_runner_impl.h"
 #include "sharing/common/compatible_u8_string.h"
+#include "sharing/internal/api/sharing_platform.h"
 #include "sharing/internal/public/logging.h"
 
 namespace nearby {
 namespace sharing {
 namespace {
 
+using ::nearby::sharing::api::SharingPlatform;
+
 // Called on the FileTaskRunner to actually open the files passed.
 std::vector<NearbyFileHandler::FileInfo> DoOpenFiles(
     absl::Span<const std::filesystem::path> file_paths) {
   std::vector<NearbyFileHandler::FileInfo> files;
   for (const auto& file_path : file_paths) {
-    if (!std::filesystem::exists(file_path)) {
+    std::optional<uintmax_t> size = GetFileSize(file_path);
+    if (!size.has_value()) {
       NL_LOG(ERROR) << __func__ << ": Failed to open file. File="
                     << GetCompatibleU8String(file_path.u8string());
       return {};
     }
-
-    int64_t size = std::filesystem::file_size(file_path);
-    if (size < 0) return {};
-
-    files.push_back({size, file_path});
+    files.push_back({*size, file_path});
   }
   return files;
 }
 
-std::filesystem::path GenerateUniquePath(const std::filesystem::path& path) {
-  NL_DCHECK(!path.empty());
-  // Nearby Share is not responsible for generating unique paths, any more.
-  // Nearby Connections contains the logic to ensure there is no conflict.
-  // Just return the original file path, here.
-  return path;
-}
-
 }  // namespace
 
-NearbyFileHandler::NearbyFileHandler() {
+NearbyFileHandler::NearbyFileHandler(SharingPlatform& platform)
+    : platform_(platform) {
   sequenced_task_runner_ = std::make_unique<TaskRunnerImpl>(1);
 }
 
@@ -74,28 +70,6 @@ void NearbyFileHandler::OpenFiles(std::vector<std::filesystem::path> file_paths,
         auto opened_files = DoOpenFiles(file_paths);
         callback(opened_files);
       });
-}
-
-void NearbyFileHandler::GetUniquePath(const std::filesystem::path& file_path,
-                                      GetUniquePathCallback callback) {
-  sequenced_task_runner_->PostTask(
-      [callback = std::move(callback), file_path]() {
-        std::filesystem::path unique_path = GenerateUniquePath(file_path);
-        callback(unique_path);
-      });
-}
-
-bool RemoveFile(const std::filesystem::path file) noexcept {
-  try {
-    if (!std::filesystem::remove(file)) {
-      return false;
-    }
-  } catch (std::exception) {
-    return false;
-  } catch (...) {
-    return false;
-  }
-  return true;
 }
 
 void NearbyFileHandler::DeleteFilesFromDisk(
@@ -127,6 +101,16 @@ void NearbyFileHandler::DeleteFilesFromDisk(
     }
     callback();
   });
+}
+
+void NearbyFileHandler::UpdateFilesOriginMetadata(
+    std::vector<std::filesystem::path> file_paths,
+    absl::AnyInvocable<void(bool success)> callback) {
+  sequenced_task_runner_->PostTask(
+      [this, callback = std::move(callback),
+       file_paths = std::move(file_paths)]() mutable {
+        std::move(callback)(platform_.UpdateFileOriginMetadata(file_paths));
+      });
 }
 
 }  // namespace sharing

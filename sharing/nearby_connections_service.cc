@@ -37,14 +37,13 @@ Status ConvertToStatus(NcStatus status) {
 Payload ConvertToPayload(NcPayload payload) {
   switch (payload.GetType()) {
     case NcPayloadType::kBytes: {
-      NcByteArray bytes = payload.AsBytes();
+      const NcByteArray& bytes = payload.AsBytes();
       std::string data = std::string(bytes);
       return Payload(payload.GetId(),
                      std::vector<uint8_t>(data.begin(), data.end()));
     }
     case NcPayloadType::kFile: {
-      std::filesystem::path file_path =
-          std::filesystem::u8path(payload.AsFile()->GetFilePath());
+      std::string file_path = payload.AsFile()->GetFilePath();
       std::string parent_folder = payload.GetParentFolder();
       NL_VLOG(1) << __func__ << ": Payload file_path=" << file_path
                  << ", parent_folder = " << parent_folder;

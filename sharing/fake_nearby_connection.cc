@@ -22,22 +22,29 @@
 #include <utility>
 #include <vector>
 
+#include "absl/synchronization/mutex.h"
+#include "internal/platform/task_runner.h"
 #include "sharing/internal/public/logging.h"
-#include "sharing/nearby_connection.h"
 
 namespace nearby {
 namespace sharing {
-FakeNearbyConnection::FakeNearbyConnection() = default;
+FakeNearbyConnection::FakeNearbyConnection(TaskRunner* task_runner)
+    : task_runner_(task_runner) {}
 FakeNearbyConnection::~FakeNearbyConnection() = default;
 
-void FakeNearbyConnection::Read(ReadCallback callback) {
+void FakeNearbyConnection::Read(
+    std::function<void(std::optional<std::vector<uint8_t>> bytes)> callback) {
   NL_DCHECK(!closed_);
-  callback_ = std::move(callback);
+  {
+    absl::MutexLock lock(&read_mutex_);
+    callback_ = std::move(callback);
+  }
   MaybeRunCallback();
 }
 
 void FakeNearbyConnection::Write(std::vector<uint8_t> bytes) {
   NL_DCHECK(!closed_);
+  absl::MutexLock lock(&write_mutex_);
   write_data_.push(std::move(bytes));
 }
 
@@ -45,10 +52,23 @@ void FakeNearbyConnection::Close() {
   NL_DCHECK(!closed_);
   closed_ = true;
 
-  if (disconnect_listener_) {
-    std::move(disconnect_listener_)();
+  {
+    if (task_runner_) {
+      task_runner_->PostTask([this]() {
+        absl::MutexLock lock(&disconnect_mutex_);
+        if (disconnect_listener_) {
+          std::move(disconnect_listener_)();
+        }
+      });
+      return;
+    }
+    absl::MutexLock lock(&disconnect_mutex_);
+    if (disconnect_listener_) {
+      std::move(disconnect_listener_)();
+    }
   }
 
+  absl::MutexLock lock(&read_mutex_);
   if (callback_) {
     has_read_callback_been_run_ = true;
     auto callback = std::move(callback_);
@@ -60,16 +80,31 @@ void FakeNearbyConnection::Close() {
 void FakeNearbyConnection::SetDisconnectionListener(
     std::function<void()> listener) {
   NL_DCHECK(!closed_);
+  absl::MutexLock lock(&disconnect_mutex_);
   disconnect_listener_ = std::move(listener);
 }
 
 void FakeNearbyConnection::AppendReadableData(std::vector<uint8_t> bytes) {
   NL_DCHECK(!closed_);
-  read_data_.push(std::move(bytes));
+  if (task_runner_) {
+    task_runner_->PostTask([this, bytes = std::move(bytes)]() {
+      {
+        absl::MutexLock lock(&read_mutex_);
+        read_data_.push(std::move(bytes));
+      }
+      MaybeRunCallback();
+    });
+    return;
+  }
+  {
+    absl::MutexLock lock(&read_mutex_);
+    read_data_.push(std::move(bytes));
+  }
   MaybeRunCallback();
 }
 
 std::vector<uint8_t> FakeNearbyConnection::GetWrittenData() {
+  absl::MutexLock lock(&write_mutex_);
   if (write_data_.empty()) return {};
 
   std::vector<uint8_t> bytes = std::move(write_data_.front());
@@ -81,12 +116,17 @@ bool FakeNearbyConnection::IsClosed() { return closed_; }
 
 void FakeNearbyConnection::MaybeRunCallback() {
   NL_DCHECK(!closed_);
-  if (!callback_ || read_data_.empty()) return;
-  auto item = std::move(read_data_.front());
-  read_data_.pop();
-  has_read_callback_been_run_ = true;
-  auto callback = std::move(callback_);
-  callback_ = nullptr;
+  std::vector<uint8_t> item;
+  std::function<void(std::optional<std::vector<uint8_t>> bytes)> callback;
+  {
+    absl::MutexLock lock(&read_mutex_);
+    if (!callback_ || read_data_.empty()) return;
+    item = std::move(read_data_.front());
+    read_data_.pop();
+    callback = std::move(callback_);
+    callback_ = nullptr;
+    has_read_callback_been_run_ = true;
+  }
   callback(std::move(item));
 }
 

@@ -15,8 +15,7 @@
 #ifndef THIRD_PARTY_NEARBY_SHARING_FILE_ATTACHMENT_H_
 #define THIRD_PARTY_NEARBY_SHARING_FILE_ATTACHMENT_H_
 
-#include <stdint.h>
-
+#include <cstdint>
 #include <filesystem>  // NOLINT(build/c++17)
 #include <optional>
 #include <string>
@@ -32,13 +31,12 @@ namespace sharing {
 
 // A single attachment to be sent by / received from a |ShareTarget|, can be
 // either a file or text.
-struct ShareTarget;
-
 class FileAttachment : public Attachment {
  public:
   using Type = nearby::sharing::service::proto::FileMetadata::Type;
 
   explicit FileAttachment(std::filesystem::path file_path,
+                          absl::string_view mime_type = "",
                           std::string parent_folder = "", int32_t batch_id = 0,
                           SourceType source_type = SourceType::kUnknown);
   FileAttachment(int64_t id, int64_t size, std::string file_name,
@@ -60,7 +58,6 @@ class FileAttachment : public Attachment {
   }
 
   // Attachment:
-  void MoveToShareTarget(ShareTarget& share_target) override;
   absl::string_view GetDescription() const override;
   ShareType GetShareType() const override;
 

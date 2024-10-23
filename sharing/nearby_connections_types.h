@@ -19,14 +19,16 @@
 
 #include <filesystem>  // NOLINT(build/c++17)
 #include <functional>
+#include <limits>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "absl/random/random.h"
 #include "absl/strings/string_view.h"
 #include "absl/time/time.h"
-#include "internal/crypto_cros/random.h"
+#include "internal/base/files.h"
 #include "internal/interop/authentication_status.h"
 #include "sharing/common/compatible_u8_string.h"
 
@@ -204,6 +206,7 @@ struct AdvertisingOptions {
                      bool enforce_topology_constraints,
                      bool enable_bluetooth_listening,
                      bool enable_webrtc_listening,
+                     bool use_stable_endpoint_id,
                      Uuid fast_advertisement_service_uuid) {
     this->strategy = strategy;
     this->allowed_mediums = allowed_mediums;
@@ -211,6 +214,7 @@ struct AdvertisingOptions {
     this->enforce_topology_constraints = enforce_topology_constraints;
     this->enable_bluetooth_listening = enable_bluetooth_listening;
     this->enable_webrtc_listening = enable_webrtc_listening;
+    this->use_stable_endpoint_id = use_stable_endpoint_id;
     this->fast_advertisement_service_uuid = fast_advertisement_service_uuid;
   }
 
@@ -237,6 +241,9 @@ struct AdvertisingOptions {
   // By default, this option is false. If true, this allows listening on
   // incoming WebRTC connections while advertising.
   bool enable_webrtc_listening = false;
+  // Indicates whether the endpoint id should be stable. When visibility is
+  // everyone mode, we should set this to true to avoid duplicated endpoint ids.
+  bool use_stable_endpoint_id = false;
   // Optional. If set, BLE advertisements will be in their "fast advertisement"
   // form, use this UUID, and non-connectable; if empty, BLE advertisements
   // will otherwise be normal and connectable.
@@ -276,11 +283,13 @@ struct ConnectionOptions {
       MediumSelection allowed_mediums,
       std::optional<std::vector<uint8_t>> remote_bluetooth_mac_address,
       std::optional<absl::Duration> keep_alive_interval,
-      std::optional<absl::Duration> keep_alive_timeout) {
+      std::optional<absl::Duration> keep_alive_timeout,
+      bool non_disruptive_hotspot_mode) {
     this->allowed_mediums = allowed_mediums;
     this->remote_bluetooth_mac_address = remote_bluetooth_mac_address;
     this->keep_alive_interval = keep_alive_interval;
     this->keep_alive_timeout = keep_alive_timeout;
+    this->non_disruptive_hotspot_mode = non_disruptive_hotspot_mode;
   }
 
   // Describes which mediums are allowed to be used for connection. Note that
@@ -297,6 +306,9 @@ struct ConnectionOptions {
   // for this length of time. An unspecified or negative value will result in
   // the Nearby Connections default of 30 seconds being used.
   std::optional<absl::Duration> keep_alive_timeout;
+  // If true, only use WiFi Hotspot for connection when Wifi LAN is not
+  // connected.
+  bool non_disruptive_hotspot_mode = false;
 };
 
 // The status of the payload transfer at the time of this update.
@@ -384,7 +396,9 @@ enum class DistanceInfo {
 
 struct InputFile {
   InputFile() = default;
-  explicit InputFile(std::filesystem::path path) { this->path = path; }
+  explicit InputFile(std::string path) {
+    this->path = std::filesystem::u8path(path);
+  }
 
   std::filesystem::path path;
 };
@@ -413,9 +427,9 @@ struct PayloadContent {
   FilePayload file_payload;
   enum class Type { kUnknown = 0, kBytes = 1, kStream = 2, kFile = 3 };
   Type type;
-  bool is_bytes() { return type == Type::kBytes; }
-  bool is_file() { return type == Type::kFile; }
-  bool is_stream() { return type == Type::kStream; }
+  bool is_bytes() const { return type == Type::kBytes; }
+  bool is_file() const { return type == Type::kFile; }
+  bool is_stream() const { return type == Type::kStream; }
 };
 
 // A Payload sent between devices. Payloads sent with a particular content type
@@ -439,8 +453,9 @@ struct Payload {
     id = std::hash<std::string>()(GetCompatibleU8String(file.path.u8string()));
 
     content.type = PayloadContent::Type::kFile;
-    if (std::filesystem::exists(file.path)) {
-      content.file_payload.size = std::filesystem::file_size(file.path);
+    std::optional<uintmax_t> size = GetFileSize(file.path);
+    if (size.has_value()) {
+      content.file_payload.size = *size;
     }
 
     content.file_payload.file = std::move(file);
@@ -456,8 +471,9 @@ struct Payload {
           absl::string_view parent_folder = absl::string_view())
       : id(id) {
     content.type = PayloadContent::Type::kFile;
-    if (std::filesystem::exists(file.path)) {
-      content.file_payload.size = std::filesystem::file_size(file.path);
+    std::optional<uintmax_t> size = GetFileSize(file.path);
+    if (size.has_value()) {
+      content.file_payload.size = *size;
     }
 
     content.file_payload.file = std::move(file);
@@ -468,14 +484,29 @@ struct Payload {
       : Payload(GenerateId(), std::vector<uint8_t>(bytes, bytes + size)) {}
 
   int64_t GenerateId() {
-    int64_t id;
-    crypto::RandBytes(&id, sizeof(id));
-    return id;
+    absl::BitGen bitgen;
+    return absl::Uniform<int64_t>(absl::IntervalOpenClosed, bitgen, 0,
+                                  std::numeric_limits<int64_t>::max());
   }
 };
 
-// Transport type to decide whether to upgrade to a high quality medium.
-enum class TransportType { kAny = 0, kNonDisruptive = 1, kHighQuality = 2 };
+// This is a bitmask field that determines the transport type to upgrade to.
+enum class TransportType {
+  kAny = 0,
+  // Allows use of WiFi Hotspot for connection when Wifi LAN is not connected.
+  kNonDisruptive = 1,
+  // Allows use of Wifi Hotspot for connection.
+  kHighQuality = 2,
+  // kNonDisruptive | kHighQuality
+  kHighQualityNonDisruptive = 3,
+};
+
+// Returns true if all flags in `mask` are enabled in `transport_type`.
+inline bool IsTransportTypeFlagsSet(TransportType transport_type,
+                                    TransportType mask) {
+  return (static_cast<int>(transport_type) &
+          static_cast<int>(mask)) == static_cast<int>(mask);
+}
 
 }  // namespace sharing
 }  // namespace nearby

@@ -270,6 +270,7 @@ TEST(OfflineFramesTest, CanGenerateConnectionResponse) {
         status: 1
         response: REJECT
         os_info { type: LINUX }
+        multiplex_socket_bitmask: 0x01
         safe_to_disconnect_version: 5
       >
     >)pb";
@@ -277,9 +278,11 @@ TEST(OfflineFramesTest, CanGenerateConnectionResponse) {
   OsInfo os_info;
   os_info.set_type(OsInfo::LINUX);
   NearbyFlags::GetInstance().OverrideInt64FlagValue(
-        config_package_nearby::nearby_connections_feature::
-            kSafeToDisconnectVersion, 5);
-  ByteArray bytes = ForConnectionResponse(1, os_info);
+      config_package_nearby::nearby_connections_feature::
+          kSafeToDisconnectVersion,
+      5);
+  ByteArray bytes =
+      ForConnectionResponse(1, os_info, /*multiplex_socket_bitmask=*/0x01);
   auto response = FromBytes(bytes);
   ASSERT_TRUE(response.ok());
   OfflineFrame message = response.result();
@@ -607,10 +610,9 @@ TEST(OfflineFramesTest, CanGenerateAutoReconnectIntroductionAck) {
       type: AUTO_RECONNECT
       auto_reconnect: <
         event_type: CLIENT_INTRODUCTION_ACK
-        endpoint_id: "ABC"
       >
     >)pb";
-  ByteArray bytes = ForAutoReconnectIntroductionAck(std::string(kEndpointId));
+  ByteArray bytes = ForAutoReconnectIntroductionAck();
   auto response = FromBytes(bytes);
   ASSERT_TRUE(response.ok());
   OfflineFrame message = response.result();

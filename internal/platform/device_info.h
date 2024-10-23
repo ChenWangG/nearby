@@ -15,7 +15,8 @@
 #ifndef PLATFORM_PUBLIC_DEVICE_INFO_H_
 #define PLATFORM_PUBLIC_DEVICE_INFO_H_
 
-#include <filesystem>
+#include <cstddef>
+#include <filesystem>  // NOLINT
 #include <functional>
 #include <optional>
 #include <string>
@@ -33,14 +34,12 @@ class DeviceInfo {
   virtual std::string GetOsDeviceName() const = 0;
   virtual api::DeviceInfo::DeviceType GetDeviceType() const = 0;
   virtual api::DeviceInfo::OsType GetOsType() const = 0;
-  virtual std::optional<std::string> GetFullName() const = 0;
   virtual std::optional<std::string> GetGivenName() const = 0;
-  virtual std::optional<std::string> GetLastName() const = 0;
-  virtual std::optional<std::string> GetProfileUserName() const = 0;
 
   virtual std::filesystem::path GetDownloadPath() const = 0;
   virtual std::filesystem::path GetAppDataPath() const = 0;
   virtual std::filesystem::path GetTemporaryPath() const = 0;
+  virtual std::filesystem::path GetLogPath() const = 0;
 
   virtual std::optional<size_t> GetAvailableDiskSpaceInBytes(
       const std::filesystem::path& path) const = 0;

@@ -29,6 +29,7 @@
 #include "gmock/gmock.h"
 #include "protobuf-matchers/protocol-buffer-matchers.h"
 #include "gtest/gtest.h"
+#include "absl/container/flat_hash_set.h"
 #include "absl/strings/string_view.h"
 #include "absl/synchronization/notification.h"
 #include "absl/time/time.h"
@@ -59,6 +60,7 @@ namespace {
 using ::nearby::sharing::proto::DataUsage;
 using ::testing::ElementsAre;
 using ::testing::FieldsAre;
+using ::testing::UnorderedElementsAre;
 
 constexpr char kServiceId[] = "NearbySharing";
 constexpr Strategy kStrategy = Strategy::kP2pPointToPoint;
@@ -94,6 +96,8 @@ void InitializeTemporaryFile(std::filesystem::path& file) {
 }
 
 }  // namespace
+
+namespace NearbyConnectionsManagerUnitTests {
 
 class MockDiscoveryListener
     : public NearbyConnectionsManager::DiscoveryListener {
@@ -134,28 +138,20 @@ class NearbyConnectionsManagerImplTest : public testing::Test {
     NearbyFlags::GetInstance().OverrideBoolFlagValue(
         config_package_nearby::nearby_sharing_feature::kEnableMediumWifiLan,
         true);
-    std::unique_ptr<NearbyConnectionsService> nearby_connections_service =
+    auto nearby_connections_service =
         std::make_unique<testing::NiceMock<FakeNearbyConnectionsService>>();
     SetConnectionType(ConnectivityManager::ConnectionType::kWifi);
-    nearby_connections_ =
-        dynamic_cast<testing::NiceMock<FakeNearbyConnectionsService>*>(
-            nearby_connections_service.get());
+    nearby_connections_ = nearby_connections_service.get();
 
     nearby_connections_manager_ =
         std::make_unique<NearbyConnectionsManagerImpl>(
-            &fake_context_, fake_connectivity_manager_, fake_device_info_,
-            std::move(nearby_connections_service));
+            &fake_task_runner_, &fake_context_, fake_connectivity_manager_,
+            fake_device_info_, std::move(nearby_connections_service));
   }
 
   void TearDown() override {
-    NearbyFlags::GetInstance().OverrideBoolFlagValue(
-        config_package_nearby::nearby_sharing_feature::kEnableMediumWebRtc,
-        false);
-    NearbyFlags::GetInstance().OverrideBoolFlagValue(
-        config_package_nearby::nearby_sharing_feature::kEnableMediumWifiLan,
-        true);
-
-    FakeTaskRunner::WaitForRunningTasksWithTimeout(absl::Seconds(1));
+    NearbyFlags::GetInstance().ResetOverridedValues();
+    fake_task_runner_.SyncWithTimeout(absl::Seconds(1));
   }
 
   void SetConnectionType(ConnectivityManager::ConnectionType connection_type) {
@@ -167,8 +163,7 @@ class NearbyConnectionsManagerImplTest : public testing::Test {
   }
 
   void Sync() {
-    EXPECT_TRUE(
-        FakeTaskRunner::WaitForRunningTasksWithTimeout(absl::Seconds(1)));
+    EXPECT_TRUE(fake_task_runner_.SyncWithTimeout(absl::Seconds(1)));
   }
 
  protected:
@@ -243,7 +238,7 @@ class NearbyConnectionsManagerImplTest : public testing::Test {
         };
     nearby_connections_manager_->StartAdvertising(
         local_endpoint_info, &incoming_connection_listener,
-        PowerLevel::kHighPower, DataUsage::ONLINE_DATA_USAGE,
+        PowerLevel::kHighPower, DataUsage::ONLINE_DATA_USAGE, false,
         std::move(callback));
     EXPECT_TRUE(
         notification.WaitForNotificationWithTimeout(kSynchronizationTimeOut));
@@ -287,6 +282,7 @@ class NearbyConnectionsManagerImplTest : public testing::Test {
         TransportType::kHighQuality,
         [&](NearbyConnection* connection, Status status) {
           nearby_connection = connection;
+          notification.Notify();
         });
 
     EXPECT_TRUE(request_connection_notification.WaitForNotificationWithTimeout(
@@ -302,7 +298,6 @@ class NearbyConnectionsManagerImplTest : public testing::Test {
 
           payload_listener_remote = std::move(listener);
           std::move(callback)(Status::kSuccess);
-          notification.Notify();
         });
 
     ConnectionInfo connection_info;
@@ -438,6 +433,7 @@ class NearbyConnectionsManagerImplTest : public testing::Test {
   }
 
   nearby::FakeContext fake_context_;
+  FakeTaskRunner fake_task_runner_{fake_context_.fake_clock(), 1};
   nearby::FakeDeviceInfo fake_device_info_;
   nearby::FakeConnectivityManager fake_connectivity_manager_;
   bool should_use_web_rtc_ = false;
@@ -531,6 +527,50 @@ TEST_F(NearbyConnectionsManagerImplTest, DiscoveryFlow) {
       kSynchronizationTimeOut));
 }
 
+TEST_F(NearbyConnectionsManagerImplTest, DisableWifiHotspot) {
+  SetConnectionType(ConnectivityManager::ConnectionType::kWifi);
+
+  MediumSelection expected_mediums(/*bluetooth=*/true,
+                                   /*ble=*/false,
+                                   /*web_rtc=*/should_use_web_rtc_,
+                                   /*wifi_lan=*/should_use_wifilan_,
+                                   /*wifi_hotspot*/ true);
+
+  // StartDiscovery will succeed.
+  NearbyConnectionsService::DiscoveryListener discovery_listener_remote;
+  testing::NiceMock<MockDiscoveryListener> discovery_listener;
+  StartDiscovery(discovery_listener_remote, DataUsage::WIFI_ONLY_DATA_USAGE,
+                 discovery_listener);
+
+  absl::Notification notification;
+  const std::vector<uint8_t> local_endpoint_info(std::begin(kEndpointInfo),
+                                                 std::end(kEndpointInfo));
+  EXPECT_CALL(*nearby_connections_, RequestConnection)
+      .WillOnce([&](absl::string_view service_id,
+                    const std::vector<uint8_t>& endpoint_info,
+                    absl::string_view endpoint_id, ConnectionOptions options,
+                    NearbyConnectionsService::ConnectionListener listener,
+                    std::function<void(Status status)> callback) {
+        EXPECT_EQ(service_id, kServiceId);
+        EXPECT_EQ(endpoint_info, local_endpoint_info);
+        EXPECT_EQ(endpoint_id, kRemoteEndpointId);
+        EXPECT_EQ(options.allowed_mediums.wifi_hotspot, true);
+        EXPECT_TRUE(options.non_disruptive_hotspot_mode);
+        std::move(callback)(Status::kSuccess);
+        notification.Notify();
+      });
+
+  NearbyConnectionsManager::NearbyConnectionCallback connections_callback;
+
+  nearby_connections_manager_->Connect(
+      local_endpoint_info, kRemoteEndpointId,
+      /*bluetooth_mac_address=*/std::nullopt, DataUsage::WIFI_ONLY_DATA_USAGE,
+      TransportType::kHighQualityNonDisruptive, connections_callback);
+
+  EXPECT_TRUE(
+      notification.WaitForNotificationWithTimeout(kSynchronizationTimeOut));
+}
+
 /******************************************************************************/
 // Begin: NearbyConnectionsManagerImplTestConnectionMediums
 /******************************************************************************/
@@ -607,6 +647,9 @@ TEST_P(NearbyConnectionsManagerImplTestConnectionMediums,
                   expected_mediums.bluetooth);
         EXPECT_EQ(options.allowed_mediums.web_rtc, expected_mediums.web_rtc);
         EXPECT_EQ(options.allowed_mediums.wifi_lan, expected_mediums.wifi_lan);
+        EXPECT_EQ(options.allowed_mediums.wifi_hotspot,
+                  expected_mediums.wifi_hotspot);
+        EXPECT_FALSE(options.non_disruptive_hotspot_mode);
         std::move(callback)(Status::kSuccess);
         notification.Notify();
       });
@@ -739,7 +782,7 @@ TEST_F(NearbyConnectionsManagerImplTest, ConnectDisconnected) {
   NearbyConnection* nearby_connection =
       Connect(connection_listener_remote, payload_listener_remote,
               ConnectionResponse::kDisconnected);
-  EXPECT_TRUE(FakeTaskRunner::WaitForRunningTasksWithTimeout(absl::Seconds(1)));
+  EXPECT_TRUE(fake_task_runner_.SyncWithTimeout(absl::Seconds(1)));
   EXPECT_FALSE(nearby_connection);
   EXPECT_FALSE(nearby_connections_manager_->GetRawAuthenticationToken(
       kRemoteEndpointId));
@@ -835,6 +878,7 @@ TEST_F(NearbyConnectionsManagerImplTest, ConnectReadAfterAppend) {
 
   absl::Notification read_notification;
   nearby_connection->Read([&](std::optional<std::vector<uint8_t>> bytes) {
+    ASSERT_TRUE(bytes.has_value());
     EXPECT_EQ(bytes, byte_payload);
     read_notification.Notify();
   });
@@ -1398,10 +1442,9 @@ TEST_F(NearbyConnectionsManagerImplTest, IncomingBytesPayload) {
   StartAdvertising(connection_listener_remote, incoming_connection_listener);
 
   NearbyConnectionsService::PayloadListener payload_listener_remote;
-  NearbyConnection* connection = OnIncomingConnection(
+  ASSERT_TRUE(OnIncomingConnection(
       connection_listener_remote, incoming_connection_listener,
-      payload_listener_remote);
-  EXPECT_TRUE(connection);
+      payload_listener_remote) != nullptr);
 
   auto payload_listener =
       std::make_shared<testing::NiceMock<MockPayloadStatusListener>>();
@@ -1425,7 +1468,7 @@ TEST_F(NearbyConnectionsManagerImplTest, IncomingBytesPayload) {
   EXPECT_TRUE(payload_notification.WaitForNotificationWithTimeout(
       kSynchronizationTimeOut));
 
-  Payload* payload =
+  const Payload* payload =
       nearby_connections_manager_->GetIncomingPayload(kPayloadId);
   ASSERT_NE(payload, nullptr);
   ASSERT_TRUE(payload->content.is_bytes());
@@ -1470,7 +1513,7 @@ TEST_F(NearbyConnectionsManagerImplTest, IncomingFilePayload) {
   EXPECT_TRUE(payload_notification.WaitForNotificationWithTimeout(
       kSynchronizationTimeOut));
 
-  Payload* payload =
+  const Payload* payload =
       nearby_connections_manager_->GetIncomingPayload(kPayloadId);
   ASSERT_NE(payload, nullptr);
   ASSERT_TRUE(payload->content.is_file());
@@ -1619,7 +1662,7 @@ TEST_P(NearbyConnectionsManagerImplTestMediums, StartAdvertising_Options) {
 
   nearby_connections_manager_->StartAdvertising(
       local_endpoint_info, &incoming_connection_listener, power_level,
-      data_usage, std::move(callback));
+      data_usage, false, std::move(callback));
 
   EXPECT_TRUE(
       notification.WaitForNotificationWithTimeout(kSynchronizationTimeOut));
@@ -1731,5 +1774,254 @@ TEST_F(NearbyConnectionsManagerImplTest,
       notification.WaitForNotificationWithTimeout(kSynchronizationTimeOut));
 }
 
+TEST_F(NearbyConnectionsManagerImplTest, UnknownFilePathsToDelete) {
+  nearby_connections_manager_->AddUnknownFilePathsToDeleteForTesting(
+      "test1.txt");
+  nearby_connections_manager_->AddUnknownFilePathsToDeleteForTesting(
+      "test2.txt");
+  auto unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  nearby_connections_manager_->AddUnknownFilePathsToDeleteForTesting(
+      "test3.txt");
+
+  // Test if we get copy of container.
+  EXPECT_NE(unknown_file_paths.size(), 3);
+  EXPECT_EQ(unknown_file_paths.size(), 2);
+  EXPECT_EQ(nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting()
+                .size(),
+            3);
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_THAT(unknown_file_paths,
+              UnorderedElementsAre("test1.txt", "test2.txt", "test3.txt"));
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+  EXPECT_TRUE(
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting()
+          .empty());
+
+  // Test GetAndClearUnknownFilePathsToDelete
+  nearby_connections_manager_->AddUnknownFilePathsToDeleteForTesting(
+      "test1.txt");
+  nearby_connections_manager_->AddUnknownFilePathsToDeleteForTesting(
+      "test2.txt");
+  unknown_file_paths =
+      nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+  EXPECT_EQ(unknown_file_paths.size(), 2);
+  EXPECT_TRUE(
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting()
+          .empty());
+}
+
+TEST_F(NearbyConnectionsManagerImplTest,
+       OnPayloadTransferUpdateForUnknownFile) {
+  NearbyConnectionsService::ConnectionListener connection_listener_remote;
+  testing::NiceMock<MockIncomingConnectionListener>
+      incoming_connection_listener;
+  StartAdvertising(connection_listener_remote, incoming_connection_listener);
+
+  NearbyConnectionsService::PayloadListener payload_listener_remote;
+  ASSERT_TRUE(OnIncomingConnection(
+      connection_listener_remote, incoming_connection_listener,
+      payload_listener_remote) != nullptr);
+  std::filesystem::path file(std::filesystem::temp_directory_path() /
+                             "file.jpg");
+  payload_listener_remote.payload_cb(kRemoteEndpointId,
+                                     Payload(kPayloadId, InputFile(file)));
+
+  nearby_connections_manager_->OnPayloadTransferUpdateForTesting(
+      kRemoteEndpointId,
+      PayloadTransferUpdate(kPayloadId, PayloadStatus::kCanceled, kTotalSize,
+                            /*bytes_transferred=*/kTotalSize));
+  absl::flat_hash_set<std::filesystem::path> unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_EQ(unknown_file_paths.size(), 1);
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+
+  // Flag is on. Don't add unknown file paths w/o kCanceled to the list.
+  nearby_connections_manager_->OnPayloadTransferUpdateForTesting(
+      kRemoteEndpointId,
+      PayloadTransferUpdate(kPayloadId, PayloadStatus::kFailure, kTotalSize,
+                            /*bytes_transferred=*/kTotalSize));
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_TRUE(unknown_file_paths.empty());
+}
+
+TEST_F(NearbyConnectionsManagerImplTest,
+       OnPayloadReceivedForUnknownFile) {
+  NearbyConnectionsService::ConnectionListener connection_listener_remote;
+  testing::NiceMock<MockIncomingConnectionListener>
+      incoming_connection_listener;
+  StartAdvertising(connection_listener_remote, incoming_connection_listener);
+
+  NearbyConnectionsService::PayloadListener payload_listener_remote;
+  ASSERT_TRUE(OnIncomingConnection(
+      connection_listener_remote, incoming_connection_listener,
+      payload_listener_remote) != nullptr);
+  std::filesystem::path file(std::filesystem::temp_directory_path() /
+                             "file.jpg");
+  payload_listener_remote.payload_cb(kRemoteEndpointId,
+                                     Payload(kPayloadId, InputFile(file)));
+
+  // Flag is on. Add unknown file paths with kCanceled to the list.
+  NearbyFlags::GetInstance().OverrideBoolFlagValue(
+      config_package_nearby::nearby_sharing_feature::
+          kDeleteUnexpectedReceivedFileFix,
+      true);
+  nearby_connections_manager_->ClearIncomingPayloads();
+  Payload payload(kPayloadId, InputFile(file));
+  nearby_connections_manager_->OnPayloadReceivedForTesting(
+      kRemoteEndpointId, payload);
+
+  std::filesystem::path file2(std::filesystem::temp_directory_path() /
+                             "file2.jpg");
+  Payload payload2(kPayloadId, InputFile(file2));
+  nearby_connections_manager_->OnPayloadReceivedForTesting(
+      kRemoteEndpointId, payload2);
+  auto unknown_file_paths =
+      nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+
+  EXPECT_EQ(unknown_file_paths.size(), 2);
+
+  auto payload_listener =
+      std::make_shared<testing::NiceMock<MockPayloadStatusListener>>();
+  nearby_connections_manager_->RegisterPayloadStatusListener(
+      kPayloadId, payload_listener->GetWeakPtr());
+  std::filesystem::path file3(std::filesystem::temp_directory_path() /
+                             "file3.jpg");
+  Payload payload3(kPayloadId, InputFile(file3));
+  nearby_connections_manager_->OnPayloadReceivedForTesting(
+      kRemoteEndpointId, payload3);
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+
+  EXPECT_EQ(unknown_file_paths.size(), 0);
+}
+
+TEST_F(NearbyConnectionsManagerImplTest,
+       OnPayloadReceivedDeletePreviousFileWithSamePayloadId) {
+  NearbyFlags::GetInstance().OverrideBoolFlagValue(
+      config_package_nearby::nearby_sharing_feature::
+          kDeleteUnexpectedReceivedFileFix,
+      true);
+
+  NearbyConnectionsService::ConnectionListener connection_listener_remote;
+  testing::NiceMock<MockIncomingConnectionListener>
+      incoming_connection_listener;
+  StartAdvertising(connection_listener_remote, incoming_connection_listener);
+
+  NearbyConnectionsService::PayloadListener payload_listener_remote;
+  ASSERT_TRUE(OnIncomingConnection(
+      connection_listener_remote, incoming_connection_listener,
+      payload_listener_remote) != nullptr);
+  auto payload_listener =
+      std::make_shared<testing::NiceMock<MockPayloadStatusListener>>();
+  nearby_connections_manager_->RegisterPayloadStatusListener(
+      kPayloadId, payload_listener->GetWeakPtr());
+
+  std::filesystem::path file(std::filesystem::temp_directory_path() /
+                             "file.jpg");
+
+  Payload payload(kPayloadId, InputFile(file));
+  nearby_connections_manager_->OnPayloadReceivedForTesting(
+      kRemoteEndpointId, payload);
+
+  auto unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_EQ(unknown_file_paths.size(), 0);
+
+  absl::Notification cancel_notification;
+  EXPECT_CALL(*nearby_connections_, CancelPayload)
+      .WillOnce([&](absl::string_view service_id, int64_t payload_id,
+                    std::function<void(Status status)> callback) {
+        EXPECT_EQ(service_id, kServiceId);
+        EXPECT_EQ(payload_id, kPayloadId);
+
+        std::move(callback)(Status::kSuccess);
+        cancel_notification.Notify();
+      });
+
+  absl::Notification payload_notification;
+  EXPECT_CALL(*payload_listener, OnStatusUpdate)
+      .WillOnce([&](std::unique_ptr<PayloadTransferUpdate> update,
+                    std::optional<Medium> upgraded_medium) {
+        EXPECT_EQ(update->payload_id, kPayloadId);
+        EXPECT_EQ(update->status, PayloadStatus::kCanceled);
+        EXPECT_EQ(update->total_bytes, 0u);
+        EXPECT_EQ(update->bytes_transferred, 0u);
+        EXPECT_FALSE(upgraded_medium.has_value());
+        payload_notification.Notify();
+      });
+
+  std::filesystem::path file2(std::filesystem::temp_directory_path() /
+                              "file2.jpg");
+  Payload payload2(kPayloadId, InputFile(file2));
+  nearby_connections_manager_->OnPayloadReceivedForTesting(kRemoteEndpointId,
+                                                           payload2);
+  unknown_file_paths =
+      nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+  EXPECT_EQ(unknown_file_paths.size(), 1);
+
+  EXPECT_TRUE(payload_notification.WaitForNotificationWithTimeout(
+      kSynchronizationTimeOut));
+  EXPECT_TRUE(cancel_notification.WaitForNotificationWithTimeout(
+      kSynchronizationTimeOut));
+}
+
+TEST_F(NearbyConnectionsManagerImplTest, ProcessUnknownFilePathsToDelete) {
+  std::filesystem::path file(std::filesystem::temp_directory_path() /
+                             "file.jpg");
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kCanceled, PayloadContent::Type::kFile, file);
+  absl::flat_hash_set<std::filesystem::path> unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_EQ(unknown_file_paths.size(), 1);
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+
+  // Check we add kInProgress status.
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kInProgress, PayloadContent::Type::kFile, file);
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_EQ(unknown_file_paths.size(), 1);
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+
+  // Check only one file is added to the list, since we use hash set.
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kInProgress, PayloadContent::Type::kFile, file);
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kCanceled, PayloadContent::Type::kFile, file);
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_EQ(unknown_file_paths.size(), 1);
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+
+  // Check kSuccess or kFailure are not added to the list.
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kSuccess, PayloadContent::Type::kFile, file);
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kFailure, PayloadContent::Type::kFile, file);
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_TRUE(unknown_file_paths.empty());
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+
+  // Check only kFile type is added to the list.
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kSuccess, PayloadContent::Type::kBytes, file);
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_TRUE(unknown_file_paths.empty());
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+
+  nearby_connections_manager_->ProcessUnknownFilePathsToDeleteForTesting(
+      PayloadStatus::kFailure, PayloadContent::Type::kFile, file);
+  unknown_file_paths =
+      nearby_connections_manager_->GetUnknownFilePathsToDeleteForTesting();
+  EXPECT_TRUE(unknown_file_paths.empty());
+  nearby_connections_manager_->GetAndClearUnknownFilePathsToDelete();
+}
+
+}  // namespace NearbyConnectionsManagerUnitTests
 }  // namespace sharing
 }  // namespace nearby

@@ -15,6 +15,23 @@
 licenses(["notice"])
 
 cc_library(
+    name = "mocks",
+    testonly = 1,
+    hdrs = [
+        "mock_account_manager.h",
+        "mock_account_observer.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//internal/platform/implementation:account_manager",
+        "@com_google_absl//absl/functional:any_invocable",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings:string_view",
+        "@com_google_googletest//:gtest_for_library_testonly",
+    ],
+)
+
+cc_library(
     name = "test",
     srcs = [
         "fake_account_manager.cc",
@@ -22,7 +39,6 @@ cc_library(
         "fake_single_thread_executor.cc",
         "fake_task_runner.cc",
         "fake_timer.cc",
-        "fake_webrtc.cc",
     ],
     hdrs = [
         "fake_account_manager.h",
@@ -33,7 +49,6 @@ cc_library(
         "fake_single_thread_executor.h",
         "fake_task_runner.h",
         "fake_timer.h",
-        "fake_webrtc.h",
     ],
     copts = [
         "-Ithird_party",
