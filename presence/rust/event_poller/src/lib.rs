@@ -29,8 +29,8 @@ impl<E> EventWriter<E> {
         }
     }
 
-    pub async fn stop(&self) {
-        self.sender.send(PollerEvent::Stop).await;
+    pub async fn stop(&self) -> Result<(), SendError<()>> {
+        self.sender.send(PollerEvent::Stop).await.or_else(|_| { Err(SendError(())) })
     }
 }
 
