@@ -6,7 +6,10 @@ use tokio::task::JoinHandle;
 pub trait EventProcessor: Send {
     type Event;
 
-    fn process(&mut self, event: Option<Self::Event>) -> impl std::future::Future<Output = ()> + Send;
+    fn process(
+        &mut self,
+        event: Option<Self::Event>,
+    ) -> impl std::future::Future<Output = ()> + Send;
 }
 
 enum PollerEvent<E> {
@@ -19,10 +22,10 @@ pub struct EventWriter<E> {
 }
 
 impl<E> EventWriter<E> {
-    pub async fn write(&self, event: E) -> Result<(), SendError<()>> {
+    pub async fn write(&self, event: E) -> Result<(), SendError<E>> {
         match self.sender.send(PollerEvent::Event(event)).await {
-            Ok(_) =>  Ok(()),
-            Err(_) => Err(SendError(())),
+            Err(SendError(PollerEvent::Event(event))) => Err(SendError(event)),
+            _ => Ok(()),
         }
     }
 
@@ -32,19 +35,28 @@ impl<E> EventWriter<E> {
 }
 
 pub struct EventPoller<P>
-    where P: EventProcessor + Send + 'static,
-          P::Event: Send + 'static + Clone {
+where
+    P: EventProcessor + Send + 'static,
+    P::Event: Send + 'static + Clone,
+{
     processor: P,
     receiver: mpsc::Receiver<PollerEvent<P::Event>>,
 }
 
 impl<P> EventPoller<P>
-    where P: EventProcessor + Send + 'static,
-          P::Event: Send + 'static + Clone {
-
+where
+    P: EventProcessor + Send + 'static,
+    P::Event: Send + 'static + Clone,
+{
     pub fn create(processor: P) -> (EventWriter<P::Event>, Self) {
         let (sender, receiver) = mpsc::channel(32);
-        (EventWriter{sender}, EventPoller{receiver, processor})
+        (
+            EventWriter { sender },
+            EventPoller {
+                receiver,
+                processor,
+            },
+        )
     }
 
     pub fn processor(&mut self) -> &mut P {
@@ -52,7 +64,6 @@ impl<P> EventPoller<P>
     }
 
     pub fn start(mut self) -> JoinHandle<()> {
-        println!("start poll.");
         task::spawn(async move {
             loop {
                 match self.receiver.recv().await {

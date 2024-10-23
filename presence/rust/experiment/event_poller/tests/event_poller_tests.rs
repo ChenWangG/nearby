@@ -1,37 +1,43 @@
-use tokio::sync::mpsc;
-use event_poller::EventProcessor;
 use event_poller::EventPoller;
+use event_poller::EventProcessor;
+use tokio::sync::mpsc;
 use tokio::sync::mpsc::error::SendError;
 
-struct ScanController {
-    echo_sender: mpsc::Sender<i32>,
+#[derive(PartialEq, Clone, Debug)]
+enum EchoEvent {
+    Closed,
+    Number(i32),
+}
+struct EchoController {
+    echo_sender: mpsc::Sender<EchoEvent>,
 }
 
-impl EventProcessor for ScanController {
-    type Event = i32;
+impl EventProcessor for EchoController {
+    type Event = EchoEvent;
 
     async fn process(&mut self, event: Option<Self::Event>) {
         // Echo the event back.
-        let echo_event = match event {
-            None => -1,
-            Some(number) => number,
-        };
-        self.echo_sender.send(echo_event).await.expect("Echo send failed.");
+        // If the event is None, echo Closed back.
+        let echo_event = event.unwrap_or_else(|| EchoEvent::Closed);
+        self.echo_sender.send(echo_event).await.unwrap();
     }
 }
 
 #[tokio::test]
 async fn test_event_poller() {
-    let(echo_sender, mut echo_receiver) = mpsc::channel(32);
+    let (echo_sender, mut echo_receiver) = mpsc::channel(100);
 
-    let (scan_controller_writer, scan_controller_poller) =
-        EventPoller::create(ScanController{ echo_sender });
-    scan_controller_poller.start();
+    let (echo_writer, echo_poller) = EventPoller::create(EchoController { echo_sender });
+    echo_poller.start();
 
-    let _ = scan_controller_writer.write(1).await;
-    let received_number = echo_receiver.recv().await.unwrap();
-    assert_eq!(received_number, 1);
+    let n = 1;
+    assert_eq!(echo_writer.write(EchoEvent::Number(n)).await, Ok(()));
+    assert_eq!(echo_receiver.recv().await.unwrap(), EchoEvent::Number(n));
 
-    scan_controller_writer.stop().await;
-    assert_eq!(echo_receiver.recv().await, Some(-1));
+    echo_writer.stop().await;
+    assert_eq!(echo_receiver.recv().await.unwrap(), EchoEvent::Closed);
+    assert_eq!(
+        echo_writer.write(EchoEvent::Number(2)).await,
+        Err(SendError(EchoEvent::Number(2)))
+    );
 }
