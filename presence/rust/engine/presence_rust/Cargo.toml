@@ -1,0 +1,9 @@
+[package]
+name = "presence_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+event_poller = { path = "../../event_poller" }
+tokio = { version = "1.36.0", features = ["sync", "rt-multi-thread", "macros"] }
+log = "0.4.22"

@@ -17,6 +17,7 @@ enum PollerEvent<E> {
     Event(E),
 }
 
+#[derive(Clone)]
 pub struct EventWriter<E> {
     sender: mpsc::Sender<PollerEvent<E>>,
 }
