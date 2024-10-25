@@ -12,6 +12,21 @@ pub trait EventProcessor: Send {
     ) -> impl std::future::Future<Output = ()> + Send;
 }
 
+pub fn create<P>(processor: P) -> (EventWriter<P::Event>, EventPoller<P>)
+where
+    P: EventProcessor + Send + 'static,
+    P::Event: Send + 'static + Clone,
+{
+    let (sender, receiver) = mpsc::channel(32);
+    (
+        EventWriter { sender },
+        EventPoller {
+            receiver,
+            processor,
+        },
+    )
+}
+
 enum PollerEvent<E> {
     Stop,
     Event(E),
@@ -31,7 +46,10 @@ impl<E> EventWriter<E> {
     }
 
     pub async fn stop(&self) -> Result<(), SendError<()>> {
-        self.sender.send(PollerEvent::Stop).await.or_else(|_| { Err(SendError(())) })
+        self.sender
+            .send(PollerEvent::Stop)
+            .await
+            .or_else(|_| Err(SendError(())))
     }
 }
 
@@ -49,17 +67,6 @@ where
     P: EventProcessor + Send + 'static,
     P::Event: Send + 'static + Clone,
 {
-    pub fn create(processor: P) -> (EventWriter<P::Event>, Self) {
-        let (sender, receiver) = mpsc::channel(32);
-        (
-            EventWriter { sender },
-            EventPoller {
-                receiver,
-                processor,
-            },
-        )
-    }
-
     pub fn processor(&mut self) -> &mut P {
         &mut self.processor
     }

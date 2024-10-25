@@ -15,7 +15,7 @@ pub fn create<C>(callback: C) -> (Client, Runtime<C>)
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    let (engine_writer, mut engine_poller) = EventPoller::create(Engine::new(callback));
+    let (engine_writer, engine_poller) = event_poller::create(Engine::new(callback));
     (Client::new(engine_writer), Runtime::new(engine_poller))
 }
 
