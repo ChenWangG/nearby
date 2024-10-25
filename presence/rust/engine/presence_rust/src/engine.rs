@@ -5,14 +5,14 @@ use event_poller::EventProcessor;
 pub enum EngineEvent {
     Ble,
 }
-pub struct Engine<C>
+pub struct EngineProcessor<C>
 where
     C: DiscoveryCallback + Send + 'static,
 {
     discovery_callback: C,
 }
 
-impl<C> EventProcessor for Engine<C>
+impl<C> EventProcessor for EngineProcessor<C>
 where
     C: DiscoveryCallback + Send + 'static,
 {
@@ -21,7 +21,7 @@ where
     async fn process(&mut self, event: Option<Self::Event>) {}
 }
 
-impl<C> Engine<C>
+impl<C> EngineProcessor<C>
 where
     C: DiscoveryCallback + Send + 'static,
 {

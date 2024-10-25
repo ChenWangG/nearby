@@ -1,4 +1,4 @@
-use crate::engine::{Engine, EngineEvent};
+use crate::engine::{EngineProcessor, EngineEvent};
 use event_poller::{EventPoller, EventWriter};
 use std::future::Future;
 use std::marker::Send;
@@ -15,7 +15,7 @@ pub fn create<C>(callback: C) -> (Client, Runtime<C>)
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    let (engine_writer, engine_poller) = event_poller::create(Engine::new(callback));
+    let (engine_writer, engine_poller) = event_poller::create(EngineProcessor::new(callback));
     (Client::new(engine_writer), Runtime::new(engine_poller))
 }
 
@@ -40,14 +40,14 @@ pub struct Runtime<C>
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    event_poller: EventPoller<Engine<C>>,
+    event_poller: EventPoller<EngineProcessor<C>>,
 }
 
 impl<C> Runtime<C>
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    pub fn new(event_poller: EventPoller<Engine<C>>) -> Self {
+    pub fn new(event_poller: EventPoller<EngineProcessor<C>>) -> Self {
         Self { event_poller }
     }
 
