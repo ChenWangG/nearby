@@ -1,9 +1,8 @@
-use event_poller::{EventPoller, EventWriter};
 use crate::engine::{Engine, EngineEvent};
+use event_poller::{EventPoller, EventWriter};
+use std::future::Future;
+use std::marker::Send;
 use tokio::runtime::Builder;
-use  std::future::Future;
-use std::sync::Mutex;
-use log::{debug, error, info};
 
 mod engine;
 
@@ -12,57 +11,56 @@ pub trait DiscoveryCallback {
     fn on_update(&self, result: DiscoveryResult);
 }
 
-pub struct Presence<C>
-where C: DiscoveryCallback {
-    discovery_callback: C,
-    engine_writer: Option<EventWriter<EngineEvent>>,
-    mutex: Mutex<i32>,
+pub fn create<C>(callback: C) -> (Client, Runtime<C>)
+where
+    C: DiscoveryCallback + Send + 'static,
+{
+    let (engine_writer, mut engine_poller) = EventPoller::create(Engine::new(callback));
+    (Client::new(engine_writer), Runtime::new(engine_poller))
 }
 
-impl<C> Presence<C>
-where C: DiscoveryCallback {
-    pub fn new(discovery_callback: C)  -> Self {
-        Self { discovery_callback, engine_writer: None, mutex: Mutex::new(0), }
+pub struct Client {
+    engine_writer: EventWriter<EngineEvent>,
+}
+
+impl Client {
+    pub fn new(engine_writer: EventWriter<EngineEvent>) -> Self {
+        Self { engine_writer }
     }
 
     pub fn set_request(&mut self) {
-        let _lock = self.mutex.lock().unwrap();
-        if self.engine_writer.is_none() {
-            info!("Send a request to the Engine which is not started.");
-            return;
-        }
-        if let Some(writer) = self.engine_writer.clone() {
-            Self::async_block_on(async move { writer.write(EngineEvent::Ble).await.unwrap() });
-        }
-    }
-
-    pub fn start(&mut self) {
-        let lock = self.mutex.lock().unwrap();
-        if self.engine_writer.is_some() {
-            info!("Start the Engine which is already started.");
-            return;
-        }
-        let (engine_writer, mut engine_poller) = EventPoller::create(Engine::new());
-        self.engine_writer = Some(engine_writer);
-        // unlock the mutex.
-        std::mem::drop(lock);
-        Self::async_block_on(async move { engine_poller.start().await; });
+        async_block_on(async move { self.engine_writer.write(EngineEvent::Ble).await.unwrap() });
     }
 
     pub fn stop(&mut self) {
-        let _lock = self.mutex.lock().unwrap();
-        if let Some(writer) = self.engine_writer.clone() {
-            Self::async_block_on(async move { writer.stop().await.unwrap() });
-        }
-        self.engine_writer = None;
+        async_block_on(async move { self.engine_writer.stop().await.unwrap() });
+    }
+}
+pub struct Runtime<C>
+where
+    C: DiscoveryCallback + Send + 'static,
+{
+    event_poller: EventPoller<Engine<C>>,
+}
+
+impl<C> Runtime<C>
+where
+    C: DiscoveryCallback + Send + 'static,
+{
+    pub fn new(event_poller: EventPoller<Engine<C>>) -> Self {
+        Self { event_poller }
     }
 
-    fn async_block_on(future: impl Future<Output = ()>) {
-        Builder::new_current_thread()
-            .build()
-            .unwrap()
-            .block_on(future);
+    pub fn start(self) {
+        async_block_on(async move { self.event_poller.start().await.unwrap() });
     }
+}
+
+fn async_block_on(future: impl Future<Output = ()>) {
+    Builder::new_current_thread()
+        .build()
+        .unwrap()
+        .block_on(future);
 }
 
 // The enum is annotated by repr(C) to pass through FFI.
@@ -76,7 +74,7 @@ pub enum PresenceMedium {
     MDNS,
 }
 
-impl  PresenceMedium {
+impl PresenceMedium {
     pub fn from_i32(value: i32) -> PresenceMedium {
         match value {
             0 => PresenceMedium::Unknown,

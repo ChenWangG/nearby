@@ -1,21 +1,31 @@
+use crate::DiscoveryCallback;
 use event_poller::EventProcessor;
 
-
 #[derive(Clone)]
-pub enum EngineEvent{
+pub enum EngineEvent {
     Ble,
 }
-pub struct Engine;
-
-impl EventProcessor for Engine {
-    type Event = EngineEvent;
-
-    async fn process(&mut self, event: Option<Self::Event>) {
-    }
+pub struct Engine<C>
+where
+    C: DiscoveryCallback + Send + 'static,
+{
+    discovery_callback: C,
 }
 
-impl Engine {
-    pub fn new() -> Self {
-        Self
+impl<C> EventProcessor for Engine<C>
+where
+    C: DiscoveryCallback + Send + 'static,
+{
+    type Event = EngineEvent;
+
+    async fn process(&mut self, event: Option<Self::Event>) {}
+}
+
+impl<C> Engine<C>
+where
+    C: DiscoveryCallback + Send + 'static,
+{
+    pub fn new(discovery_callback: C) -> Self {
+        Self { discovery_callback }
     }
 }
