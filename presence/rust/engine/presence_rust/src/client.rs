@@ -51,7 +51,9 @@ where
     }
 
     pub fn start(self) {
-        async_block_on(async move { self.event_poller.start().await.unwrap() });
+        async_block_on(async move {
+            // blocked by the returned handle.
+            self.event_poller.start().await.unwrap() });
     }
 }
 
