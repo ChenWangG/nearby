@@ -13,8 +13,9 @@ pub fn create<C>(callback: C) -> (Client, Runtime<C>)
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    let (engine, engine_poller) = engine::create(callback);
+    let (engine, mut engine_poller) = engine::create(callback);
     let (ble_scan_provider, ble_scan_poller) = ble_scan_provider::create();
+    engine_poller.processor().set_ble_scan_provider(ble_scan_provider);
     (
         Client::new(engine),
         Runtime::new(engine_poller, ble_scan_poller),
