@@ -1,4 +1,5 @@
 use presence_rust::client::{DiscoveryCallback, DiscoveryResult};
+use presence_rust::util;
 use std::thread;
 
 struct Callback;
@@ -12,9 +13,14 @@ impl DiscoveryCallback for Callback {
 fn test_engine() {
     thread::scope(|scope| {
         let callback = Callback {};
-        let (mut client, runtime) = presence_rust::client::create(callback);
-        let runtime_thread = scope.spawn(|| runtime.start());
+        let (mut client, engine_poller) = presence_rust::client::create(callback);
+        let engine_thread = scope.spawn(|| {
+            util::async_block_on(async move {
+                // blocked by the returned handle.
+                engine_poller.start().await.unwrap()
+            })
+        });
         client.stop();
-        runtime_thread.join().expect("Presence test crashed.");
+        engine_thread.join().expect("Presence test crashed.");
     });
 }

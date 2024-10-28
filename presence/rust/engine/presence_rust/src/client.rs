@@ -1,5 +1,5 @@
 use std::future::Future;
-use event_poller::EventPoller;
+use event_poller::{EventPoller, EventProcessor};
 use crate::engine;
 use crate::engine::{Engine, EngineProcessor};
 use std::marker::Send;
@@ -10,12 +10,12 @@ pub trait DiscoveryCallback {
     fn on_update(&self, result: DiscoveryResult);
 }
 
-pub fn create<C>(callback: C) -> (Client, Runtime<C>)
+pub fn create<C>(callback: C) -> (Client, EventPoller<EngineProcessor<C>>)
 where
     C: DiscoveryCallback + Send + 'static,
 {
     let (engine, engine_poller) = engine::create(callback);
-    (Client::new(engine), Runtime::new(engine_poller))
+    (Client::new(engine), engine_poller)
 }
 
 pub struct Client {
