@@ -1,21 +1,11 @@
-use std::future::Future;
-use event_poller::{EventPoller, EventProcessor};
-use crate::engine;
-use crate::engine::{Engine, EngineProcessor};
-use std::marker::Send;
+use crate::engine::Engine;
 use crate::util::async_block_on;
+use event_poller::EventProcessor;
+use std::future::Future;
 
 // Implemented by the client to receive discovery results.
 pub trait DiscoveryCallback {
     fn on_update(&self, result: DiscoveryResult);
-}
-
-pub fn create<C>(callback: C) -> (Client, EventPoller<EngineProcessor<C>>)
-where
-    C: DiscoveryCallback + Send + 'static,
-{
-    let (engine, engine_poller) = engine::create(callback);
-    (Client::new(engine), engine_poller)
 }
 
 pub struct Client {
@@ -28,32 +18,15 @@ impl Client {
     }
 
     pub fn set_request(&mut self, request: DiscoveryRequest) {
-        async_block_on(async move { self.engine.set_request(request).await; });
+        async_block_on(async move {
+            self.engine.set_request(request).await;
+        });
     }
 
     pub fn stop(&mut self) {
-        async_block_on(async move { self.engine.stop().await; });
-    }
-}
-pub struct Runtime<C>
-where
-    C: DiscoveryCallback + Send + 'static,
-{
-    event_poller: EventPoller<EngineProcessor<C>>,
-}
-
-impl<C> Runtime<C>
-where
-    C: DiscoveryCallback + Send + 'static,
-{
-    pub fn new(event_poller: EventPoller<EngineProcessor<C>>) -> Self {
-        Self { event_poller }
-    }
-
-    pub fn start(self) {
         async_block_on(async move {
-            // blocked by the returned handle.
-            self.event_poller.start().await.unwrap() });
+            self.engine.stop().await;
+        });
     }
 }
 

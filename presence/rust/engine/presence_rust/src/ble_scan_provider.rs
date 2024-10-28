@@ -1,16 +1,16 @@
-use std::future::Future;
 use event_poller::{EventPoller, EventProcessor, EventWriter};
+use std::future::Future;
 
-pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>)  {
-    let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor{});
-    (BleScanProvider{writer}, ble_scan_poller)
+pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>) {
+    let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor {});
+    (BleScanProvider { writer }, ble_scan_poller)
 }
 
-struct BleScanProvider {
+pub struct BleScanProvider {
     writer: EventWriter<BleScanEvent>,
 }
 
-struct BleScanProcessor;
+pub(crate) struct BleScanProcessor;
 
 impl EventProcessor for BleScanProcessor {
     type Event = BleScanEvent;
@@ -21,4 +21,4 @@ impl EventProcessor for BleScanProcessor {
 }
 
 #[derive(Clone)]
-enum BleScanEvent {}
+pub enum BleScanEvent {}

@@ -13,13 +13,9 @@ impl DiscoveryCallback for Callback {
 fn test_engine() {
     thread::scope(|scope| {
         let callback = Callback {};
-        let (mut client, engine_poller) = presence_rust::client::create(callback);
-        let engine_thread = scope.spawn(|| {
-            util::async_block_on(async move {
-                // blocked by the returned handle.
-                engine_poller.start().await.unwrap()
-            })
-        });
+        // let (mut client, engine_poller) = presence_rust::client::create(callback);
+        let (mut client, runtime) = presence_rust::create(callback);
+        let engine_thread = scope.spawn(|| runtime.start());
         client.stop();
         engine_thread.join().expect("Presence test crashed.");
     });
