@@ -1,4 +1,4 @@
-use crate::engine::{EngineProcessor, EngineEvent};
+use crate::engine::{EngineProcessor, EngineEvent, Engine};
 use event_poller::{EventPoller, EventWriter};
 use std::future::Future;
 use std::marker::Send;
@@ -15,25 +15,25 @@ pub fn create<C>(callback: C) -> (Client, Runtime<C>)
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    let (engine_writer, engine_poller) = event_poller::create(EngineProcessor::new(callback));
-    (Client::new(engine_writer), Runtime::new(engine_poller))
+    let (engine, engine_poller) = engine::create(callback);
+    (Client::new(engine), Runtime::new(engine_poller))
 }
 
 pub struct Client {
-    engine_writer: EventWriter<EngineEvent>,
+    engine: Engine,
 }
 
 impl Client {
-    pub fn new(engine_writer: EventWriter<EngineEvent>) -> Self {
-        Self { engine_writer }
+    pub fn new(engine: Engine) -> Self {
+        Self { engine }
     }
 
-    pub fn set_request(&mut self) {
-        async_block_on(async move { self.engine_writer.write(EngineEvent::Ble).await.unwrap() });
+    pub fn set_request(&mut self, request: DiscoveryRequest) {
+        async_block_on(async move { self.engine.set_request(request).await; });
     }
 
     pub fn stop(&mut self) {
-        async_block_on(async move { self.engine_writer.stop().await.unwrap() });
+        async_block_on(async move { self.engine.stop().await; });
     }
 }
 pub struct Runtime<C>
@@ -108,6 +108,8 @@ impl DiscoveryResult {
         Self { medium, device }
     }
 }
+
+pub struct DiscoveryRequest;
 
 #[cfg(test)]
 mod tests {
