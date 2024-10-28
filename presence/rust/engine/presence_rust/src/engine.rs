@@ -1,5 +1,5 @@
-use crate::{async_block_on, DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
 use event_poller::{EventPoller, EventProcessor, EventWriter};
+use crate::client::{DiscoveryCallback, DiscoveryRequest};
 
 pub fn create<C>(callback: C) -> (Engine, EventPoller<EngineProcessor<C>>)
 where
