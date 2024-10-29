@@ -3,6 +3,7 @@ use crate::client::{Client, DiscoveryCallback};
 use crate::engine::EngineProcessor;
 use crate::util::async_block_on;
 use event_poller::EventPoller;
+use futures::future;
 
 mod ble_scan_provider;
 pub mod client;
@@ -15,7 +16,9 @@ where
 {
     let (engine, mut engine_poller) = engine::create(callback);
     let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create();
-    engine_poller.processor().set_ble_scan_provider(ble_scan_provider);
+    engine_poller
+        .processor()
+        .set_ble_scan_provider(ble_scan_provider);
     ble_scan_poller.processor().set_engine(engine.clone());
     (
         Client::new(engine),
@@ -47,10 +50,11 @@ where
 
     pub fn start(self) {
         async_block_on(async move {
-            // TODO: blocked by all handles.
-            // blocked by the returned handle.
-            self.ble_scan_poller.start();
-            self.engine_poller.start().await;
+            future::join_all(vec![
+                self.ble_scan_poller.start(),
+                self.engine_poller.start(),
+            ])
+            .await;
         });
     }
 }
