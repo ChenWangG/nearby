@@ -7,8 +7,15 @@ pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>) {
     (BleScanProvider { writer }, ble_scan_poller)
 }
 
+#[derive(Clone)]
 pub struct BleScanProvider {
     writer: EventWriter<BleScanEvent>,
+}
+
+impl BleScanProvider {
+    pub async fn set_scan_request(&self) {
+        self.writer.write(BleScanEvent::Start).await;
+    }
 }
 
 pub(crate) struct BleScanProcessor {
@@ -19,7 +26,11 @@ impl EventProcessor for BleScanProcessor {
     type Event = BleScanEvent;
 
     async fn process(&mut self, event: Option<Self::Event>) {
-        todo!()
+        match event {
+            None => {}
+            Some(BleScanEvent::Start) => { println!("Received BleScanEvent::Start."); }
+            _ => panic!("Recived None BleScanEvent::Start."),
+        }
     }
 }
 
@@ -30,4 +41,7 @@ impl BleScanProcessor {
 }
 
 #[derive(Clone)]
-pub enum BleScanEvent {}
+pub enum BleScanEvent {
+    Start,
+    Stop,
+}

@@ -13,11 +13,10 @@ impl DiscoveryCallback for Callback {
 fn test_engine() {
     thread::scope(|scope| {
         let callback = Callback {};
-        // let (mut client, engine_poller) = presence_rust::client::create(callback);
         let (mut client, runtime) = presence_rust::create(callback);
-        let engine_thread = scope.spawn(|| runtime.start());
+        let runtime_thread = scope.spawn(|| runtime.start());
         client.set_request(DiscoveryRequest{});
         client.stop();
-        engine_thread.join().expect("Presence test crashed.");
+        runtime_thread.join().expect("Presence test crashed.");
     });
 }

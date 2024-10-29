@@ -50,7 +50,7 @@ where
             // TODO: blocked by all handles.
             // blocked by the returned handle.
             self.ble_scan_poller.start();
-            self.engine_poller.start().await.unwrap()
+            self.engine_poller.start().await;
         });
     }
 }

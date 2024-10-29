@@ -48,8 +48,10 @@ where
     async fn process(&mut self, event: Option<Self::Event>) {
         match event {
             None => {}
-            Some(EngineEvent::Ble) => {}
-            _ => panic!("None BLE event"),
+            Some(EngineEvent::Ble) => {
+                self.ble_scan_provider.as_mut().unwrap().set_scan_request().await;
+            }
+            _ => {}
         }
     }
 }
