@@ -14,8 +14,9 @@ where
     C: DiscoveryCallback + Send + 'static,
 {
     let (engine, mut engine_poller) = engine::create(callback);
-    let (ble_scan_provider, ble_scan_poller) = ble_scan_provider::create();
+    let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create();
     engine_poller.processor().set_ble_scan_provider(ble_scan_provider);
+    ble_scan_poller.processor().set_engine(engine.clone());
     (
         Client::new(engine),
         Runtime::new(engine_poller, ble_scan_poller),

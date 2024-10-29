@@ -10,12 +10,14 @@ where
     (Engine { writer }, engine_poller)
 }
 
+#[derive(Clone)]
 pub struct Engine {
     writer: EventWriter<EngineEvent>,
 }
 
 impl Engine {
     pub async fn set_request(&mut self, request: DiscoveryRequest) {
+        // TODO: switch to Mdns to panic the test.
         self.writer.write(EngineEvent::Ble).await.unwrap();
     }
 
@@ -27,7 +29,7 @@ impl Engine {
 #[derive(Clone)]
 pub enum EngineEvent {
     Ble,
-    Number(i32),
+    Mdns,
 }
 pub struct EngineProcessor<C>
 where
@@ -35,7 +37,6 @@ where
 {
     discovery_callback: C,
     ble_scan_provider: Option<BleScanProvider>,
-    sum: i32,
 }
 
 impl<C> EventProcessor for EngineProcessor<C>
@@ -48,7 +49,7 @@ where
         match event {
             None => {}
             Some(EngineEvent::Ble) => {}
-            Some(EngineEvent::Number(number)) => { self.sum += number; }
+            _ => panic!("None BLE event"),
         }
     }
 }
@@ -58,7 +59,7 @@ where
     C: DiscoveryCallback + Send + 'static,
 {
     pub fn new(discovery_callback: C) -> Self {
-        Self { discovery_callback, ble_scan_provider: None, sum: 0 }
+        Self { discovery_callback, ble_scan_provider: None, }
     }
 
     pub fn set_ble_scan_provider(&mut self, provider: BleScanProvider) {
