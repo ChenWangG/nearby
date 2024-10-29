@@ -1,9 +1,11 @@
 use crate::engine::Engine;
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use std::future::Future;
+use ble::{BleScanRequest, BleScanResult, BleScanner, ScanCallback, Scanner};
 
 pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>) {
-    let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor { engine: None });
+    let ble_scanner = BleScanner{};
+    let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor { engine: None, ble_scanner });
     (BleScanProvider { writer }, ble_scan_poller)
 }
 
@@ -20,6 +22,7 @@ impl BleScanProvider {
 
 pub(crate) struct BleScanProcessor {
     engine: Option<Engine>,
+    ble_scanner: BleScanner,
 }
 
 impl EventProcessor for BleScanProcessor {
@@ -28,7 +31,10 @@ impl EventProcessor for BleScanProcessor {
     async fn process(&mut self, event: Option<Self::Event>) {
         match event {
             None => {}
-            Some(BleScanEvent::Start) => { println!("Received BleScanEvent::Start."); }
+            Some(BleScanEvent::Start) => {
+                println!("Received BleScanEvent::Start.");
+                self.ble_scanner.start(BleScanRequest{}, BleScanCallback{});
+            }
             _ => panic!("Recived None BleScanEvent::Start."),
         }
     }
@@ -44,4 +50,12 @@ impl BleScanProcessor {
 pub enum BleScanEvent {
     Start,
     Stop,
+}
+
+struct BleScanCallback;
+
+impl ScanCallback for BleScanCallback {
+    fn on_update(&self, result: BleScanResult) {
+        todo!()
+    }
 }
