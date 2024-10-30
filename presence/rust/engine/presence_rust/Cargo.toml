@@ -3,9 +3,16 @@ name = "presence_rust"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+mock = []
+
 [dependencies]
 event_poller = { path = "../../event_poller" }
 ble = { path = "../../ble" }
 tokio = { version = "1.36.0", features = ["sync", "rt-multi-thread", "macros"] }
 log = "0.4.22"
 futures = "0.3.31"
+
+[dev-dependencies]
+presence_rust.path = "."
+presence_rust.features = ["mock"]

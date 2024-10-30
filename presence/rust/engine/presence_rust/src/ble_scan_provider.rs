@@ -1,9 +1,17 @@
 use crate::engine::Engine;
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use std::future::Future;
-use ble::{BleScanRequest, BleScanResult, BleScanner, ScanCallback, Scanner};
+use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
+#[cfg(not(feature = "mock"))]
+use ble::BleScanner;
+#[cfg(feature = "mock")]
+use crate::mock_ble::BleScanner;
+#[cfg(feature = "mock")]
+use crate::mock_ble::TestBleScanner;
 
 pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>) {
+    let _ = TestBleScanner;
+
     let ble_scanner = BleScanner{};
     let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor { engine: None, ble_scanner });
     (BleScanProvider { writer }, ble_scan_poller)

@@ -10,6 +10,9 @@ pub mod client;
 mod engine;
 pub mod util;
 
+#[cfg(feature = "mock")]
+mod mock_ble;
+
 pub fn create<C>(callback: C) -> (Client, Runtime<C>)
 where
     C: DiscoveryCallback + Send + 'static,
