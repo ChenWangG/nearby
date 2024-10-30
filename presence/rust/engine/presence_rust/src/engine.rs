@@ -47,7 +47,10 @@ where
 
     async fn process(&mut self, event: Option<Self::Event>) {
         match event {
-            None => {}
+            None => {
+                print!("Engine stops ble scan provider.");
+                self.ble_scan_provider.as_mut().unwrap().stop().await;
+            }
             Some(EngineEvent::Ble) => {
                 self.ble_scan_provider.as_mut().unwrap().set_scan_request().await;
             }
