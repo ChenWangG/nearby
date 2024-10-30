@@ -1,6 +1,6 @@
 use std::thread;
 use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
-use crate::ble_scan_provider::UUID;
+use crate::scan_provider::ble_scan_provider::UUID;
 
 pub struct BleScanner;
 

@@ -5,10 +5,8 @@ use crate::mock::ble::BleScanner;
 use ble::BleScanner;
 use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
 use event_poller::{EventPoller, EventProcessor, EventWriter};
-use std::future::Future;
-use futures::executor::block_on;
-use crate::ble_scan_provider;
 use crate::client::DiscoveryResult;
+use crate::scan_provider::ScanProvider;
 use crate::util::async_block_on;
 
 pub const UUID: &str = "0000";
@@ -30,15 +28,15 @@ pub struct BleScanProvider {
     writer: EventWriter<BleScanEvent>,
 }
 
-impl BleScanProvider {
-    pub async fn set_scan_request(&self) {
+impl ScanProvider for BleScanProvider {
+    async fn set_scan_request(&self) {
         self.writer.write(BleScanEvent::Start).await;
     }
-    pub async fn on_scan_result(&self) {
+    async fn on_scan_result(&self) {
         self.writer.write(BleScanEvent::Result).await;
     }
 
-    pub async fn stop(&mut self) {
+    async fn stop(&mut self) {
         self.writer.stop().await.unwrap();
     }
 }

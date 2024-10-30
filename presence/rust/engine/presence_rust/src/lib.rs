@@ -1,16 +1,17 @@
-use crate::ble_scan_provider::BleScanProcessor;
+use scan_provider::ble_scan_provider::BleScanProcessor;
 use crate::client::{Client, DiscoveryCallback};
 use crate::engine::EngineProcessor;
 use crate::util::async_block_on;
 use event_poller::EventPoller;
 use futures::future;
+use scan_provider::ble_scan_provider;
 
-mod ble_scan_provider;
 pub mod client;
 mod engine;
 pub mod util;
 #[cfg(feature = "mock")]
 mod mock;
+mod scan_provider;
 
 pub fn create<C>(callback: C) -> (Client, Runtime<C>)
 where

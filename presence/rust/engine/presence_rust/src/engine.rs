@@ -1,6 +1,7 @@
 use event_poller::{EventPoller, EventProcessor, EventWriter};
-use crate::ble_scan_provider::BleScanProvider;
+use crate::scan_provider::ble_scan_provider::BleScanProvider;
 use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
+use crate::scan_provider::ScanProvider;
 
 pub fn create<C>(callback: C) -> (Engine, EventPoller<EngineProcessor<C>>)
 where
