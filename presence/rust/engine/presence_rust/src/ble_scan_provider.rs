@@ -1,19 +1,18 @@
 use crate::engine::Engine;
-use event_poller::{EventPoller, EventProcessor, EventWriter};
-use std::future::Future;
-use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
+#[cfg(feature = "mock")]
+use crate::mock::ble::BleScanner;
 #[cfg(not(feature = "mock"))]
 use ble::BleScanner;
-#[cfg(feature = "mock")]
-use crate::mock_ble::BleScanner;
-#[cfg(feature = "mock")]
-use crate::mock_ble::TestBleScanner;
+use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
+use event_poller::{EventPoller, EventProcessor, EventWriter};
+use std::future::Future;
 
 pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>) {
-    let _ = TestBleScanner;
-
-    let ble_scanner = BleScanner{};
-    let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor { engine: None, ble_scanner });
+    let ble_scanner = BleScanner {};
+    let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor {
+        engine: None,
+        ble_scanner,
+    });
     (BleScanProvider { writer }, ble_scan_poller)
 }
 
@@ -41,7 +40,8 @@ impl EventProcessor for BleScanProcessor {
             None => {}
             Some(BleScanEvent::Start) => {
                 println!("Received BleScanEvent::Start.");
-                self.ble_scanner.start(BleScanRequest{}, BleScanCallback{});
+                self.ble_scanner
+                    .start(BleScanRequest {}, BleScanCallback {});
             }
             _ => panic!("Recived None BleScanEvent::Start."),
         }

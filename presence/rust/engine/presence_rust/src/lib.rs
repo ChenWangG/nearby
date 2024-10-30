@@ -9,9 +9,8 @@ mod ble_scan_provider;
 pub mod client;
 mod engine;
 pub mod util;
-
 #[cfg(feature = "mock")]
-mod mock_ble;
+mod mock;
 
 pub fn create<C>(callback: C) -> (Client, Runtime<C>)
 where
