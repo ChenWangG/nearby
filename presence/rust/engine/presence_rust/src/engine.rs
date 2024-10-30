@@ -1,7 +1,7 @@
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::scan_provider::ble_scan_provider::BleScanProvider;
 use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
-use crate::scan_provider::ScanProvider;
+use crate::scan_provider::{ScanProvider, ScanRequest};
 
 pub fn create<C>(callback: C) -> (Engine, EventPoller<EngineProcessor<C>>)
 where
@@ -61,7 +61,7 @@ where
             }
             Some(EngineEvent::Ble) => {
                 print!("Engine set ble scan request.");
-                self.ble_scan_provider.as_mut().unwrap().set_scan_request().await;
+                self.ble_scan_provider.as_mut().unwrap().set_scan_request(ScanRequest{ priority: 100}).await;
             }
             Some(EngineEvent::Result) => {
                 print!("Engine receives discovery result.");

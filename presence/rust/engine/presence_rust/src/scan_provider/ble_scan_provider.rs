@@ -6,7 +6,7 @@ use ble::BleScanner;
 use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::client::DiscoveryResult;
-use crate::scan_provider::ScanProvider;
+use crate::scan_provider::{ScanProvider, ScanRequest, ScanResult};
 use crate::util::async_block_on;
 
 pub const UUID: &str = "0000";
@@ -29,10 +29,10 @@ pub struct BleScanProvider {
 }
 
 impl ScanProvider for BleScanProvider {
-    async fn set_scan_request(&self) {
+    async fn set_scan_request(&self, request: ScanRequest) {
         self.writer.write(BleScanEvent::Start).await;
     }
-    async fn on_scan_result(&self) {
+    async fn on_scan_result(&self, result: ScanResult) {
         self.writer.write(BleScanEvent::Result).await;
     }
 
@@ -92,7 +92,7 @@ impl ScanCallback for BleScanCallback {
     fn on_update(&self, result: BleScanResult) {
         let scan_provider = self.ble_scan_provider.clone();
         async_block_on(async move {
-            scan_provider.on_scan_result().await;
+            scan_provider.on_scan_result(ScanResult{ service_data: vec![1, 2, 3]}).await;
         });
     }
 }
