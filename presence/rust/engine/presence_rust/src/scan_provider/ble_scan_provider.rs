@@ -30,7 +30,7 @@ pub struct BleScanProvider {
 
 impl ScanProvider<BleScanResult> for BleScanProvider {
     async fn set_request(&self, request: ScanRequest) {
-        self.writer.write(BleScanEvent::Start).await;
+        self.writer.write(BleScanEvent::ScanRequest(request)).await;
     }
     async fn on_result(&self, result: BleScanResult) {
         self.writer.write(BleScanEvent::Result).await;
@@ -53,11 +53,11 @@ impl EventProcessor for BleScanProcessor {
     async fn process(&mut self, event: Option<Self::Event>) {
         match event {
             None => {}
-            Some(BleScanEvent::Start) => {
-                println!("Received BleScanEvent::Start.");
+            Some(BleScanEvent::ScanRequest(request)) => {
+                println!("Received BleScanEvent::ScanRequest.");
                 let ble_scan_provider = self.ble_scan_provider.clone().unwrap();
                 self.ble_scanner
-                    .start(BleScanRequest::new(String::from(UUID)), BleScanCallback { ble_scan_provider });
+                    .start(BleScanRequest::new(String::from(UUID), request.priority), BleScanCallback { ble_scan_provider });
             }
             Some(BleScanEvent::Result) => {
                 println!("Received BleScanEvent::Result.");
@@ -82,6 +82,7 @@ pub enum BleScanEvent {
     Start,
     Stop,
     Result,
+    ScanRequest(ScanRequest),
 }
 
 struct BleScanCallback {

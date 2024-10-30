@@ -1,14 +1,18 @@
 pub struct BleScanRequest {
-   uuid: String,
+    uuid: String,
+    priority: i32,
 }
 
 impl BleScanRequest {
-    pub fn new(uuid: String) -> Self {
-       BleScanRequest{ uuid }
+    pub fn new(uuid: String, priority: i32) -> Self {
+       BleScanRequest{ uuid,  priority }
     }
 
     pub fn uuid(&self) -> &str {
         &self.uuid
+    }
+    pub fn priority(&self) -> i32 {
+        self.priority
     }
 }
 pub struct BleScanResult {
