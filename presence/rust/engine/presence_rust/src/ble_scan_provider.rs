@@ -6,7 +6,10 @@ use ble::BleScanner;
 use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use std::future::Future;
+use futures::executor::block_on;
 use crate::ble_scan_provider;
+use crate::client::DiscoveryResult;
+use crate::util::async_block_on;
 
 pub const UUID: &str = "0000";
 
@@ -31,6 +34,9 @@ impl BleScanProvider {
     pub async fn set_scan_request(&self) {
         self.writer.write(BleScanEvent::Start).await;
     }
+    pub async fn on_scan_result(&self) {
+        self.writer.write(BleScanEvent::Result).await;
+    }
 
     pub async fn stop(&mut self) {
         self.writer.stop().await.unwrap();
@@ -51,8 +57,13 @@ impl EventProcessor for BleScanProcessor {
             None => {}
             Some(BleScanEvent::Start) => {
                 println!("Received BleScanEvent::Start.");
+                let ble_scan_provider = self.ble_scan_provider.clone().unwrap();
                 self.ble_scanner
-                    .start(BleScanRequest::new(String::from(UUID)), BleScanCallback { });
+                    .start(BleScanRequest::new(String::from(UUID)), BleScanCallback { ble_scan_provider });
+            }
+            Some(BleScanEvent::Result) => {
+                println!("Received BleScanEvent::Result.");
+                self.engine.as_mut().unwrap().on_result(DiscoveryResult{}).await;
             }
             _ => panic!("Recived None BleScanEvent::Start."),
         }
@@ -72,13 +83,18 @@ impl BleScanProcessor {
 pub enum BleScanEvent {
     Start,
     Stop,
+    Result,
 }
 
 struct BleScanCallback {
+    ble_scan_provider: BleScanProvider,
 }
 
 impl ScanCallback for BleScanCallback {
     fn on_update(&self, result: BleScanResult) {
-
+        let scan_provider = self.ble_scan_provider.clone();
+        async_block_on(async move {
+            scan_provider.on_scan_result().await;
+        });
     }
 }

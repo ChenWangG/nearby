@@ -8,6 +8,7 @@ pub trait DiscoveryCallback {
     fn on_update(&self, result: DiscoveryResult);
 }
 
+#[derive(Clone)]
 pub struct Client {
     engine: Engine,
 }
@@ -65,14 +66,11 @@ impl Device {
     }
 }
 #[derive(Debug)]
-pub struct DiscoveryResult {
-    pub medium: PresenceMedium,
-    pub device: Device,
-}
+pub struct DiscoveryResult;
 
 impl DiscoveryResult {
     pub fn new(medium: PresenceMedium, device: Device) -> Self {
-        Self { medium, device }
+        Self {}
     }
 }
 

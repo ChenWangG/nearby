@@ -1,6 +1,6 @@
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::ble_scan_provider::BleScanProvider;
-use crate::client::{DiscoveryCallback, DiscoveryRequest};
+use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
 
 pub fn create<C>(callback: C) -> (Engine, EventPoller<EngineProcessor<C>>)
 where
@@ -17,19 +17,24 @@ pub struct Engine {
 
 impl Engine {
     pub async fn set_request(&mut self, request: DiscoveryRequest) {
-        // TODO: switch to Mdns to panic the test.
         self.writer.write(EngineEvent::Ble).await.unwrap();
     }
 
+    pub async fn on_result(&mut self, request: DiscoveryResult) {
+        self.writer.write(crate::engine::EngineEvent::Result).await.unwrap();
+    }
     pub async fn stop(&mut self) {
         self.writer.stop().await.unwrap();
     }
+
+
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum EngineEvent {
     Ble,
     Mdns,
+    Result,
 }
 pub struct EngineProcessor<C>
 where
@@ -46,16 +51,23 @@ where
     type Event = EngineEvent;
 
     async fn process(&mut self, event: Option<Self::Event>) {
+        println!("Engine Processor process event starts.");
         match event {
             None => {
                 print!("Engine stops ble scan provider.");
                 self.ble_scan_provider.as_mut().unwrap().stop().await;
             }
             Some(EngineEvent::Ble) => {
+                print!("Engine set ble scan request.");
                 self.ble_scan_provider.as_mut().unwrap().set_scan_request().await;
             }
-            _ => {}
+            Some(EngineEvent::Result) => {
+                print!("Engine receives discovery result.");
+                self.discovery_callback.on_update(DiscoveryResult{});
+            }
+            _ => { print!("Other event");}
         }
+        println!("Engine Processor process event ends.");
     }
 }
 
