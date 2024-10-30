@@ -28,11 +28,11 @@ pub struct BleScanProvider {
     writer: EventWriter<BleScanEvent>,
 }
 
-impl ScanProvider for BleScanProvider {
+impl ScanProvider<BleScanResult> for BleScanProvider {
     async fn set_request(&self, request: ScanRequest) {
         self.writer.write(BleScanEvent::Start).await;
     }
-    async fn on_result(&self, result: ScanResult) {
+    async fn on_result(&self, result: BleScanResult) {
         self.writer.write(BleScanEvent::Result).await;
     }
 
@@ -92,7 +92,7 @@ impl ScanCallback for BleScanCallback {
     fn on_update(&self, result: BleScanResult) {
         let scan_provider = self.ble_scan_provider.clone();
         async_block_on(async move {
-            scan_provider.on_result(ScanResult{ service_data: vec![1, 2, 3]}).await;
+            scan_provider.on_result(result).await;
         });
     }
 }

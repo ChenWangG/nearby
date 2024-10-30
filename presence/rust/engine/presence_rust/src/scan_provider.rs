@@ -1,8 +1,9 @@
 pub mod ble_scan_provider;
 
-pub trait ScanProvider {
+pub trait ScanProvider<R> {
     async fn set_request(&self, request: ScanRequest);
-    async fn on_result(&self, result: ScanResult);
+    // The result type is decided by the underlying media such as BLE o mDNS.
+    async fn on_result(&self, result: R);
     async fn stop(&mut self);
 }
 
