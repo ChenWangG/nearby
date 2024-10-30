@@ -71,7 +71,7 @@ where
         &mut self.processor
     }
 
-    pub fn start(mut self) -> JoinHandle<()> {
+    pub fn start(mut self) -> JoinHandle<Result<(), ()>> {
         task::spawn(async move {
             loop {
                 match self.receiver.recv().await {
@@ -83,6 +83,7 @@ where
                     }
                 }
             }
+            Ok(())
         })
     }
 }

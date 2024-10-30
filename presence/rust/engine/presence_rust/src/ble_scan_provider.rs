@@ -7,13 +7,15 @@ use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use std::future::Future;
 
+pub const UUID: &str = "0000";
+
 pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>) {
     let ble_scanner = BleScanner {};
-    let (writer, ble_scan_poller) = event_poller::create(BleScanProcessor {
+    let (writer, mut ble_scan_poller) = event_poller::create(BleScanProcessor {
         engine: None,
         ble_scanner,
     });
-    (BleScanProvider { writer }, ble_scan_poller)
+    (BleScanProvider{writer}, ble_scan_poller)
 }
 
 #[derive(Clone)]
@@ -41,7 +43,7 @@ impl EventProcessor for BleScanProcessor {
             Some(BleScanEvent::Start) => {
                 println!("Received BleScanEvent::Start.");
                 self.ble_scanner
-                    .start(BleScanRequest {}, BleScanCallback {});
+                    .start(BleScanRequest::new(String::from(UUID)), BleScanCallback { });
             }
             _ => panic!("Recived None BleScanEvent::Start."),
         }
@@ -52,6 +54,8 @@ impl BleScanProcessor {
     pub fn set_engine(&mut self, engine: Engine) {
         self.engine = Some(engine);
     }
+    pub fn set_provider(&mut self, ble_scan_provider: BleScanProvider) {
+    }
 }
 
 #[derive(Clone)]
@@ -60,10 +64,11 @@ pub enum BleScanEvent {
     Stop,
 }
 
-struct BleScanCallback;
+struct BleScanCallback {
+}
 
 impl ScanCallback for BleScanCallback {
     fn on_update(&self, result: BleScanResult) {
-        todo!()
+
     }
 }

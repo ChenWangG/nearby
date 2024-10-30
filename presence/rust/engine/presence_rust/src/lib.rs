@@ -52,11 +52,13 @@ where
 
     pub fn start(self) {
         async_block_on(async move {
-            future::join_all(vec![
+            let results = future::join_all(vec![
                 self.ble_scan_poller.start(),
                 self.engine_poller.start(),
-            ])
-            .await;
+            ]).await;
+            for result in results {
+                result.unwrap().unwrap();
+            }
         });
     }
 }
