@@ -19,7 +19,7 @@ pub struct Engine {
 impl Engine {
     pub async fn set_request(&mut self, request: DiscoveryRequest) {
         assert_eq!(request.priority, 100);
-        self.writer.write(EngineEvent::Ble).await.unwrap();
+        self.writer.write(EngineEvent::DiscoveryRequest(request)).await.unwrap();
     }
 
     pub async fn on_result(&mut self, request: DiscoveryResult) {
@@ -36,6 +36,7 @@ impl Engine {
 pub enum EngineEvent {
     Ble,
     Mdns,
+    DiscoveryRequest(DiscoveryRequest),
     Result,
 }
 pub struct EngineProcessor<C>
@@ -59,9 +60,9 @@ where
                 print!("Engine stops ble scan provider.");
                 self.ble_scan_provider.as_mut().unwrap().stop().await;
             }
-            Some(EngineEvent::Ble) => {
+            Some(EngineEvent::DiscoveryRequest(request)) => {
                 print!("Engine set ble scan request.");
-                self.ble_scan_provider.as_mut().unwrap().set_request(ScanRequest{ priority: 100}).await;
+                self.ble_scan_provider.as_mut().unwrap().set_request(ScanRequest{ priority: request.priority}).await;
             }
             Some(EngineEvent::Result) => {
                 print!("Engine receives discovery result.");

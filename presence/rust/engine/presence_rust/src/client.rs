@@ -74,6 +74,7 @@ impl DiscoveryResult {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct DiscoveryRequest {
     pub priority: i32,
 }
