@@ -61,7 +61,7 @@ where
             }
             Some(EngineEvent::Ble) => {
                 print!("Engine set ble scan request.");
-                self.ble_scan_provider.as_mut().unwrap().set_scan_request(ScanRequest{ priority: 100}).await;
+                self.ble_scan_provider.as_mut().unwrap().set_request(ScanRequest{ priority: 100}).await;
             }
             Some(EngineEvent::Result) => {
                 print!("Engine receives discovery result.");
