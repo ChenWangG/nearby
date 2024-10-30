@@ -1,6 +1,5 @@
 use std::sync::mpsc;
-use presence_rust::client::{Client, DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
-use presence_rust::util;
+use presence_rust::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
 use std::thread;
 
 struct Callback {
@@ -21,7 +20,7 @@ fn test_engine() {
         let callback = Callback { tx };
         let (mut client, runtime) = presence_rust::create(callback);
         let runtime_thread = scope.spawn(|| runtime.start());
-        client.set_request(DiscoveryRequest{});
+        client.set_request(DiscoveryRequest{ priority: 100 });
         rx.recv().unwrap();
         client.stop();
         runtime_thread.join().expect("Presence test crashed.");

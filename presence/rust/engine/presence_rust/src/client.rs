@@ -74,7 +74,9 @@ impl DiscoveryResult {
     }
 }
 
-pub struct DiscoveryRequest;
+pub struct DiscoveryRequest {
+    pub priority: i32,
+}
 
 #[cfg(test)]
 mod tests {
