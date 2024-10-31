@@ -15,6 +15,7 @@ impl BleScanRequest {
         self.priority
     }
 }
+#[derive(Clone)]
 pub struct BleScanResult {
     tx_power: i32,
     service_data: Vec<u8>,

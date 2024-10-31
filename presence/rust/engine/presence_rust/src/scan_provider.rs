@@ -12,6 +12,17 @@ pub struct ScanRequest {
     pub(crate) priority: i32,
 }
 
+#[derive(Clone, Debug)]
 pub struct ScanResult {
     service_data: Vec<u8>,
+}
+
+impl ScanResult {
+    pub fn new(service_data: Vec<u8>) -> Self {
+        Self{ service_data }
+    }
+
+    pub fn service_data(&self) -> &Vec<u8> {
+        &self.service_data
+    }
 }

@@ -1,7 +1,7 @@
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::scan_provider::ble_scan_provider::BleScanProvider;
 use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
-use crate::scan_provider::{ScanProvider, ScanRequest};
+use crate::scan_provider::{ScanProvider, ScanRequest, ScanResult};
 
 pub fn create<C>(callback: C) -> (Engine, EventPoller<EngineProcessor<C>>)
 where
@@ -22,8 +22,8 @@ impl Engine {
         self.writer.write(EngineEvent::DiscoveryRequest(request)).await.unwrap();
     }
 
-    pub async fn on_result(&mut self, request: DiscoveryResult) {
-        self.writer.write(crate::engine::EngineEvent::Result).await.unwrap();
+    pub async fn on_scan_result(&mut self, result: ScanResult) {
+        self.writer.write(crate::engine::EngineEvent::ScanResult(result)).await.unwrap();
     }
     pub async fn stop(&mut self) {
         self.writer.stop().await.unwrap();
@@ -37,7 +37,7 @@ pub enum EngineEvent {
     Ble,
     Mdns,
     DiscoveryRequest(DiscoveryRequest),
-    Result,
+    ScanResult(ScanResult),
 }
 pub struct EngineProcessor<C>
 where
@@ -64,9 +64,9 @@ where
                 print!("Engine set ble scan request.");
                 self.ble_scan_provider.as_mut().unwrap().set_request(ScanRequest{ priority: request.priority}).await;
             }
-            Some(EngineEvent::Result) => {
+            Some(EngineEvent::ScanResult(scan_result)) => {
                 print!("Engine receives discovery result.");
-                self.discovery_callback.on_update(DiscoveryResult{});
+                self.discovery_callback.on_update(DiscoveryResult::new(scan_result.service_data().clone()));
             }
             _ => { print!("Other event");}
         }

@@ -10,7 +10,7 @@ pub mod client;
 mod engine;
 pub mod util;
 #[cfg(feature = "mock")]
-mod mock;
+pub mod mock;
 mod scan_provider;
 
 pub fn create<C>(callback: C) -> (Client, Runtime<C>)
