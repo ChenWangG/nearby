@@ -19,6 +19,7 @@ public class Presence {
       System.out.println("Hello from Presence Java Lib.");
       presence_rust_ptr = newPresence();
       System.out.println("Presence Rust ptr: " + presence_rust_ptr);
+      setRequest(1, 1);
   }
 
   // Memory address of Rust Presence.
