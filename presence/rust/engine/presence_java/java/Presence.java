@@ -17,11 +17,11 @@ public class Presence {
 
   public void hello() {
       System.out.println("Hello from Presence Java Lib.");
+      presence_rust_ptr = newPresence();
+      System.out.println("Presence Rust ptr: " + presence_rust_ptr);
   }
-
-
 
   // Memory address of Rust Presence.
   // Opaque pointer to be passed back and forth between Rust and Java.
-  private long rust_engine_ptr;
+  private long presence_rust_ptr;
 }
