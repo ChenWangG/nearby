@@ -5,6 +5,8 @@ use jni::{JNIEnv, JavaVM};
 use presence_rust::client::{Client, DiscoveryCallback, DiscoveryResult};
 use presence_rust::Runtime;
 
+static ON_DISCOVERY_SIGNATURE: &str = "(J)V";
+
 struct Callback {}
 
 impl DiscoveryCallback for Callback {
@@ -34,6 +36,28 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_Presence_newPresen
     let (client, runtime) = presence_rust::create(callback);
     let presence_rust = PresenceRust{client, runtime};
     Box::into_raw(Box::new(presence_rust)) as jlong
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern "system" fn Java_com_google_nearby_presence_Presence_start
+(mut env: JNIEnv,
+ presence_java: JObject,
+ presence_rust_ptr: jlong,
+) {
+    println!("Presence Rust start.");
+
+    let presence_rust_ptr = presence_rust_ptr as *mut PresenceRust;
+    (*presence_rust_ptr).test_ptr();
+
+    let addr = 1 as jlong;
+    env.call_method(
+        presence_java,
+        "onDiscovery",
+        ON_DISCOVERY_SIGNATURE,
+        &[addr.into()],
+    )
+        .unwrap();
 }
 
 #[no_mangle]

@@ -14,12 +14,19 @@ public class Presence {
   /* ========== Native methods implemented in Rust. ========== */
   private static native long newPresence();
   private static native void setRequest(long presence, long request);
+  private native void start(long presence);
+
+  /* ========== Callbacks called from Rust. ========== */
+  synchronized public void onDiscovery(long result) {
+      System.out.println("onDiscovery.");
+  }
 
   public void hello() {
       System.out.println("Hello from Presence Java Lib.");
       presence_rust_ptr = newPresence();
       System.out.println("Presence Rust ptr: " + presence_rust_ptr);
       setRequest(1, 1);
+      start(presence_rust_ptr);
   }
 
   // Memory address of Rust Presence.
