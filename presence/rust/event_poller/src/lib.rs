@@ -4,7 +4,7 @@ use tokio::task;
 use tokio::task::JoinHandle;
 
 pub trait EventProcessor: Send + 'static {
-    type Event;
+    type Event: Send + 'static + Clone;
 
     fn process(
         &mut self,
@@ -15,7 +15,6 @@ pub trait EventProcessor: Send + 'static {
 pub fn create<P>(processor: P) -> (EventWriter<P::Event>, EventPoller<P>)
 where
     P: EventProcessor,
-    P::Event: Send + 'static + Clone,
 {
     let (sender, receiver) = mpsc::channel(32);
     (
@@ -56,7 +55,6 @@ impl<E> EventWriter<E> {
 pub struct EventPoller<P>
 where
     P: EventProcessor,
-    P::Event: Send + 'static + Clone,
 {
     processor: P,
     receiver: mpsc::Receiver<PollerEvent<P::Event>>,
@@ -65,7 +63,6 @@ where
 impl<P> EventPoller<P>
 where
     P: EventProcessor,
-    P::Event: Send + 'static + Clone,
 {
     pub fn processor(&mut self) -> &mut P {
         &mut self.processor

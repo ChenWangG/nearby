@@ -27,7 +27,7 @@ impl EventProcessor for EchoController {
 async fn test_event_poller() {
     let (echo_sender, mut echo_receiver) = mpsc::channel(100);
 
-    let (echo_writer, echo_poller) = EventPoller::create(EchoController { echo_sender });
+    let (echo_writer, echo_poller) = event_poller::create(EchoController { echo_sender });
     echo_poller.start();
 
     let n = 1;
