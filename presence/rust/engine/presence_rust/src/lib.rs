@@ -13,10 +13,7 @@ pub mod util;
 pub mod mock;
 mod scan_provider;
 
-pub fn create<C>() -> (Client, Runtime<C>)
-where
-    C: DiscoveryCallback
-{
+pub fn create<C: DiscoveryCallback>() -> (Client, Runtime<C>) {
     let (engine, mut engine_poller) = engine::create();
     let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create();
     engine_poller
@@ -29,18 +26,12 @@ where
     )
 }
 
-pub struct Runtime<C>
-where
-    C: DiscoveryCallback
-{
+pub struct Runtime<C: DiscoveryCallback> {
     engine_poller: EventPoller<EngineProcessor<C>>,
     ble_scan_poller: EventPoller<BleScanProcessor>,
 }
 
-impl<C> Runtime<C>
-where
-    C: DiscoveryCallback
-{
+impl<C: DiscoveryCallback> Runtime<C> {
     pub fn new(
         engine_poller: EventPoller<EngineProcessor<C>>,
         ble_scan_poller: EventPoller<BleScanProcessor>,
