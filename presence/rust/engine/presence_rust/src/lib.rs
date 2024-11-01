@@ -13,11 +13,11 @@ pub mod util;
 pub mod mock;
 mod scan_provider;
 
-pub fn create<C>(callback: C) -> (Client, Runtime<C>)
+pub fn create<C>() -> (Client, Runtime<C>)
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    let (engine, mut engine_poller) = engine::create(callback);
+    let (engine, mut engine_poller) = engine::create();
     let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create();
     engine_poller
         .processor()
@@ -49,6 +49,10 @@ where
             engine_poller,
             ble_scan_poller,
         }
+    }
+
+    pub fn set_discovery_callback(&mut self, callback: C) {
+        self.engine_poller.processor().set_discovery_callback(callback);
     }
 
     pub fn start(self) {

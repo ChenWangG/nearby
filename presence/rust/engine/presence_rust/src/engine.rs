@@ -3,11 +3,11 @@ use crate::scan_provider::ble_scan_provider::BleScanProvider;
 use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
 use crate::scan_provider::{ScanProvider, ScanRequest, ScanResult};
 
-pub fn create<C>(callback: C) -> (Engine, EventPoller<EngineProcessor<C>>)
+pub fn create<C>() -> (Engine, EventPoller<EngineProcessor<C>>)
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    let (writer, engine_poller) = event_poller::create(EngineProcessor::new(callback));
+    let (writer, engine_poller) = event_poller::create(EngineProcessor::new());
     (Engine { writer }, engine_poller)
 }
 
@@ -43,7 +43,7 @@ pub struct EngineProcessor<C>
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    discovery_callback: C,
+    discovery_callback: Option<C>,
     ble_scan_provider: Option<BleScanProvider>,
 }
 
@@ -66,7 +66,7 @@ where
             }
             Some(EngineEvent::ScanResult(scan_result)) => {
                 print!("Engine receives discovery result.");
-                self.discovery_callback.on_update(DiscoveryResult::new(scan_result.service_data().clone()));
+                self.discovery_callback.as_mut().unwrap().on_update(DiscoveryResult::new(scan_result.service_data().clone()));
             }
             _ => { print!("Other event");}
         }
@@ -78,11 +78,14 @@ impl<C> EngineProcessor<C>
 where
     C: DiscoveryCallback + Send + 'static,
 {
-    pub fn new(discovery_callback: C) -> Self {
-        Self { discovery_callback, ble_scan_provider: None, }
+    pub fn new() -> Self {
+        Self { discovery_callback: None, ble_scan_provider: None, }
     }
 
     pub fn set_ble_scan_provider(&mut self, provider: BleScanProvider) {
         self.ble_scan_provider = Some(provider);
+    }
+    pub fn set_discovery_callback(&mut self, callback: C) {
+        self.discovery_callback = Some(callback);
     }
 }

@@ -19,7 +19,8 @@ fn test_engine() {
     thread::scope(|scope| {
         let (tx, rx) = mpsc::channel();
         let callback = Callback { tx };
-        let (mut client, runtime) = presence_rust::create(callback);
+        let (mut client, mut runtime) = presence_rust::create();
+        runtime.set_discovery_callback(callback);
         let runtime_thread = scope.spawn(|| runtime.start());
         client.set_request(DiscoveryRequest{ priority: 100 });
         let result = rx.recv().unwrap();
