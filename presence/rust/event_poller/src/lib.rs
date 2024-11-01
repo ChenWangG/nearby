@@ -3,7 +3,7 @@ use tokio::sync::mpsc::error::SendError;
 use tokio::task;
 use tokio::task::JoinHandle;
 
-pub trait EventProcessor: Send {
+pub trait EventProcessor: Send + 'static {
     type Event;
 
     fn process(
@@ -14,7 +14,7 @@ pub trait EventProcessor: Send {
 
 pub fn create<P>(processor: P) -> (EventWriter<P::Event>, EventPoller<P>)
 where
-    P: EventProcessor + Send + 'static,
+    P: EventProcessor,
     P::Event: Send + 'static + Clone,
 {
     let (sender, receiver) = mpsc::channel(32);
@@ -55,7 +55,7 @@ impl<E> EventWriter<E> {
 
 pub struct EventPoller<P>
 where
-    P: EventProcessor + Send + 'static,
+    P: EventProcessor,
     P::Event: Send + 'static + Clone,
 {
     processor: P,
@@ -64,7 +64,7 @@ where
 
 impl<P> EventPoller<P>
 where
-    P: EventProcessor + Send + 'static,
+    P: EventProcessor,
     P::Event: Send + 'static + Clone,
 {
     pub fn processor(&mut self) -> &mut P {
