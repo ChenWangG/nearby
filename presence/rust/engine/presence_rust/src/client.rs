@@ -4,7 +4,7 @@ use event_poller::EventProcessor;
 use std::future::Future;
 
 // Implemented by the client to receive discovery results.
-pub trait DiscoveryCallback {
+pub trait DiscoveryCallback : Send + 'static {
     fn on_update(&self, result: DiscoveryResult);
 }
 

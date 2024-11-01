@@ -15,7 +15,7 @@ mod scan_provider;
 
 pub fn create<C>() -> (Client, Runtime<C>)
 where
-    C: DiscoveryCallback + Send + 'static,
+    C: DiscoveryCallback
 {
     let (engine, mut engine_poller) = engine::create();
     let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create();
@@ -31,7 +31,7 @@ where
 
 pub struct Runtime<C>
 where
-    C: DiscoveryCallback + Send + 'static,
+    C: DiscoveryCallback
 {
     engine_poller: EventPoller<EngineProcessor<C>>,
     ble_scan_poller: EventPoller<BleScanProcessor>,
@@ -39,7 +39,7 @@ where
 
 impl<C> Runtime<C>
 where
-    C: DiscoveryCallback + Send + 'static,
+    C: DiscoveryCallback
 {
     pub fn new(
         engine_poller: EventPoller<EngineProcessor<C>>,

@@ -5,7 +5,7 @@ use crate::scan_provider::{ScanProvider, ScanRequest, ScanResult};
 
 pub fn create<C>() -> (Engine, EventPoller<EngineProcessor<C>>)
 where
-    C: DiscoveryCallback + Send + 'static,
+    C: DiscoveryCallback,
 {
     let (writer, engine_poller) = event_poller::create(EngineProcessor::new());
     (Engine { writer }, engine_poller)
@@ -41,7 +41,7 @@ pub enum EngineEvent {
 }
 pub struct EngineProcessor<C>
 where
-    C: DiscoveryCallback + Send + 'static,
+    C: DiscoveryCallback,
 {
     discovery_callback: Option<C>,
     ble_scan_provider: Option<BleScanProvider>,
@@ -49,7 +49,7 @@ where
 
 impl<C> EventProcessor for EngineProcessor<C>
 where
-    C: DiscoveryCallback + Send + 'static,
+    C: DiscoveryCallback,
 {
     type Event = EngineEvent;
 
@@ -76,7 +76,7 @@ where
 
 impl<C> EngineProcessor<C>
 where
-    C: DiscoveryCallback + Send + 'static,
+    C: DiscoveryCallback,
 {
     pub fn new() -> Self {
         Self { discovery_callback: None, ble_scan_provider: None, }
