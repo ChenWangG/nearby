@@ -1,4 +1,3 @@
-use event_poller::EventPoller;
 use event_poller::EventProcessor;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::error::SendError;

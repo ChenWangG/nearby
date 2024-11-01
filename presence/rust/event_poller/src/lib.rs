@@ -12,10 +12,7 @@ pub trait EventProcessor: Send + 'static {
     ) -> impl std::future::Future<Output = ()> + Send;
 }
 
-pub fn create<P>(processor: P) -> (EventWriter<P::Event>, EventPoller<P>)
-where
-    P: EventProcessor,
-{
+pub fn create<P: EventProcessor>(processor: P) -> (EventWriter<P::Event>, EventPoller<P>) {
     let (sender, receiver) = mpsc::channel(32);
     (
         EventWriter { sender },
@@ -52,18 +49,12 @@ impl<E> EventWriter<E> {
     }
 }
 
-pub struct EventPoller<P>
-where
-    P: EventProcessor,
-{
+pub struct EventPoller<P: EventProcessor> {
     processor: P,
     receiver: mpsc::Receiver<PollerEvent<P::Event>>,
 }
 
-impl<P> EventPoller<P>
-where
-    P: EventProcessor,
-{
+impl<P: EventProcessor> EventPoller<P> {
     pub fn processor(&mut self) -> &mut P {
         &mut self.processor
     }
