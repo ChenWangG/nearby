@@ -4,6 +4,8 @@
 //    javac *.java && javap -s *.class
 package com.google.nearby.presence;
 
+import java.util.concurrent.ExecutorService;
+
 // Presence in Java Wrapping the Rust implementation.
 public class Presence {
 
@@ -18,7 +20,22 @@ public class Presence {
 
   /* ========== Callbacks called from Rust. ========== */
   synchronized public void onDiscovery(long result) {
-      System.out.println("onDiscovery.");
+      System.out.println("Java onDiscovery.");
+  }
+
+
+  /* ========== Presence Java API. ========== */
+  public Presence() {
+    presence_rust_ptr = newPresence();
+  }
+
+  synchronized public void start(ExecutorService executor) {
+     System.out.println("Start Engine.");
+     executor.execute(() -> { start(this.presence_rust_ptr); });
+   }
+
+  synchronized public void setRequest() {
+    setRequest(this.presence_rust_ptr, 1);
   }
 
   public void hello() {

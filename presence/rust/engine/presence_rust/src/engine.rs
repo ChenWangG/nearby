@@ -15,7 +15,6 @@ pub struct Engine {
 
 impl Engine {
     pub async fn set_request(&mut self, request: DiscoveryRequest) {
-        assert_eq!(request.priority, 100);
         self.writer.write(EngineEvent::DiscoveryRequest(request)).await.unwrap();
     }
 

@@ -41,7 +41,7 @@ impl ScanProvider<BleScanResult> for BleScanProvider {
     }
 }
 
-pub(crate) struct BleScanProcessor {
+pub struct BleScanProcessor {
     engine: Option<Engine>,
     ble_scan_provider: Option<BleScanProvider>,
     ble_scanner: BleScanner,
