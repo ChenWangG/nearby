@@ -8,6 +8,9 @@ import java.util.concurrent.ExecutorService;
 
 // Presence in Java Wrapping the Rust implementation.
 public class Presence {
+  public interface Callbacks {
+    public void onDiscovery(long result);
+  }
 
   static {
     System.loadLibrary("presence_java");
@@ -17,15 +20,19 @@ public class Presence {
   private static native long newPresence();
   private static native void setRequest(long presence, long request);
   private native void start(long presence);
+  private native void stop(long presence);
 
   /* ========== Callbacks called from Rust. ========== */
   synchronized public void onDiscovery(long result) {
       System.out.println("Java onDiscovery.");
+      this.callbacks.onDiscovery(result);
+
   }
 
 
   /* ========== Presence Java API. ========== */
-  public Presence() {
+  public Presence(Callbacks callbacks) {
+    this.callbacks = callbacks;
     presence_rust_ptr = newPresence();
   }
 
@@ -38,6 +45,11 @@ public class Presence {
     setRequest(this.presence_rust_ptr, 1);
   }
 
+  synchronized public void stop() {
+     System.out.println("Stop Engine.");
+     stop(this.presence_rust_ptr);
+  }
+
   public void hello() {
       System.out.println("Hello from Presence Java Lib.");
       presence_rust_ptr = newPresence();
@@ -46,6 +58,7 @@ public class Presence {
       start(presence_rust_ptr);
   }
 
+  final Callbacks callbacks;
   // Memory address of Rust Presence.
   // Opaque pointer to be passed back and forth between Rust and Java.
   private long presence_rust_ptr;

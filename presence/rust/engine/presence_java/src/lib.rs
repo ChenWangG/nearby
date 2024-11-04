@@ -81,6 +81,17 @@ pub unsafe extern "system" fn Java_com_google_nearby_presence_Presence_start
 
 #[no_mangle]
 #[allow(non_snake_case)]
+pub unsafe extern "system" fn Java_com_google_nearby_presence_Presence_stop
+(mut env: JNIEnv,
+ presence_java: JObject,
+ presence_rust_ptr: jlong,
+) {
+    let presence_rust_ptr = presence_rust_ptr as *mut PresenceRust;
+    (*(*presence_rust_ptr).client).stop();
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
 pub unsafe extern "system" fn Java_com_google_nearby_presence_Presence_setRequest
 (_env: JNIEnv,
  _class: JClass,

@@ -1,13 +1,41 @@
 import com.google.nearby.presence.Presence;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+
+class TestCallbacks implements Presence.Callbacks {
+  synchronized public void onDiscovery(long result)  {
+    System.out.println("TestCallbacks: onDiscovery");
+    this.result = result;
+    notify();
+  }
+
+ synchronized public long waitForResult() {
+     try {
+       while(this.result == null) {
+         this.wait();
+       }
+       System.out.println("TestCallbacks: waitForResult has the result.");
+     } catch (InterruptedException e) {
+       e.printStackTrace();
+     }
+     return this.result;
+   }
+
+   private Long result = null;
+}
 
 public class Main {
   public static void main(String[] args) {
     System.out.println("======== Example to demo Presence Rust Java API.==========");
     System.out.println("==========================================================");
-    Presence presence = new Presence();
-    presence.start(Executors.newSingleThreadExecutor());
+    TestCallbacks callbacks = new TestCallbacks();
+    Presence presence = new Presence(callbacks);
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    presence.start(executor);
     presence.setRequest();
+    callbacks.waitForResult();
+    presence.stop();
+    executor.shutdown();
     System.out.println("==========================================================");
     System.out.println("========== End of demo Presence Rust Java API.============");
   }
