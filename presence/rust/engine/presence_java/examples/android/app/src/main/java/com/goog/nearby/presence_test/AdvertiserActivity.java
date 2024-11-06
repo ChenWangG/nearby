@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class AdvertiserActivity extends BtActivity {
+
   private Button advertiseButton;
   private boolean isAdvertising = false;
   private TextView textView;

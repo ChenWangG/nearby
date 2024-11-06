@@ -42,23 +42,23 @@ public class ScannerActivity extends BtActivity {
     };
 
     scanButton.setOnClickListener(
-      v -> {
-        textView.setVisibility(View.VISIBLE);
-        if (isScanning) {
-          isScanning = false;
-          scanButton.setText("Start Scan");
-          mBtLeScanner.stopScan(bleCallback);
-          textView.setText("BLE Scan stopped");
-        } else {
-          isScanning = true;
-          scanButton.setText("Stop Scan");
-          try {
-            mBtLeScanner.startScan(bleCallback);
-            log("Succeeded to start BLE scan.");
-          } catch (Exception e) {
-            log("Failed to start BLE scan.");
+        v -> {
+          textView.setVisibility(View.VISIBLE);
+          if (isScanning) {
+            isScanning = false;
+            scanButton.setText("Start Scan");
+            mBtLeScanner.stopScan(bleCallback);
+            textView.setText("BLE Scan stopped");
+          } else {
+            isScanning = true;
+            scanButton.setText("Stop Scan");
+            try {
+              mBtLeScanner.startScan(bleCallback);
+              log("Succeeded to start BLE scan.");
+            } catch (Exception e) {
+              log("Failed to start BLE scan.");
+            }
           }
-        }
-      });
+        });
   }
 }

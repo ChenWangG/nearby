@@ -34,8 +34,9 @@ public class MainActivity extends Activity {
     testPresenceV1();
 
     requestPermissions(
-        new String[] {
-          BLUETOOTH_ADVERTISE, BLUETOOTH_SCAN, UWB_RANGING, ACCESS_FINE_LOCATION, POST_NOTIFICATION
+        new String[]{
+            BLUETOOTH_ADVERTISE, BLUETOOTH_SCAN, UWB_RANGING, ACCESS_FINE_LOCATION,
+            POST_NOTIFICATION
         },
         REQUEST_CODE);
   }
@@ -48,7 +49,8 @@ public class MainActivity extends Activity {
 
   @Override
   public void onRequestPermissionsResult(
-      int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {}
+      int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+  }
 
   private void testPresenceV1() {
     Log.d(TAG, "Test Presence V1");

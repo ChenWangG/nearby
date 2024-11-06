@@ -6,7 +6,9 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class BtActivity extends Activity {
+
   protected TextView textView;
+
   protected void log(String log) {
     getMainExecutor()
         .execute(
