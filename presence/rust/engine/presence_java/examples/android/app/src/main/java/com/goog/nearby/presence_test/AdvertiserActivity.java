@@ -1,32 +1,21 @@
 package com.goog.nearby.presence_test;
 
-import android.app.Activity;
-import android.content.Context;
-
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-public class AdvertiserActivity extends Activity {
+public class AdvertiserActivity extends BtActivity {
   private Button advertiseButton;
   private boolean isAdvertising = false;
   private TextView textView;
-  private Executor executor;
-  private Context context;
 
+  @SuppressLint("SetTextI18n")
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    this.executor = Executors.newSingleThreadExecutor();
-    this.context = getApplicationContext();
 
     setContentView(R.layout.activity_advertiser);
     advertiseButton = findViewById(R.id.broadcast);
@@ -38,31 +27,11 @@ public class AdvertiserActivity extends Activity {
           textView.setVisibility(View.VISIBLE);
           if (isAdvertising) {
             isAdvertising = false;
-
+            advertiseButton.setText("Start Broadcast");
           } else {
-
             isAdvertising = true;
+            advertiseButton.setText("Stop Broadcast");
           }
-          showUi();
         });
-  }
-
-  private void showUi() {
-    advertiseButton.setText(isAdvertising ? "Stop Broadcast" : "Start Broadcast");
-  }
-
-  private void log(String log) {
-    getMainExecutor()
-        .execute(
-            () -> {
-              StringBuilder stringBuilder =
-                  new StringBuilder()
-                      .append(DateFormat.getDateTimeInstance().format(new Date()))
-                      .append(": ")
-                      .append(log)
-                      .append("\n")
-                      .append("\n");
-              textView.append(stringBuilder.toString());
-            });
   }
 }
