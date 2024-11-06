@@ -7,9 +7,6 @@ import static android.Manifest.permission.UWB_RANGING;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +16,7 @@ import androidx.annotation.NonNull;
 
 public class MainActivity extends Activity {
 
-  static final String TAG = "MainlineTest";
+  static final String TAG = "PresenceTest";
   private static final String POST_NOTIFICATION = "android.permission.POST_NOTIFICATIONS";
   private static final int REQUEST_CODE = 123;
 
@@ -29,27 +26,6 @@ public class MainActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Log.d(TAG, "Check Mainline Tethering module version code.");
-    PackageInfo packageInfo = null;
-    try {
-      packageInfo =
-          getApplicationContext()
-              .getPackageManager()
-              .getPackageInfo("com.google.android.tethering", PackageManager.MATCH_APEX);
-    } catch (NameNotFoundException e1) {
-      try {
-        packageInfo =
-            getApplicationContext()
-                .getPackageManager()
-                .getPackageInfo("com.android.tethering", PackageManager.MATCH_APEX);
-      } catch (NameNotFoundException e2) {
-        Log.d(TAG, "Tethering package not found.");
-      }
-    }
-    if (packageInfo != null) {
-      Log.d(TAG, "Tethering package version code: " + packageInfo.getLongVersionCode());
-    }
-
     setContentView(R.layout.activity_main);
     broadcastButton = findViewById(R.id.broadcast_role);
     discoverButton = findViewById(R.id.discovery_role);

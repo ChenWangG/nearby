@@ -1,34 +1,26 @@
 package com.goog.nearby.presence_test;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.bluetooth.le.ScanResult;
-import android.content.Context;
 
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanCallback;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-public class ScannerActivity extends Activity {
+public class ScannerActivity extends BtActivity {
 
   private BluetoothLeScanner mBtLeScanner;
+  private ScanCallback bleCallback;
   private Button scanButton;
   private boolean isScanning = false;
-  private TextView textView;
 
   // Permission already required in MainActivity.
-  @SuppressLint("MissingPermission")
+  @SuppressLint({"MissingPermission", "SetTextI18n"})
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -40,46 +32,33 @@ public class ScannerActivity extends Activity {
     textView = findViewById(R.id.discovery_display);
     textView.setVisibility(View.GONE);
     textView.setMovementMethod(new ScrollingMovementMethod());
+
+    bleCallback = new ScanCallback() {
+      @Override
+      public void onScanResult(int callbackType, ScanResult result) {
+        super.onScanResult(callbackType, result);
+        log("BLE scan callback.");
+      }
+    };
+
     scanButton.setOnClickListener(
-        v -> {
-          textView.setVisibility(View.VISIBLE);
-          if (isScanning) {
-            isScanning = false;
-
-          } else {
-            try {
-              mBtLeScanner.startScan(new ScanCallback() {
-                @Override
-                public void onScanResult(int callbackType, ScanResult result) {
-                  log("BLE onScanResult.");
-                }
-              });
-              log("Succeeded to start BLE scan.");
-            } catch (Exception e) {
-              log("Failed to start BLE scan.");
-            }
-            isScanning = true;
+      v -> {
+        textView.setVisibility(View.VISIBLE);
+        if (isScanning) {
+          isScanning = false;
+          scanButton.setText("Start Scan");
+          mBtLeScanner.stopScan(bleCallback);
+          textView.setText("BLE Scan stopped");
+        } else {
+          isScanning = true;
+          scanButton.setText("Stop Scan");
+          try {
+            mBtLeScanner.startScan(bleCallback);
+            log("Succeeded to start BLE scan.");
+          } catch (Exception e) {
+            log("Failed to start BLE scan.");
           }
-          showUi();
-        });
-  }
-
-  private void showUi() {
-    scanButton.setText(isScanning ? "Stop Scan" : "Start Scan");
-  }
-
-  protected void log(String log) {
-    getMainExecutor()
-        .execute(
-            () -> {
-              StringBuilder stringBuilder =
-                  new StringBuilder()
-                      .append(DateFormat.getDateTimeInstance().format(new Date()))
-                      .append(": ")
-                      .append(log)
-                      .append("\n")
-                      .append("\n");
-              textView.append(stringBuilder.toString());
-            });
+        }
+      });
   }
 }
