@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true">
+
+    <TextView
+        android:id="@+id/select_protocol"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/back"
+        android:fontFamily="sans-serif-medium"
+        android:scrollbars="vertical"
+        android:text="@string/select_protocol"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="20dp"
+        android:orientation="vertical">
+        <RadioButton android:id="@+id/radio_presence_v1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/presence_v1"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_presence_fast_pair"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/presence_fast_pair"
+            android:onClick="onRadioButtonClicked"/>
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/select_role"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_below="@+id/select_protocol"
+        android:background="@drawable/back"
+        android:fontFamily="sans-serif-medium"
+        android:scrollbars="vertical"
+        android:text="@string/select_role"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/broadcast_role"
+        android:textStyle="bold"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="12dp"
+        android:layout_below="@+id/select_protocol"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/broadcast"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/discovery_role"
+        android:textStyle="bold"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginEnd="12dp"
+        android:layout_below="@+id/select_protocol"
+        android:layout_toEndOf="@+id/broadcast_role"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/discovery"
+        android:textSize="16sp" />
+</RelativeLayout>
