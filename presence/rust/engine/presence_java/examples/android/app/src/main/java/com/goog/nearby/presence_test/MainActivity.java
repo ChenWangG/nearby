@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import androidx.annotation.NonNull;
 
 public class MainActivity extends Activity {
 
@@ -71,7 +72,7 @@ public class MainActivity extends Activity {
 
   @Override
   public void onRequestPermissionsResult(
-      int requestCode, String[] permissions, int[] grantResults) {}
+      int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {}
 
   private void testPresenceV1() {
     Log.d(TAG, "Test Presence V1");
