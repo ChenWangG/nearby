@@ -5,7 +5,6 @@ import static android.Manifest.permission.BLUETOOTH_ADVERTISE;
 import static android.Manifest.permission.BLUETOOTH_SCAN;
 import static android.Manifest.permission.UWB_RANGING;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -17,9 +16,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 
-/** Shows options for role selection, and allows to activate broadcast or discovery. */
-@SuppressLint("RestrictedApi")
-@SuppressWarnings("GmsCoreFirstPartyApiChecker")
 public class MainActivity extends Activity {
 
   static final String TAG = "MainlineTest";
@@ -71,8 +67,6 @@ public class MainActivity extends Activity {
     if (!((RadioButton) view).isChecked()) {
       return;
     }
-
-    
   }
 
   @Override
@@ -87,6 +81,4 @@ public class MainActivity extends Activity {
     discoverButton.setOnClickListener(
         v -> startActivity(new Intent(MainActivity.this, ScannerActivity.class)));
   }
-
-
 }
