@@ -12,6 +12,10 @@ public class Presence {
     public void onDiscovery(long result);
   }
 
+  public int testNdk() {
+      return 7;
+  }
+
   static {
     System.loadLibrary("presence_java");
   }

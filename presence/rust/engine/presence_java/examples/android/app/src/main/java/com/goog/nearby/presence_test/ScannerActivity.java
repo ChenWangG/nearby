@@ -20,6 +20,7 @@ class TestCallbacks implements Presence.Callbacks {
 
   }
 }
+
 public class ScannerActivity extends BtActivity {
 
   private BluetoothLeScanner mBtLeScanner;
@@ -59,6 +60,8 @@ public class ScannerActivity extends BtActivity {
             textView.setText("BLE Scan stopped");
             Presence presence = new Presence(new TestCallbacks());
             log(String.valueOf(presence.testNdk()));
+            TestNdk testNdk = new TestNdk();
+            log(String.valueOf(testNdk.getNdkValue()));
 
           } else {
             isScanning = true;
