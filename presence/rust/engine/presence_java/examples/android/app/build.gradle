@@ -44,11 +44,11 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    //externalNativeBuild {
-    //    cmake {
-    //        path "cpp/CMakeLists.txt"
-    //    }
-    //}
+    externalNativeBuild {
+        cmake {
+            path "cpp/CMakeLists.txt"
+        }
+    }
 }
 
 dependencies {
