@@ -12,6 +12,14 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanCallback;
 
+import com.google.nearby.presence.Presence;
+
+class TestCallbacks implements Presence.Callbacks {
+  @Override
+  public void onDiscovery(long l) {
+
+  }
+}
 public class ScannerActivity extends BtActivity {
 
   private BluetoothLeScanner mBtLeScanner;
@@ -49,6 +57,9 @@ public class ScannerActivity extends BtActivity {
             scanButton.setText("Start Scan");
             mBtLeScanner.stopScan(bleCallback);
             textView.setText("BLE Scan stopped");
+            Presence presence = new Presence(new TestCallbacks());
+            log(String.valueOf(presence.testNdk()));
+
           } else {
             isScanning = true;
             scanButton.setText("Stop Scan");
