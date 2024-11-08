@@ -4,16 +4,23 @@ project(presence_java)
 find_package(Java REQUIRED)
 include(UseJava)
 
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CARGO_CMD cargo build)
-    set(TARGET_DIR "debug")
-else ()
-    set(CARGO_CMD cargo build --release)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(TARGET_DIR "release")
+else ()
+    set(TARGET_DIR "debug")
 endif ()
 
-set(PRESENCE_SO "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_DIR}/libpresence_java.so")
+if (${ANDROID_HOME})
+    set(CARGO_CMD ANDROID_HOME=${ANDROID_HOME} cargo ndk --platform 30 --target aarch64-linux-android build)
+    set(PRESENCE_SO "${CMAKE_CURRENT_BINARY_DIR}/aarch64-linux-android/${TARGET_DIR}/libpresence_java.so")
+else ()
+    set(CARGO_CMD cargo build)
+    set(PRESENCE_SO "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_DIR}/libpresence_java.so")
+endif ()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(CARGO_CMD ${CARGO_CMD} --release)
+endif ()
 
 message(STATUS "Cargo build Presence Java.")
 add_custom_target(presence_java ALL
@@ -27,6 +34,10 @@ add_jar(Presence
         java/Presence.java)
 get_target_property(_presenceJarFile Presence JAR_FILE)
 message(STATUS "Jar file ${_presenceJarFile}")
+
+if (${ANDROID_HOME})
+     return ()
+endif ()
 
 add_jar(Main examples/Main.java INCLUDE_JARS Presence)
 add_dependencies(Main Presence)

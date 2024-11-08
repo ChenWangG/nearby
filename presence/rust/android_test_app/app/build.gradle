@@ -18,6 +18,12 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        externalNativeBuild {
+            cmake {
+                targets "presence_android"
+            }
+        }
     }
 
     buildTypes {
@@ -46,7 +52,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "cpp/CMakeLists.txt"
+            path "CMakeLists.txt"
         }
     }
 }
@@ -69,4 +75,10 @@ dependencies {
     androidTestImplementation libs.androidx.ui.test.junit4
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.test.manifest
+}
+
+afterEvaluate {
+    android.applicationVariants.configureEach { variant ->
+        variant.javaCompile.dependsOn(tasks.named("buildCMakeDebug[arm64-v8a][presence_android]"))
+    }
 }
