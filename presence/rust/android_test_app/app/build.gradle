@@ -22,10 +22,10 @@ android {
         externalNativeBuild {
             cmake {
                 targets "presence_android"
+                arguments.add("-DANDROID_HOME=$System.env.ANDROID_HOME")
             }
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false

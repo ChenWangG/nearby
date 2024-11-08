@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.14...3.28)
 project(presence_android)
 
-set(ANDROID_HOME "/usr/local/google/home/chenw/Android/Sdk")
 add_subdirectory(presence_java)
 
 message(STATUS "Copy libpresence_java.so to jinLibs.")

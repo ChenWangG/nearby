@@ -1,4 +1,6 @@
 **/target/*
 **/build/*
 *.class
+*.so
+*.jar
 cmake-build-*
