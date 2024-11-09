@@ -26,57 +26,16 @@
         android:fontFamily="sans-serif-medium"
         android:text="@string/start_discovery"/>
 
-    <TextView
-        android:id="@+id/select_account_key"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_below="@+id/discovery"
-        android:background="@drawable/back"
-        android:fontFamily="sans-serif-medium"
-        android:scrollbars="vertical"
-        android:text="@string/select_account_key"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:visibility="invisible"/>
-
-    <RadioGroup
-        android:id="@+id/radio_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginStart="20dp"
-        android:layout_below="@+id/discovery"
-        android:orientation="vertical"
-        android:visibility="invisible">
-
-      <RadioButton
-          android:id="@+id/radio_account_key_1"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:onClick="onAccountKeyClicked"
-          android:text="@string/account_key_1" />
-      <RadioButton
-          android:id="@+id/radio_account_key_2"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:onClick="onAccountKeyClicked"
-          android:text="@string/account_key_2" />
-
-    </RadioGroup>
 
     <TextView
         android:id="@+id/discovery_display"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="100dp"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:background="@drawable/back"
         android:fontFamily="sans-serif-medium"
-        android:layout_below="@+id/radio_group"
         android:scrollbars="vertical"
         android:text=""
         android:textSize="16sp" />

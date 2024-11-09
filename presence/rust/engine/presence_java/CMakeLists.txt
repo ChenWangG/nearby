@@ -11,11 +11,13 @@ else ()
     set(RELEASE_DIR "debug")
 endif ()
 
-if (${ANDROID_HOME})
+if (ANDROID_HOME)
+    message(STATUS "Set cargo for Android.")
     set(TARGET aarch64-linux-android)
     set(CARGO_CMD ANDROID_HOME=${ANDROID_HOME} cargo ndk --platform 30 --target ${TARGET} build ${RELEASE})
     set(PRESENCE_SO "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}/${RELEASE_DIR}/libpresence_java.so")
 else ()
+    message(STATUS "Set cargo for Linux.")
     set(CARGO_CMD cargo build ${RELEASE})
     set(PRESENCE_SO "${CMAKE_CURRENT_BINARY_DIR}/${RELEASE_DIR}/libpresence_java.so")
 endif ()
@@ -33,7 +35,7 @@ add_jar(Presence
 get_target_property(_presenceJarFile Presence JAR_FILE)
 message(STATUS "Jar file ${_presenceJarFile}")
 
-if (${ANDROID_HOME})
+if (ANDROID_HOME)
      return ()
 endif ()
 
