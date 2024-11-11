@@ -30,14 +30,14 @@ add_custom_target(presence_java ALL
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(presence_java PROPERTIES BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
+if (ANDROID_HOME_DIR)
+    return ()
+endif ()
+
 add_jar(Presence
         java/Presence.java)
 get_target_property(_presenceJarFile Presence JAR_FILE)
 message(STATUS "Jar file ${_presenceJarFile}")
-
-if (ANDROID_HOME_DIR)
-     return ()
-endif ()
 
 add_jar(Main examples/Main.java INCLUDE_JARS Presence)
 add_dependencies(Main Presence)

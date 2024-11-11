@@ -55,9 +55,3 @@ dependencies {
     // implementation fileTree('libs') { include '*.jar' }
     implementation libs.androidx.annotation.jvm
 }
-
-afterEvaluate {
-    android.applicationVariants.configureEach { variant ->
-        variant.javaCompile.dependsOn(tasks.named("buildCMakeDebug[arm64-v8a][presence_android]"))
-    }
-}
