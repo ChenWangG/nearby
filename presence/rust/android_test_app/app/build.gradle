@@ -18,11 +18,11 @@ android {
             useSupportLibrary true
         }
 
+        project.logger.info("Set ANDROID_HOME for NDK: ${System.env.ANDROID_HOME}")
         externalNativeBuild {
             cmake {
                 targets "presence_android"
-                // arguments.add("-DANDROID_HOME=$System.env.ANDROID_HOME")
-                arguments.add("-DANDROID_HOME_DIR=/usr/local/google/home/chenw/Android/Sdk")
+                arguments.add("-DANDROID_HOME_DIR=${System.env.ANDROID_HOME}")
             }
         }
     }

@@ -3,7 +3,7 @@ project(presence_android)
 
 add_subdirectory(presence_java)
 
-message(STATUS "Copy libpresence_java.so to jinLibs.")
+message(STATUS "Copy libpresence_java.so to jinLibs. ${CMAKE_CURRENT_BINARY_DIR}")
 add_custom_target(presence_android ALL
     COMMENT "Copy libpresence_java.so to Android"
     COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/presence_java/libpresence_java.so
