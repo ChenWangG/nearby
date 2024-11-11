@@ -8,7 +8,7 @@ add_custom_target(presence_android ALL
     COMMENT "Copy libpresence_java.so to Android"
     COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/presence_java/libpresence_java.so
                ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jniLibs/arm64-v8a/
-    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/presence_java/Presence.jar
-               ${CMAKE_CURRENT_SOURCE_DIR}/libs/
+    #COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/presence_java/Presence.jar
+    #           ${CMAKE_CURRENT_SOURCE_DIR}/libs/
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 add_dependencies(presence_android presence_java Presence)

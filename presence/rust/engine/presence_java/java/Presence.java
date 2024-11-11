@@ -12,8 +12,8 @@ public class Presence {
     public void onDiscovery(long result);
   }
 
-  public int testNdk() {
-      return 7;
+  public long testNdk() {
+      return this.presence_rust_ptr;
   }
 
   static {

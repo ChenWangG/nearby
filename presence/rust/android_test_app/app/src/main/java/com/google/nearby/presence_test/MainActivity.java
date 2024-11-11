@@ -1,4 +1,4 @@
-package com.goog.nearby.presence_test;
+package com.google.nearby.presence_test;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.BLUETOOTH_ADVERTISE;

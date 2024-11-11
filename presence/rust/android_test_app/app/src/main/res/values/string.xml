@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">MainlineTestApp</string>
+  <string name="app_name">PresenceTestApp</string>
   <string name="broadcast">Broadcast</string>
   <string name="discovery">Discovery</string>
   <string name="start_broadcast">Start Broadcast</string>

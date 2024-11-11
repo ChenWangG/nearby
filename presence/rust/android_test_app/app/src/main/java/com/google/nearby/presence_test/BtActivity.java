@@ -1,4 +1,4 @@
-package com.goog.nearby.presence_test;
+package com.google.nearby.presence_test;
 
 import android.app.Activity;
 import android.widget.TextView;
