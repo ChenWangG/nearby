@@ -5,5 +5,6 @@ public class TestBle {
     Ble ble = new Ble();
     System.out.println("======== Test BLE Java.==========");
     ble.hello();
+    System.exit(0);
   }
 }
