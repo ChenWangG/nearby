@@ -46,16 +46,6 @@ pub struct BleScanner;
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
-        println!("BleScanner start.");
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        assert_eq!(1, 1);
+        println!("BleScanner Lib start.");
     }
 }
