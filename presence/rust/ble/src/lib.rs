@@ -1,3 +1,4 @@
+use jni::{JNIEnv, JavaVM};
 pub struct BleScanRequest {
     uuid: String,
     priority: i32,
@@ -42,7 +43,7 @@ pub trait Scanner : Send + 'static {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback);
 }
 
-pub struct BleScanner;
+pub struct BleScanner {}
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
