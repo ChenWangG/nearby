@@ -7,8 +7,12 @@ edition = "2021"
 name = "presence_java"
 crate-type = ["cdylib"]
 
+[features]
+mock = []
+
 [dependencies]
-presence_rust = { path = "../presence_rust", features = ["mock"] }
+presence_rust = { path = "../presence_rust" }
+ble = { path = "../../ble" }
 jni = "0.21.1"
 log = "0.3.0"
 android_logger = "0.3.0"

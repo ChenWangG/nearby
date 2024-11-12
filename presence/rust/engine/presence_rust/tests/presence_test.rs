@@ -1,7 +1,7 @@
 use std::sync::mpsc;
 use presence_rust::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
 use std::thread;
-use presence_rust::mock::ble::SERVICE_DATA;
+use presence_rust::mock::ble::{BleScanner, SERVICE_DATA};
 
 struct Callback {
     tx: mpsc::Sender<DiscoveryResult>,
@@ -19,7 +19,7 @@ fn test_engine() {
     thread::scope(|scope| {
         let (tx, rx) = mpsc::channel();
         let callback = Callback { tx };
-        let (mut client, mut runtime) = presence_rust::create();
+        let (mut client, mut runtime) = presence_rust::create(BleScanner{});
         runtime.set_discovery_callback(callback);
         let runtime_thread = scope.spawn(|| runtime.start());
         client.set_request(DiscoveryRequest{ priority: 100 });

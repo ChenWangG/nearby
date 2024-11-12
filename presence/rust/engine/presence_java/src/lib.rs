@@ -1,11 +1,15 @@
 use std::ptr::null_mut;
-use std::sync::mpsc;
-use jni::objects::{GlobalRef, JClass, JObject, JValue};
+use jni::objects::{GlobalRef, JClass, JObject};
 use jni::sys::jlong;
 use jni::{JNIEnv, JavaVM};
-use jni::errors::Error::NullPtr;
 use presence_rust::client::{Client, DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
+use ble::Scanner;
 use presence_rust::Runtime;
+
+#[cfg(feature = "mock")]
+use presence_rust::mock::ble::BleScanner;
+#[cfg(not(feature = "mock"))]
+use ble::BleScanner;
 
 static ON_DISCOVERY_SIGNATURE: &str = "(J)V";
 
@@ -31,7 +35,7 @@ impl DiscoveryCallback for Callback {
 // Placeholder for both client and runtime to be "owned" by the host in Java.
 struct PresenceRust {
     client: *mut Client,
-    runtime: *mut Runtime<Callback>,
+    runtime: *mut Runtime<Callback, BleScanner>,
 }
 
 #[no_mangle]
@@ -39,7 +43,8 @@ struct PresenceRust {
 pub unsafe extern "system" fn Java_com_google_nearby_presence_Presence_newPresence
 (_env: JNIEnv,
  _class: JClass) -> jlong {
-    let (client, runtime) = presence_rust::create();
+    let ble_scanner = BleScanner{};
+    let (client, runtime) = presence_rust::create(ble_scanner);
     let presence_rust = PresenceRust{client: Box::into_raw(Box::new(client)), runtime: Box::into_raw(Box::new(runtime))};
     Box::into_raw(Box::new(presence_rust)) as jlong
 }

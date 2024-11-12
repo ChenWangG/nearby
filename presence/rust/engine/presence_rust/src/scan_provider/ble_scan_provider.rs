@@ -1,8 +1,4 @@
 use crate::engine::Engine;
-#[cfg(feature = "mock")]
-use crate::mock::ble::BleScanner;
-#[cfg(not(feature = "mock"))]
-use ble::BleScanner;
 use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::client::DiscoveryResult;
@@ -11,8 +7,7 @@ use crate::util::async_block_on;
 
 pub const UUID: &str = "0000";
 
-pub fn create() -> (BleScanProvider, EventPoller<BleScanProcessor>) {
-    let ble_scanner = BleScanner {};
+pub fn create<S: Scanner>(ble_scanner: S) -> (BleScanProvider, EventPoller<BleScanProcessor<S>>) {
     let (writer, mut ble_scan_poller) = event_poller::create(BleScanProcessor {
         engine: None,
         ble_scan_provider: None,
@@ -41,13 +36,13 @@ impl ScanProvider<BleScanResult> for BleScanProvider {
     }
 }
 
-pub struct BleScanProcessor {
+pub struct BleScanProcessor<S: Scanner> {
     engine: Option<Engine>,
     ble_scan_provider: Option<BleScanProvider>,
-    ble_scanner: BleScanner,
+    ble_scanner: S,
 }
 
-impl EventProcessor for BleScanProcessor {
+impl<S: Scanner> EventProcessor for BleScanProcessor<S> {
     type Event = BleScanEvent;
 
     async fn process(&mut self, event: Option<Self::Event>) {
@@ -68,7 +63,7 @@ impl EventProcessor for BleScanProcessor {
     }
 }
 
-impl BleScanProcessor {
+impl<S: Scanner> BleScanProcessor<S> {
     pub fn set_engine(&mut self, engine: Engine) {
         self.engine = Some(engine);
     }

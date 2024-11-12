@@ -4,18 +4,18 @@ use crate::engine::EngineProcessor;
 use crate::util::async_block_on;
 use event_poller::EventPoller;
 use futures::future;
+use ble::Scanner;
 use scan_provider::ble_scan_provider;
 
 pub mod client;
 mod engine;
 pub mod util;
-#[cfg(feature = "mock")]
 pub mod mock;
 mod scan_provider;
 
-pub fn create<C: DiscoveryCallback>() -> (Client, Runtime<C>) {
+pub fn create<C: DiscoveryCallback, S: Scanner>(ble_scanner: S) -> (Client, Runtime<C, S>) {
     let (engine, mut engine_poller) = engine::create();
-    let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create();
+    let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create(ble_scanner);
     engine_poller
         .processor()
         .set_ble_scan_provider(ble_scan_provider);
@@ -26,15 +26,15 @@ pub fn create<C: DiscoveryCallback>() -> (Client, Runtime<C>) {
     )
 }
 
-pub struct Runtime<C: DiscoveryCallback> {
+pub struct Runtime<C: DiscoveryCallback, S: Scanner> {
     engine_poller: EventPoller<EngineProcessor<C>>,
-    ble_scan_poller: EventPoller<BleScanProcessor>,
+    ble_scan_poller: EventPoller<BleScanProcessor<S>>,
 }
 
-impl<C: DiscoveryCallback> Runtime<C> {
+impl<C: DiscoveryCallback, S: Scanner> Runtime<C, S> {
     pub fn new(
         engine_poller: EventPoller<EngineProcessor<C>>,
-        ble_scan_poller: EventPoller<BleScanProcessor>,
+        ble_scan_poller: EventPoller<BleScanProcessor<S>>,
     ) -> Self {
         Self {
             engine_poller,

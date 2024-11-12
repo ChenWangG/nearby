@@ -38,7 +38,7 @@ impl BleScanResult {
 pub trait ScanCallback: std::marker::Sync {
   fn on_update(&self, result: BleScanResult);
 }
-pub trait Scanner {
+pub trait Scanner : Send + 'static {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback);
 }
 

@@ -3,9 +3,6 @@ name = "presence_rust"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-mock = []
-
 [dependencies]
 event_poller = { path = "../../event_poller" }
 ble = { path = "../../ble" }
@@ -14,6 +11,4 @@ log = "0.4.22"
 futures = "0.3.31"
 np_adv = { git = "https://beto-core.googlesource.com/beto-core.git", branch = "main" }
 
-[dev-dependencies]
-presence_rust.path = "."
-presence_rust.features = ["mock"]
+
