@@ -28,6 +28,7 @@ public class Main {
   public static void main(String[] args) {
     System.out.println("======== Example to demo Presence Rust Java API.==========");
     System.out.println("==========================================================");
+
     TestCallbacks callbacks = new TestCallbacks();
     Presence presence = new Presence(callbacks);
     ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -36,6 +37,18 @@ public class Main {
     callbacks.waitForResult();
     presence.stop();
     executor.shutdown();
+    System.out.println("Service shutdown.");
+
+    // New Presence instance required to restart the service.
+    // The previous instance has been consumed by the executor.
+    presence = new Presence(callbacks);
+    executor = Executors.newSingleThreadExecutor();
+    presence.start(executor);
+    System.out.println("Service Restarted.");
+    presence.stop();
+    executor.shutdown();
+    System.out.println("Service shutdown again.");
+
     System.out.println("==========================================================");
     System.out.println("========== End of demo Presence Rust Java API.============");
   }

@@ -13,18 +13,12 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanCallback;
 
 import com.google.nearby.presence.Presence;
-
-class TestCallbacks implements Presence.Callbacks {
-  @Override
-  public void onDiscovery(long l) {
-
-  }
-}
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ScannerActivity extends BtActivity {
-  private TestCallbacks testCallbacks;
+  private ExecutorService executor;
   private Presence presence;
-
   private BluetoothLeScanner mBtLeScanner;
   private ScanCallback bleCallback;
   private Button scanButton;
@@ -44,9 +38,6 @@ public class ScannerActivity extends BtActivity {
     textView.setVisibility(View.GONE);
     textView.setMovementMethod(new ScrollingMovementMethod());
 
-    testCallbacks = new TestCallbacks();
-    presence = new Presence(testCallbacks);
-
     bleCallback = new ScanCallback() {
       @Override
       public void onScanResult(int callbackType, ScanResult result) {
@@ -63,12 +54,24 @@ public class ScannerActivity extends BtActivity {
             scanButton.setText("Start Scan");
             mBtLeScanner.stopScan(bleCallback);
             textView.setText("BLE Scan stopped");
+            presence.stop();
+            executor.shutdown();
             log(String.valueOf(presence.testNdk()));
           } else {
             isScanning = true;
             scanButton.setText("Stop Scan");
+            Presence.Callbacks callbacks = new Presence.Callbacks() {
+              @Override
+              public void onDiscovery(long result) {
+                log("onDiscovery");
+              }
+            };
+            presence = new Presence(callbacks);
+            executor = Executors.newSingleThreadExecutor();
+            presence.start(executor);
+            presence.setRequest();
             try {
-              mBtLeScanner.startScan(bleCallback);
+              // mBtLeScanner.startScan(bleCallback);
               log("Succeeded to start BLE scan.");
             } catch (Exception e) {
               log("Failed to start BLE scan.");
