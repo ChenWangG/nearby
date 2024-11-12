@@ -60,12 +60,7 @@ public class ScannerActivity extends BtActivity {
           } else {
             isScanning = true;
             scanButton.setText("Stop Scan");
-            Presence.Callbacks callbacks = new Presence.Callbacks() {
-              @Override
-              public void onDiscovery(long result) {
-                log("onDiscovery");
-              }
-            };
+            Presence.Callbacks callbacks = result -> log("onDiscovery");
             presence = new Presence(callbacks);
             executor = Executors.newSingleThreadExecutor();
             presence.start(executor);
