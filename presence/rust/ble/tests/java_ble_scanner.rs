@@ -8,7 +8,7 @@ struct JavaBleScanner {
 }
 #[no_mangle]
 #[allow(non_snake_case)]
-pub unsafe extern "system" fn Java_com_google_nearby_test_Ble_newBle
+pub unsafe extern "system" fn Java_com_google_nearby_test_TestBleScanner_newTestBleScanner
 (_env: JNIEnv,
  _class: JClass) -> jlong {
   0

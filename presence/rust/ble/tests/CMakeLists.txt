@@ -1,4 +1,4 @@
-add_jar(TestBle TestBle.java Ble.java)
+add_jar(TestBle TestBle.java TestBleScanner.java)
 get_target_property(_testBleJarFile TestBle JAR_FILE)
 message(STATUS "Created Jar file ${_testBleJarFile}")
 

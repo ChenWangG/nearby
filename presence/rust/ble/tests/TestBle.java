@@ -1,10 +1,10 @@
-import com.google.nearby.test.Ble;
+import com.google.nearby.test.TestBleScanner;
 
 public class TestBle {
   public static void main(String[] args) {
-    Ble ble = new Ble();
+    TestBleScanner test_scanner = new TestBleScanner();
     System.out.println("======== Test BLE Java.==========");
-    ble.hello();
+    test_scanner.hello();
     assert true;
   }
 }

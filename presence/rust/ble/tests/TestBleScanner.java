@@ -4,9 +4,9 @@
 //    javac *.java && javap -s *.class
 package com.google.nearby.test;
 
-public class Ble {
+public class TestBleScanner {
   /* ========== Native methods implemented in Rust. ========== */
-  private static native long newBle();
+  private static native long newTestBleScanner();
 
   public void hello() {
      System.out.println("Hello Ble.");
