@@ -4,4 +4,6 @@ project(nearby_ble)
 find_package(Java REQUIRED)
 include(UseJava)
 
+enable_testing()
+
 add_subdirectory(tests)
