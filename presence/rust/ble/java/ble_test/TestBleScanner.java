@@ -2,7 +2,7 @@
 //    javac -h . *.java
 // To get method signatures:
 //    javac *.java && javap -s *.class
-package com.google.nearby.test;
+package com.google.nearby.ble_test;
 
 public class TestBleScanner {
   static {

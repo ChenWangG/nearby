@@ -1,4 +1,4 @@
-import com.google.nearby.test.TestBleScanner;
+import com.google.nearby.ble_test.TestBleScanner;
 
 public class TestBle {
   public static void main(String[] args) {
