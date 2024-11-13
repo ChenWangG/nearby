@@ -1,5 +1,5 @@
 set(TEST_BLE_SCANNER_SO "${CMAKE_CURRENT_BINARY_DIR}/debug/examples/libtest_ble_scanner.so")
-message(STATUS "Cargo build ${LIB_TEST_BLE_SCAN}")
+message(STATUS "Cargo build ${TEST_BLE_SCANNER_SO}")
 add_custom_target(cargo_build_test_ble_scan ALL
     COMMAND CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} cargo test
     COMMAND cp ${TEST_BLE_SCANNER_SO} ${CMAKE_CURRENT_BINARY_DIR}
