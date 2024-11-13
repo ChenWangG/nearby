@@ -43,7 +43,7 @@ pub trait Scanner : Send + 'static {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback);
 }
 
-pub struct BleScanner {}
+pub struct BleScanner { }
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {

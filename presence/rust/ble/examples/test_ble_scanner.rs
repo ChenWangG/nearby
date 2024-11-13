@@ -3,7 +3,7 @@ use jni::objects::JClass;
 use jni::sys::jlong;
 use ble::BleScanner;
 
-struct JavaBleScanner {
+struct TestBleScanner {
     ble_scanner: BleScanner,
 }
 #[no_mangle]
@@ -11,5 +11,6 @@ struct JavaBleScanner {
 pub unsafe extern "system" fn Java_com_google_nearby_test_TestBleScanner_newTestBleScanner
 (_env: JNIEnv,
  _class: JClass) -> jlong {
-  7
+    let test_ble_scanner = TestBleScanner { ble_scanner: BleScanner{} };
+    Box::into_raw(Box::new(test_ble_scanner)) as jlong
 }
