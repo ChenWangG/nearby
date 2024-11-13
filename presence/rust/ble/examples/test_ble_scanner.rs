@@ -11,5 +11,5 @@ struct JavaBleScanner {
 pub unsafe extern "system" fn Java_com_google_nearby_test_TestBleScanner_newTestBleScanner
 (_env: JNIEnv,
  _class: JClass) -> jlong {
-  0
+  7
 }

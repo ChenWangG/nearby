@@ -3,5 +3,10 @@ name = "ble"
 version = "0.1.0"
 edition = "2021"
 
+[[example]]
+name = "test_ble_scanner"
+path = "examples/test_ble_scanner.rs"
+crate-type = ["cdylib"]
+
 [dependencies]
 jni = "0.21.1"

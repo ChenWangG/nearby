@@ -5,10 +5,14 @@
 package com.google.nearby.test;
 
 public class TestBleScanner {
+  static {
+    System.loadLibrary("test_ble_scanner");
+  }
+
   /* ========== Native methods implemented in Rust. ========== */
   private static native long newTestBleScanner();
 
   public void hello() {
-     System.out.println("Hello Ble.");
+     System.out.println("Hello Ble." + newTestBleScanner());
   }
 }
