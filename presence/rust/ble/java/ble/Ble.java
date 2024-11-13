@@ -5,10 +5,9 @@
 package com.google.nearby.ble;
 
 
-// Nearby BLE in Java Wrapping the Rust implementation.
+// Nearby BLE in Java Wrapping the system API.
 public class Ble {
-
-  static {
-    System.loadLibrary("nearby_ble");
+  public static Ble build() {
+    return new Ble();
   }
 }
