@@ -13,6 +13,6 @@ public class TestBleScanner {
   private static native long newTestBleScanner();
 
   public void hello() {
-     System.out.println("TestBleScanner ptr: " + newTestBleScanner());
+     System.out.println("TestBleScanner ptr: " + String.valueOf(newTestBleScanner()));
   }
 }
