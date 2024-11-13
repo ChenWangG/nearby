@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_com_google_nearby_ble_1test_TestBleScanner_newTestBleScanner
   (JNIEnv *, jclass);
 
+/*
+ * Class:     com_google_nearby_ble_test_TestBleScanner
+ * Method:    start
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_google_nearby_ble_1test_TestBleScanner_start
+  (JNIEnv *, jclass, jlong);
+
 #ifdef __cplusplus
 }
 #endif

@@ -11,8 +11,13 @@ public class TestBleScanner {
 
   /* ========== Native methods implemented in Rust. ========== */
   private static native long newTestBleScanner();
+  private static native void start(long scanner_ptr);
 
   public void hello() {
-     System.out.println("TestBleScanner ptr: " + String.valueOf(newTestBleScanner()));
+     this.scanner_ptr = newTestBleScanner();
+     System.out.println("TestBleScanner ptr: " + String.valueOf(this.scanner_ptr));
+     start(this.scanner_ptr);
   }
+
+  private long scanner_ptr;
 }
