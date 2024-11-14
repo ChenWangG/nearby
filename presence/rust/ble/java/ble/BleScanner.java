@@ -21,7 +21,8 @@ public class BleScanner {
       @Override
       public void onScanResult(int callbackType, ScanResult result) {
         System.out.println("[Java][BleScanner] onScanResult called.");
-        
+        BleScanner.onScanResult(1, 1);
+
       }
       private final long rustCallbackPtr = callbackPtr;
     };

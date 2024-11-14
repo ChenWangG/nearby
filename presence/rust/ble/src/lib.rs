@@ -1,5 +1,5 @@
 use jni::{JNIEnv, JavaVM};
-use jni::objects::{GlobalRef, JObject};
+use jni::objects::{GlobalRef, JClass, JObject};
 use jni::sys::jlong;
 use log::info;
 
@@ -86,4 +86,15 @@ impl BleScanner {
         Self { jvm, java_ble_scanner }
 
     }
+}
+
+#[no_mangle]
+#[allow(non_snake_case)]
+pub unsafe extern "system" fn Java_com_google_nearby_ble_BleScanner_onScanResult
+(mut env: JNIEnv,
+ _class: JClass,
+ callback_ptr: jlong,
+ result: jlong,
+) {
+    info!("BleScanner_onScanResult.");
 }
