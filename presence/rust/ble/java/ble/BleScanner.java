@@ -22,20 +22,12 @@ public class BleScanner {
       public void onScanResult(int callbackType, ScanResult result) {
 
       }
-
-      @Override
-      public void setInner(Object inner) {
-        this.inner = inner;
-      }
-
-      @Override
-      public Object getInner() {
-        return inner;
-      }
-
-      private Object inner;
     };
     bleWrapper.startScan(callback);
+  }
+
+  public void stop(long callbackPtr) {
+    bleWrapper.stopScan(callbackPtr);
   }
 
   /* ========== Native methods implemented in Rust. ========== */

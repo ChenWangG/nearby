@@ -4,9 +4,6 @@ public class BleWrapper {
   public interface ScanCallback {
     public void onScanResult (int callbackType,
         ScanResult result);
-
-    public void setInner(Object inner);
-    public Object getInner();
   }
 
   public BleWrapper() {}
@@ -15,7 +12,7 @@ public class BleWrapper {
     System.out.println("[Java][BleWrapper] startScan");
   }
 
-  public void stopScan(ScanCallback callback) {
+  public void stopScan(long callbackPtr) {
     System.out.println("[Java][BleWrapper] stopScan");
   }
 }

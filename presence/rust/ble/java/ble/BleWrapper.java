@@ -8,9 +8,6 @@ public class BleWrapper {
   public interface ScanCallback {
     public void onScanResult (int callbackType,
         ScanResult result);
-
-    public void setInner(Object inner);
-    public Object getInner();
   }
 
   public BleWrapper() {
@@ -26,13 +23,13 @@ public class BleWrapper {
         callback.onScanResult(callbackType, new ScanResult());
       }
     };
-    callback.setInner(leScanCallback);
     leScanner.startScan(leScanCallback);
   }
 
+  // TODO map callbackPtr to LeCallback instance.
+  // Note: include callbackPtr into ScanCallback to setup the map.
   @SuppressLint({"MissingPermission"})
-  public void stopScan(ScanCallback callback) {
-    leScanner.stopScan((android.bluetooth.le.ScanCallback)callback.getInner());
+  public void stopScan(long callbackPtr) {
   }
 
   private final BluetoothLeScanner leScanner;
