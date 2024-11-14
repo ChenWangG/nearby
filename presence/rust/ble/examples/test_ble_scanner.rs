@@ -1,9 +1,17 @@
 use jni::JNIEnv;
 use jni::objects::JClass;
 use jni::sys::jlong;
-use ble::BleScanner;
+use ble::{BleScanRequest, BleScanResult, BleScanner, ScanCallback, Scanner};
 
 use log::{debug, info};
+
+struct TestBleCallback;
+
+impl ScanCallback for TestBleCallback {
+    fn on_update(&self, result: BleScanResult) {
+        info!("on_upate: BleScanResult.");
+    }
+}
 
 struct TestBleScanner {
     ble_scanner: BleScanner,
@@ -11,7 +19,9 @@ struct TestBleScanner {
 
 impl TestBleScanner {
     pub fn start(&mut self) {
-       info!("TestBleScanner sart.")
+        info!("TestBleScanner sart.");
+        let scan_request = BleScanRequest::new(String::from("0000"), 1);
+        self.ble_scanner.start(scan_request, TestBleCallback{} );
     }
 }
 

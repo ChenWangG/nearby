@@ -1,3 +1,6 @@
+// Test Helper to pass JVM into Rust BleScanner.
+// The Rust counterpart TestBleScanner is provided in examples/test_ble_scanner.rs.
+//
 // To generate JNI header, run
 //    javac -h . *.java
 // To get method signatures:

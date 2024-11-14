@@ -1,5 +1,6 @@
 use jni::{JNIEnv, JavaVM};
 use jni::objects::{GlobalRef, JObject};
+use log::info;
 
 static BLE_CLASS: &str = "com/google/nearby/ble/BleScanner";
 static BUILD_SIGNATURE: &str =
@@ -55,7 +56,7 @@ pub struct BleScanner {
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
-        println!("BleScanner Lib start.");
+        info!("BleScanner Lib start.");
     }
 }
 
