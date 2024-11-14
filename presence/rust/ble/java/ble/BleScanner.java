@@ -20,8 +20,10 @@ public class BleScanner {
     ScanCallback callback = new ScanCallback() {
       @Override
       public void onScanResult(int callbackType, ScanResult result) {
-
+        System.out.println("[Java][BleScanner] onScanResult called.");
+        
       }
+      private final long rustCallbackPtr = callbackPtr;
     };
     bleWrapper.startScan(callback);
   }
