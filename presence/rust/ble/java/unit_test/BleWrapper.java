@@ -12,8 +12,10 @@ public class BleWrapper {
   public BleWrapper() {}
 
   public void startScan(ScanCallback callback) {
+    System.out.println("[Java][BleWrapper] startScan");
   }
 
   public void stopScan(ScanCallback callback) {
+    System.out.println("[Java][BleWrapper] stopScan");
   }
 }

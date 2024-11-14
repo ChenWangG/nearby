@@ -5,6 +5,8 @@
 package com.google.nearby.ble;
 
 
+import com.google.nearby.ble.BleWrapper.ScanCallback;
+
 // Counterpart of Rust BleScanner for FFI.
 public class BleScanner {
   // Static method called from Rust to return a Ble instance.
@@ -14,6 +16,26 @@ public class BleScanner {
 
   public void start(long callbackPtr) {
     System.out.println("[Java][BleScanner] start.");
+
+    ScanCallback callback = new ScanCallback() {
+      @Override
+      public void onScanResult(int callbackType, ScanResult result) {
+
+      }
+
+      @Override
+      public void setInner(Object inner) {
+        this.inner = inner;
+      }
+
+      @Override
+      public Object getInner() {
+        return inner;
+      }
+
+      private Object inner;
+    };
+    bleWrapper.startScan(callback);
   }
 
   /* ========== Native methods implemented in Rust. ========== */
