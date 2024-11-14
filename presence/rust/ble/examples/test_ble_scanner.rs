@@ -18,12 +18,12 @@ impl TestBleScanner {
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "system" fn Java_com_google_nearby_ble_1test_TestBleScanner_newTestBleScanner
-(_env: JNIEnv,
+(env: JNIEnv,
  _class: JClass) -> jlong {
     println!("[Rust] Println newTestBleScanner before logging started.");
     env_logger::init();
     info!("Rust newTestBleScanner.");
-    let test_ble_scanner = TestBleScanner { ble_scanner: BleScanner{} };
+    let test_ble_scanner = TestBleScanner { ble_scanner: BleScanner::new(env.get_java_vm().unwrap()) };
     Box::into_raw(Box::new(test_ble_scanner)) as jlong
 }
 

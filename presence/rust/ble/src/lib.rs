@@ -1,4 +1,9 @@
 use jni::{JNIEnv, JavaVM};
+use jni::objects::{GlobalRef, JObject};
+
+static BLE_CLASS: &str = "com/google/nearby/ble/BleScanner";
+static BUILD_SIGNATURE: &str =
+    "()Lcom/google/nearby/ble/BleScanner;";
 pub struct BleScanRequest {
     uuid: String,
     priority: i32,
@@ -43,10 +48,31 @@ pub trait Scanner : Send + 'static {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback);
 }
 
-pub struct BleScanner { }
+pub struct BleScanner {
+    jvm: JavaVM,
+    java_ble: GlobalRef,
+}
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
         println!("BleScanner Lib start.");
+    }
+}
+
+impl BleScanner {
+    pub fn new(jvm: JavaVM) -> Self {
+        let mut env = jvm.get_env().unwrap();
+        let java_ble = env.call_static_method(
+            BLE_CLASS,
+            "build",
+            BUILD_SIGNATURE,
+            &[],
+        )
+            .unwrap()
+            .l()
+            .unwrap();
+        let java_ble =env.new_global_ref(java_ble).unwrap();
+        Self { jvm, java_ble }
+
     }
 }
