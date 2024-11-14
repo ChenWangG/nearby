@@ -53,7 +53,7 @@ pub trait Scanner : Send + 'static {
 
 pub struct BleScanner {
     jvm: JavaVM,
-    java_ble: GlobalRef,
+    java_ble_scanner: GlobalRef,
 }
 
 impl Scanner for BleScanner {
@@ -61,8 +61,8 @@ impl Scanner for BleScanner {
         info!("BleScanner Lib start.");
         let callback_ptr = Box::into_raw(Box::new(callback)) as jlong;
         let mut env = self.jvm.get_env().unwrap();
-        env.call_static_method(
-            BLE_CLASS,
+        env.call_method(
+            self.java_ble_scanner.as_obj(),
             "start",
             START_SIGNATURE,
             &[callback_ptr.into()],
@@ -73,7 +73,7 @@ impl Scanner for BleScanner {
 impl BleScanner {
     pub fn new(jvm: JavaVM) -> Self {
         let mut env = jvm.get_env().unwrap();
-        let java_ble = env.call_static_method(
+        let ble_scanner = env.call_static_method(
             BLE_CLASS,
             "build",
             BUILD_SIGNATURE,
@@ -82,8 +82,8 @@ impl BleScanner {
             .unwrap()
             .l()
             .unwrap();
-        let java_ble =env.new_global_ref(java_ble).unwrap();
-        Self { jvm, java_ble }
+        let java_ble_scanner =env.new_global_ref(ble_scanner).unwrap();
+        Self { jvm, java_ble_scanner }
 
     }
 }

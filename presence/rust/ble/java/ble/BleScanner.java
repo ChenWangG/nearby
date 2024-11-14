@@ -12,11 +12,13 @@ public class BleScanner {
     return new BleScanner();
   }
 
-  public static void start(long callbackPtr) {
+  public void start(long callbackPtr) {
     System.out.println("[Java][BleScanner] start.");
   }
 
   /* ========== Native methods implemented in Rust. ========== */
   // Callback to Rus to deliver a scan result.
-  public static native void onScanResult(long callbackPtr, long result);
+  private static native void onScanResult(long callbackPtr, long result);
+
+  private final BleWrapper bleWrapper = new BleWrapper();
 }
