@@ -5,7 +5,7 @@
 package com.google.nearby.ble;
 
 
-// Nearby BLE in Java Wrapping the system API.
+// Counterpart of Rust BleScanner for FFI.
 public class BleScanner {
   // Static method called from Rust to return a Ble instance.
   public static BleScanner build() {
@@ -18,7 +18,5 @@ public class BleScanner {
 
   /* ========== Native methods implemented in Rust. ========== */
   // Callback to Rus to deliver a scan result.
-  private static native long onScanResult(long rustBleScanner, long result);
-
-
+  public static native void onScanResult(long callbackPtr, long result);
 }
