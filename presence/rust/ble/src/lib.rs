@@ -1,10 +1,12 @@
 use jni::{JNIEnv, JavaVM};
 use jni::objects::{GlobalRef, JObject};
+use jni::sys::jlong;
 use log::info;
 
 static BLE_CLASS: &str = "com/google/nearby/ble/BleScanner";
 static BUILD_SIGNATURE: &str =
     "()Lcom/google/nearby/ble/BleScanner;";
+static START_SIGNATURE: &str = "(J)V";
 pub struct BleScanRequest {
     uuid: String,
     priority: i32,
@@ -57,6 +59,14 @@ pub struct BleScanner {
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
         info!("BleScanner Lib start.");
+        let callback_ptr = Box::into_raw(Box::new(callback)) as jlong;
+        let mut env = self.jvm.get_env().unwrap();
+        env.call_static_method(
+            BLE_CLASS,
+            "start",
+            START_SIGNATURE,
+            &[callback_ptr.into()],
+        ).unwrap();
     }
 }
 
