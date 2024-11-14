@@ -9,20 +9,17 @@ package com.google.nearby.ble;
 public class BleScanner {
   // Static method called from Rust to return a Ble instance.
   public static BleScanner build() {
-    return new BleScanner(1);
+    return new BleScanner();
   }
 
-  private BleScanner(long rust_scanner) {
-    this.rustBleScanner = rust_scanner;
-
+  private BleScanner() {
   }
 
   /* ========== Native methods implemented in Rust. ========== */
   // Callback to Rus to deliver a scan result.
   private static native long onScanResult(long rustBleScanner, long result);
-  public void onScanResult() {
-    
+
+  public void start() {
   }
 
-  private long rustBleScanner;
 }
