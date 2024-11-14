@@ -15,7 +15,7 @@ add_custom_target(cargo_build_test_ble_scan ALL
     COMMAND cp ${TEST_BLE_SCANNER_SO} ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_jar(TestBle "ble_test/TestBle.java" "ble_test/TestBleScanner.java" "ble/BleScanner.java")
+add_jar(TestBle "unit_test/Main.java" "ble_test/TestBleScanner.java" "ble/BleScanner.java")
 get_target_property(_testBleJarFile TestBle JAR_FILE)
 add_dependencies(TestBle cargo_build_test_ble_scan)
 message(STATUS "Created Jar file ${_testBleJarFile}")
@@ -24,5 +24,5 @@ message(STATUS "Run BLE Java tests.")
 add_test(NAME test_ble_java
     COMMAND ${Java_JAVA_EXECUTABLE}
         -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
-        -cp ${_testBleJarFile} -ea TestBle)
+        -cp ${_testBleJarFile} -ea Main)
 set_tests_properties(test_ble_java PROPERTIES DEPENDS TestBle)
