@@ -17,8 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ScannerActivity extends BtActivity {
-  private ExecutorService executor;
-  private Presence presence;
+
   private BluetoothLeScanner mBtLeScanner;
   private ScanCallback bleCallback;
   private Button scanButton;
@@ -70,18 +69,11 @@ public class ScannerActivity extends BtActivity {
   @SuppressLint({"MissingPermission", "SetTextI18n"})
   protected void stopScan() {
     // mBtLeScanner.stopScan(bleCallback);
-    textView.setText("BLE Scan stopped");
-    presence.stop();
-    executor.shutdown();
-    log(String.valueOf(presence.testNdk()));
+    log("stopScan needs to be override.");
   }
 
   protected void startScan() {
-    Presence.Callbacks callbacks = result -> log("onDiscovery");
-    presence = new Presence(callbacks);
-    executor = Executors.newSingleThreadExecutor();
-    presence.start(executor);
-    presence.setRequest();
+    log("startScan needs to be override.");
     try {
       // mBtLeScanner.startScan(bleCallback);
       log("Succeeded to start BLE scan.");
