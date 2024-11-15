@@ -59,6 +59,8 @@ public class MainActivity extends Activity {
     broadcastButton.setOnClickListener(
         v -> startActivity(new Intent(MainActivity.this, AdvertiserActivity.class)));
     discoverButton.setOnClickListener(
-        v -> startActivity(new Intent(MainActivity.this, ScannerActivity.class)));
+        v -> startActivity(new Intent(MainActivity.this,
+            PresenceScannerActivity.class))
+    );
   }
 }
