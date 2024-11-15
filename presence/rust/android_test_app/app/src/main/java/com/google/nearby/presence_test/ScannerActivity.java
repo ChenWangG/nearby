@@ -52,8 +52,7 @@ public class ScannerActivity extends BtActivity {
           if (isScanning) {
             isScanning = false;
             scanButton.setText("Start Scan");
-            mBtLeScanner.stopScan(bleCallback);
-            textView.setText("BLE Scan stopped");
+
             stopScan();
           } else {
             isScanning = true;
@@ -63,7 +62,10 @@ public class ScannerActivity extends BtActivity {
         });
   }
 
+  @SuppressLint({"MissingPermission", "SetTextI18n"})
   private void stopScan() {
+    // mBtLeScanner.stopScan(bleCallback);
+    textView.setText("BLE Scan stopped");
     presence.stop();
     executor.shutdown();
     log(String.valueOf(presence.testNdk()));
