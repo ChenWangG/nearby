@@ -54,24 +54,32 @@ public class ScannerActivity extends BtActivity {
             scanButton.setText("Start Scan");
             mBtLeScanner.stopScan(bleCallback);
             textView.setText("BLE Scan stopped");
-            presence.stop();
-            executor.shutdown();
-            log(String.valueOf(presence.testNdk()));
+            stopScan();
           } else {
             isScanning = true;
             scanButton.setText("Stop Scan");
-            Presence.Callbacks callbacks = result -> log("onDiscovery");
-            presence = new Presence(callbacks);
-            executor = Executors.newSingleThreadExecutor();
-            presence.start(executor);
-            presence.setRequest();
-            try {
-              // mBtLeScanner.startScan(bleCallback);
-              log("Succeeded to start BLE scan.");
-            } catch (Exception e) {
-              log("Failed to start BLE scan.");
-            }
+            startScan();
           }
         });
+  }
+
+  private void stopScan() {
+    presence.stop();
+    executor.shutdown();
+    log(String.valueOf(presence.testNdk()));
+  }
+
+  private void startScan() {
+    Presence.Callbacks callbacks = result -> log("onDiscovery");
+    presence = new Presence(callbacks);
+    executor = Executors.newSingleThreadExecutor();
+    presence.start(executor);
+    presence.setRequest();
+    try {
+      // mBtLeScanner.startScan(bleCallback);
+      log("Succeeded to start BLE scan.");
+    } catch (Exception e) {
+      log("Failed to start BLE scan.");
+    }
   }
 }
