@@ -1,13 +1,6 @@
 cmake_minimum_required(VERSION 3.14...3.28)
 project(nearby_ble)
 
-find_package(Java REQUIRED)
-include(UseJava)
-
-
-# For tests.
-enable_testing()
-
 set(TEST_BLE_SCANNER_SO "${CMAKE_CURRENT_BINARY_DIR}/debug/examples/libtest_ble_scanner.so")
 message(STATUS "Cargo build ${TEST_BLE_SCANNER_SO}")
 add_custom_target(cargo_build_test_ble_scan ALL
@@ -15,6 +8,8 @@ add_custom_target(cargo_build_test_ble_scan ALL
     COMMAND cp ${TEST_BLE_SCANNER_SO} ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
+find_package(Java REQUIRED)
+include(UseJava)
 add_jar(TestBle
         "unit_test/Main.java"
         "unit_test/BleWrapper.java"
@@ -26,6 +21,7 @@ add_dependencies(TestBle cargo_build_test_ble_scan)
 message(STATUS "Created Jar file ${_testBleJarFile}")
 
 message(STATUS "Run BLE Java tests.")
+enable_testing()
 add_test(NAME test_ble_java
     COMMAND ${Java_JAVA_EXECUTABLE}
         -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
