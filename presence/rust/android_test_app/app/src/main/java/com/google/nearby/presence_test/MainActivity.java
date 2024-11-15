@@ -33,12 +33,16 @@ public class MainActivity extends Activity {
     discoverButton = findViewById(R.id.discovery_role);
 
     RadioButton presenceV1 = ((RadioButton) findViewById(R.id.radio_presence_v1));
-    presenceV1.setOnClickListener(view -> testPresenceV1());
+    presenceV1.setOnClickListener(view -> setBroadCastScanActivities(
+        AdvertiserActivity.class, PresenceScannerActivity.class
+    ));
     RadioButton fastPair = ((RadioButton) findViewById(R.id.radio_presence_fast_pair));
-    fastPair.setOnClickListener(view -> Log.d(TAG, "Test Fast Pair"));
+    fastPair.setOnClickListener(view -> setBroadCastScanActivities(
+        AdvertiserActivity.class, ScannerActivity.class
+    ));
     // Default to test Presence V1.
     presenceV1.setChecked(true);
-    testPresenceV1();
+    setBroadCastScanActivities(AdvertiserActivity.class, PresenceScannerActivity.class);
 
     requestPermissions(
         new String[]{
@@ -53,14 +57,12 @@ public class MainActivity extends Activity {
       int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
   }
 
-  private void testPresenceV1() {
+  private void setBroadCastScanActivities(Class<?> advertiser, Class<?> scanner) {
     Log.d(TAG, "Test Presence V1");
     broadcastButton.setVisibility(View.VISIBLE);
-    broadcastButton.setOnClickListener(
-        v -> startActivity(new Intent(MainActivity.this, AdvertiserActivity.class)));
-    discoverButton.setOnClickListener(
-        v -> startActivity(new Intent(MainActivity.this,
-            PresenceScannerActivity.class))
-    );
+    broadcastButton.setOnClickListener(v -> startActivity(
+        new Intent(MainActivity.this, advertiser)));
+    discoverButton.setOnClickListener(v -> startActivity(
+        new Intent(MainActivity.this, scanner)));
   }
 }

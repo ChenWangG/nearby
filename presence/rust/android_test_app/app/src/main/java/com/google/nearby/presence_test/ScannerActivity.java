@@ -68,14 +68,16 @@ public class ScannerActivity extends BtActivity {
 
   @SuppressLint({"MissingPermission", "SetTextI18n"})
   protected void stopScan() {
-    // mBtLeScanner.stopScan(bleCallback);
-    log("stopScan needs to be override.");
+    mBtLeScanner.stopScan(bleCallback);
+    log("stopScan call Android BLE system API directly. Override for other test cases.");
   }
 
+
+  @SuppressLint({"MissingPermission", "SetTextI18n"})
   protected void startScan() {
-    log("startScan needs to be override.");
+    log("startScan call Android BLE system API directly. Override for other test cases.");
     try {
-      // mBtLeScanner.startScan(bleCallback);
+      mBtLeScanner.startScan(bleCallback);
       log("Succeeded to start BLE scan.");
     } catch (Exception e) {
       log("Failed to start BLE scan.");

@@ -10,6 +10,8 @@
       android:supportsRtl="true">
     <activity android:name=".AdvertiserActivity"
         android:parentActivityName=".MainActivity"/>
+    <activity android:name=".ScannerActivity"
+        android:parentActivityName=".MainActivity"/>
     <activity android:name=".PresenceScannerActivity"
         android:parentActivityName=".MainActivity"/>
     <activity
