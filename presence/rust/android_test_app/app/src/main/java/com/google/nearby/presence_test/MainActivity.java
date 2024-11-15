@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import androidx.annotation.NonNull;
 
 public class MainActivity extends Activity {
@@ -30,7 +32,12 @@ public class MainActivity extends Activity {
     broadcastButton = findViewById(R.id.broadcast_role);
     discoverButton = findViewById(R.id.discovery_role);
 
-    ((RadioButton) findViewById(R.id.radio_presence_v1)).setChecked(true);
+    RadioButton presenceV1 = ((RadioButton) findViewById(R.id.radio_presence_v1));
+    presenceV1.setOnClickListener(view -> testPresenceV1());
+    RadioButton fastPair = ((RadioButton) findViewById(R.id.radio_presence_fast_pair));
+    fastPair.setOnClickListener(view -> Log.d(TAG, "Test Fast Pair"));
+    // Default to test Presence V1.
+    presenceV1.setChecked(true);
     testPresenceV1();
 
     requestPermissions(
@@ -39,12 +46,6 @@ public class MainActivity extends Activity {
             POST_NOTIFICATION
         },
         REQUEST_CODE);
-  }
-
-  public void onRadioButtonClicked(View view) {
-    if (!((RadioButton) view).isChecked()) {
-      return;
-    }
   }
 
   @Override
