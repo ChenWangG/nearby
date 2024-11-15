@@ -44,11 +44,16 @@ impl BleScanResult {
     }
 }
 
-pub trait ScanCallback: std::marker::Sync {
+// TODO: avoid static lifetime? This is eventually owned by system API.
+pub trait ScanCallback: std::marker::Sync + 'static {
   fn on_update(&self, result: BleScanResult);
 }
 pub trait Scanner : Send + 'static {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback);
+}
+
+pub struct ScanCallbackBox {
+    scan_callback: Box<dyn ScanCallback>,
 }
 
 pub struct BleScanner {
@@ -58,8 +63,9 @@ pub struct BleScanner {
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
-        info!("BleScanner Lib start.");
-        let callback_ptr = Box::into_raw(Box::new(callback)) as jlong;
+        let scan_callback_box = ScanCallbackBox { scan_callback: Box::new(callback)};
+        let callback_ptr = Box::into_raw(Box::new(scan_callback_box)) as jlong;
+        info!("BleScanner Lib start with callback addr: {}.", callback_ptr);
         let mut env = self.jvm.get_env().unwrap();
         env.call_method(
             self.java_ble_scanner.as_obj(),
@@ -96,5 +102,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_ble_BleScanner_onScanResult
  callback_ptr: jlong,
  result: jlong,
 ) {
-    info!("BleScanner_onScanResult.");
+    info!("BleScanner_onScanResult with callback_ptr: {}.", callback_ptr);
+    let scan_callback_box_ptr = callback_ptr as *mut ScanCallbackBox;
+    &(*scan_callback_box_ptr).scan_callback.on_update(BleScanResult::new(1, vec!(1)));
 }
