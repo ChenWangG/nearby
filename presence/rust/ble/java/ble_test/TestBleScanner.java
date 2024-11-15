@@ -16,11 +16,14 @@ public class TestBleScanner {
   private static native long newTestBleScanner();
   private static native void start(long rustTestBleScanner);
 
-  public void hello() {
-     this.rustTestBleScanner = newTestBleScanner();
+  public TestBleScanner() {
+    this.rustTestBleScanner = newTestBleScanner();
+  }
+
+  public void start() {
      System.out.println("TestBleScanner ptr: " + String.valueOf(this.rustTestBleScanner));
      start(this.rustTestBleScanner);
   }
 
-  private long rustTestBleScanner;
+  private final long rustTestBleScanner;
 }
