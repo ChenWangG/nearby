@@ -30,16 +30,8 @@ public class MainActivity extends Activity {
     broadcastButton = findViewById(R.id.broadcast_role);
     discoverButton = findViewById(R.id.discovery_role);
 
-    RadioButton presenceV1 = ((RadioButton) findViewById(R.id.radio_presence_v1));
-    presenceV1.setOnClickListener(view -> setBroadCastScanActivities(
-        AdvertiserActivity.class, PresenceScannerActivity.class
-    ));
-    RadioButton fastPair = ((RadioButton) findViewById(R.id.radio_ble_api));
-    fastPair.setOnClickListener(view -> setBroadCastScanActivities(
-        AdvertiserActivity.class, ScannerActivity.class
-    ));
     // Default to test Presence V1.
-    presenceV1.setChecked(true);
+    ((RadioButton) findViewById(R.id.radio_presence_v1)).setChecked(true);
     setBroadCastScanActivities(AdvertiserActivity.class, PresenceScannerActivity.class);
 
     requestPermissions(
@@ -50,6 +42,23 @@ public class MainActivity extends Activity {
         REQUEST_CODE);
   }
 
+  // Listener for radio buttons.
+  public void onRadioButtonClicked(View view) {
+    Log.d(TAG, "onRadioButtonClicked: ");
+    if (!((RadioButton) view).isChecked()) {
+      return;
+    }
+    if (view.getId() == R.id.radio_presence_v1) {
+      setBroadCastScanActivities(
+          AdvertiserActivity.class, PresenceScannerActivity.class);
+    } else if (view.getId() == R.id.radio_ble_api) {
+        setBroadCastScanActivities(
+            AdvertiserActivity.class, ScannerActivity.class);
+    } else if (view.getId() == R.id.radio_ble_rust_api) {
+      setBroadCastScanActivities(
+          AdvertiserActivity.class, BleRustScannerActivity.class);
+    }
+  }
   @Override
   public void onRequestPermissionsResult(
       int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

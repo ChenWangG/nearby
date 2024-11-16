@@ -51,19 +51,13 @@ public class ScannerActivity extends BtActivity {
           if (isScanning) {
             isScanning = false;
             scanButton.setText("Start Scan");
-
             stopScan();
-            testScan();
           } else {
             isScanning = true;
             scanButton.setText("Stop Scan");
             startScan();
           }
         });
-  }
-
-  protected void testScan() {
-    log("in ScannerActivity.");
   }
 
   @SuppressLint({"MissingPermission", "SetTextI18n"})
