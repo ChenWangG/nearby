@@ -1,24 +1,22 @@
 cmake_minimum_required(VERSION 3.14...3.28)
-project(nearby_ble)
+project(ble)
 
 if (ANDROID_HOME_DIR)
     message(STATUS "Cargo command set Android: ${ANDROID_HOME_DIR}")
     set(TARGET aarch64-linux-android)
     set(CARGO_CMD ANDROID_HOME=${ANDROID_HOME_DIR} cargo ndk --platform 30 --target aarch64-linux-android build --examples)
     set(TEST_BLE_SCANNER_SO "${CMAKE_CURRENT_BINARY_DIR}/aarch64-linux-android/debug/examples/libtest_ble_scanner.so")
-    set(TARGET_SO "libpresence_java.so")
 else ()
     message(STATUS "Cargo command set Linux.")
     set(CARGO_CMD cargo build --examples)
     set(TEST_BLE_SCANNER_SO "${CMAKE_CURRENT_BINARY_DIR}/debug/examples/libtest_ble_scanner.so")
-    set(TARGET_SO "libtest_ble_scanner.so")
 endif ()
 
 
 message(STATUS "Cargo build ${TEST_BLE_SCANNER_SO}")
-add_custom_target(cargo_build_test_ble_scan ALL
+add_custom_target(nearby_ble ALL
     COMMAND CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} ${CARGO_CMD}
-    COMMAND cp ${TEST_BLE_SCANNER_SO} ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_SO}
+    COMMAND cp ${TEST_BLE_SCANNER_SO} ${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (ANDROID_HOME_DIR)
