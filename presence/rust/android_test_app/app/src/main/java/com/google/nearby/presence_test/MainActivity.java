@@ -12,8 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import androidx.annotation.NonNull;
 
 public class MainActivity extends Activity {
@@ -36,7 +34,7 @@ public class MainActivity extends Activity {
     presenceV1.setOnClickListener(view -> setBroadCastScanActivities(
         AdvertiserActivity.class, PresenceScannerActivity.class
     ));
-    RadioButton fastPair = ((RadioButton) findViewById(R.id.radio_presence_fast_pair));
+    RadioButton fastPair = ((RadioButton) findViewById(R.id.radio_ble_api));
     fastPair.setOnClickListener(view -> setBroadCastScanActivities(
         AdvertiserActivity.class, ScannerActivity.class
     ));

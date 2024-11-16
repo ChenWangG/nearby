@@ -9,7 +9,7 @@
   <string name="select_protocol" translatable="false">Select Protocol</string>
   <string name="select_account_key" translatable="false">Select Account Key</string>
   <string name="presence_v1" translatable="false">Presence V1</string>
-  <string name="presence_fast_pair" translatable="false">Presence Fast Pair</string>
+  <string name="ble_api" translatable="false">BlE API</string>
   <string name="account_key_1" translatable="false">Account Key 1</string>
   <string name="account_key_2" translatable="false">Account Key 2</string>
 </resources>

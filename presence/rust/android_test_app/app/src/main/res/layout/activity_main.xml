@@ -30,11 +30,12 @@
             android:layout_height="wrap_content"
             android:text="@string/presence_v1"
             android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/radio_presence_fast_pair"
+        <RadioButton
+            android:id="@+id/radio_ble_api"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/presence_fast_pair"
-            android:onClick="onRadioButtonClicked"/>
+            android:onClick="onRadioButtonClicked"
+            android:text="@string/ble_api" />
     </RadioGroup>
 
     <TextView
