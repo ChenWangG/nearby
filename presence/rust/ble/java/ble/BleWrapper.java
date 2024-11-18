@@ -3,6 +3,7 @@ package com.google.nearby.ble;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanRecord;
 
 public class BleWrapper implements BleWrapperInterface {
   public BleWrapper() {
@@ -15,7 +16,12 @@ public class BleWrapper implements BleWrapperInterface {
       @Override
       public void onScanResult(int callbackType, android.bluetooth.le.ScanResult result) {
         super.onScanResult(callbackType, result);
-        callback.onScanResult(callbackType, new ScanResult());
+        ScanRecord record = result.getScanRecord();
+        byte[] serviceData = null;
+        if (record != null) {
+          serviceData = record.getServiceData(Constants.PRESENCE_SERVICE_DATA_UUID);
+        }
+        callback.onScanResult(callbackType, new ScanResult(serviceData));
       }
     };
     leScanner.startScan(leScanCallback);
