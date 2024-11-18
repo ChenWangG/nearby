@@ -1,9 +1,14 @@
 package com.google.nearby.presence_test;
 
-import com.google.nearby.presence.Presence;
-import java.util.concurrent.Executors;
+import com.google.nearby.ble_test.TestBleScanner;
 
 public class BleRustScannerActivity extends ScannerActivity {
+
+  TestBleScanner test_scanner;
+  public BleRustScannerActivity() {
+    super();
+    test_scanner = new TestBleScanner();
+  }
   @Override
   protected void stopScan() {
     log("stop BLE Rust scan.");
@@ -12,5 +17,6 @@ public class BleRustScannerActivity extends ScannerActivity {
   @Override
   protected void startScan() {
     log("start BLE Rust scan.");
+    test_scanner.start();
   }
 }

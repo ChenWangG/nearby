@@ -4,6 +4,8 @@ use jni::sys::jlong;
 use ble::{BleScanRequest, BleScanResult, BleScanner, ScanCallback, Scanner};
 
 use log::{debug, info};
+use log::LevelFilter;
+use android_logger::Config;
 
 struct TestBleCallback;
 
@@ -31,8 +33,11 @@ pub unsafe extern "system" fn Java_com_google_nearby_ble_1test_TestBleScanner_ne
 (env: JNIEnv,
  _class: JClass) -> jlong {
     println!("[Rust] Println newTestBleScanner before logging started.");
+    #[cfg(target_os = "linux")]
     env_logger::init();
-    info!("Rust newTestBleScanner.");
+    #[cfg(target_os = "android")]
+    android_logger::init_once(Config::default().with_max_level(LevelFilter::Info));
+    info!("[PresenceTest][Rust] newTestBleScanner.");
     let test_ble_scanner = TestBleScanner { ble_scanner: BleScanner::new(env.get_java_vm().unwrap()) };
     Box::into_raw(Box::new(test_ble_scanner)) as jlong
 }

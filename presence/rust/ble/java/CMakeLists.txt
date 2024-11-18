@@ -8,7 +8,7 @@ add_jar(TestBle
          "ble/BleScanner.java"
          "ble/ScanResult.java")
 get_target_property(_testBleJarFile TestBle JAR_FILE)
-add_dependencies(TestBle cargo_build_test_ble_scan)
+add_dependencies(TestBle nearby_ble)
 message(STATUS "Created Jar file ${_testBleJarFile}")
 
 message(STATUS "Run BLE Java tests.")
