@@ -3,12 +3,14 @@ package com.google.nearby.presence_test;
 import static com.google.nearby.presence_test.MainActivity.TAG;
 
 import android.annotation.SuppressLint;
+
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 
 public class AdvertiserActivity extends BtActivity {
 
@@ -42,10 +44,10 @@ public class AdvertiserActivity extends BtActivity {
   }
 
   public void start() {
-    Log.i(TAG, "start advertise.");
+    Log.i(TAG, "Override start() to start real advertise.");
   }
 
   public void stop() {
-    Log.i(TAG, "stop advertise.");
+    Log.i(TAG, "Override stop() to stop real advertise.");
   }
 }

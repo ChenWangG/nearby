@@ -7,6 +7,7 @@ import static android.Manifest.permission.UWB_RANGING;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,10 +36,7 @@ public class MainActivity extends Activity {
     setBroadCastScanActivities(AdvertiserActivity.class, PresenceScannerActivity.class);
 
     requestPermissions(
-        new String[]{
-            BLUETOOTH_ADVERTISE, BLUETOOTH_SCAN, UWB_RANGING, ACCESS_FINE_LOCATION,
-            POST_NOTIFICATION
-        },
+        new String[]{ BLUETOOTH_ADVERTISE, BLUETOOTH_SCAN },
         REQUEST_CODE);
   }
 
@@ -53,7 +51,7 @@ public class MainActivity extends Activity {
           AdvertiserActivity.class, PresenceScannerActivity.class);
     } else if (view.getId() == R.id.radio_ble_api) {
         setBroadCastScanActivities(
-            AdvertiserActivity.class, ScannerActivity.class);
+            BleAdvertiserActivity.class, ScannerActivity.class);
     } else if (view.getId() == R.id.radio_ble_rust_api) {
       setBroadCastScanActivities(
           AdvertiserActivity.class, BleRustScannerActivity.class);
@@ -62,6 +60,16 @@ public class MainActivity extends Activity {
   @Override
   public void onRequestPermissionsResult(
       int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    Log.i(TAG, "request permission results:");
+    if (requestCode == REQUEST_CODE) {
+      for (int i = 0; i < permissions.length; i++) {
+        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+          Log.i(TAG, "Permission granted for: " + permissions[i]);
+        } else {
+          Log.e(TAG, "Permission denied for: " + permissions[i]);
+        }
+      }
+    }
   }
 
   private void setBroadCastScanActivities(Class<?> advertiser, Class<?> scanner) {
