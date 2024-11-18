@@ -5,7 +5,7 @@
 package com.google.nearby.ble;
 
 
-import com.google.nearby.ble.BleWrapper.ScanCallback;
+import com.google.nearby.ble.BleWrapperInterface.ScanCallback;
 
 // Counterpart of Rust BleScanner for FFI.
 public class BleScanner {
@@ -30,12 +30,13 @@ public class BleScanner {
   }
 
   public void stop(long callbackPtr) {
-    bleWrapper.stopScan(callbackPtr);
+    // TODO: map callbackptr to callback and call.
+    // bleWrapper.stopScan(callback);
   }
 
   /* ========== Native methods implemented in Rust. ========== */
   // Callback to Rus to deliver a scan result.
   private static native void onScanResult(long callbackPtr, long result);
 
-  private final BleWrapper bleWrapper = new BleWrapper();
+  private final BleWrapperInterface bleWrapper = new BleWrapper();
 }

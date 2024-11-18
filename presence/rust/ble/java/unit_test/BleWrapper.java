@@ -2,12 +2,7 @@ package com.google.nearby.ble;
 
 import java.lang.Thread;
 
-public class BleWrapper {
-  public interface ScanCallback {
-    public void onScanResult (int callbackType,
-        ScanResult result);
-  }
-
+public class BleWrapper implements BleWrapperInterface {
   public BleWrapper() {}
 
   public void startScan(ScanCallback callback) {
@@ -20,7 +15,7 @@ public class BleWrapper {
     }.start();
   }
 
-  public void stopScan(long callbackPtr) {
+  public void stopScan(ScanCallback callback) {
     System.out.println("[Java][BleWrapper] stopScan");
   }
 }

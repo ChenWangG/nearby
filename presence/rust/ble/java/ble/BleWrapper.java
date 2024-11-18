@@ -4,12 +4,7 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 
-public class BleWrapper {
-  public interface ScanCallback {
-    public void onScanResult (int callbackType,
-        ScanResult result);
-  }
-
+public class BleWrapper implements BleWrapperInterface {
   public BleWrapper() {
     leScanner = BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
   }
@@ -29,7 +24,7 @@ public class BleWrapper {
   // TODO map callbackPtr to LeCallback instance.
   // Note: include callbackPtr into ScanCallback to setup the map.
   @SuppressLint({"MissingPermission"})
-  public void stopScan(long callbackPtr) {
+  public void stopScan(ScanCallback callback) {
   }
 
   private final BluetoothLeScanner leScanner;

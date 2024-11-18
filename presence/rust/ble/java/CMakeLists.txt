@@ -5,8 +5,9 @@ add_jar(TestBle
         "unit_test/Main.java"
         "unit_test/BleWrapper.java"
         "ble_test/TestBleScanner.java"
-         "ble/BleScanner.java"
-         "ble/ScanResult.java")
+        "ble/BleWrapperInterface.java"
+        "ble/BleScanner.java"
+        "ble/ScanResult.java")
 get_target_property(_testBleJarFile TestBle JAR_FILE)
 add_dependencies(TestBle nearby_ble)
 message(STATUS "Created Jar file ${_testBleJarFile}")
