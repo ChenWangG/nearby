@@ -45,6 +45,7 @@ impl BleScanResult {
 }
 
 // TODO: avoid static lifetime? This is eventually owned by system API.
+// Pass type T: ScanCallback instead of impl ScanCallback.
 pub trait ScanCallback: std::marker::Sync + 'static {
   fn on_update(&self, result: BleScanResult);
 }
