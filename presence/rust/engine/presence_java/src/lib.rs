@@ -1,3 +1,5 @@
+mod java_discovery_result;
+
 use std::ptr::null_mut;
 use jni::objects::{GlobalRef, JClass, JObject};
 use jni::sys::jlong;
