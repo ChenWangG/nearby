@@ -10,5 +10,6 @@ tokio = { version = "1.36.0", features = ["sync", "rt-multi-thread", "macros"] }
 log = "0.4.22"
 futures = "0.3.31"
 np_adv = { git = "https://beto-core.googlesource.com/beto-core.git", branch = "main" }
+jni = "0.21.1"
 
 

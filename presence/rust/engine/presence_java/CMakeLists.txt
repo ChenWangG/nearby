@@ -35,6 +35,7 @@ if (ANDROID_HOME_DIR)
 endif ()
 
 add_jar(Presence
+        java/DiscoveryResult.java
         java/Presence.java)
 get_target_property(_presenceJarFile Presence JAR_FILE)
 message(STATUS "Jar file ${_presenceJarFile}")

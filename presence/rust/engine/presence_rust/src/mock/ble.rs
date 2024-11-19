@@ -1,7 +1,9 @@
 use std::thread;
 use log::info;
 use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
+use crate::engine::EngineEvent::Ble;
 use crate::scan_provider::ble_scan_provider::UUID;
+use jni::{JNIEnv, JavaVM};
 
 pub const SERVICE_DATA: &[i8] = &[1, 2, 3];
 
@@ -18,5 +20,11 @@ impl Scanner for BleScanner {
             });
             system_thread.join();
         });
+    }
+}
+
+impl BleScanner {
+    pub fn new(_jvm: JavaVM) -> Self {
+        BleScanner {}
     }
 }

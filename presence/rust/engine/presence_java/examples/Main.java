@@ -41,6 +41,8 @@ public class Main {
 
     // New Presence instance required to restart the service.
     // The previous instance has been consumed by the executor.
+    /*
+    // TODO: this init logger twice and crash.
     presence = new Presence(callbacks);
     executor = Executors.newSingleThreadExecutor();
     presence.start(executor);
@@ -48,6 +50,7 @@ public class Main {
     presence.stop();
     executor.shutdown();
     System.out.println("Service shutdown again.");
+    */
 
     System.out.println("==========================================================");
     System.out.println("========== End of demo Presence Rust Java API.============");
