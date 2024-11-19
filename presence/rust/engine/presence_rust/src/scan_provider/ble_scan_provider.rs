@@ -1,3 +1,4 @@
+use log::info;
 use crate::engine::Engine;
 use ble::{BleScanRequest, BleScanResult, ScanCallback, Scanner};
 use event_poller::{EventPoller, EventProcessor, EventWriter};
@@ -49,13 +50,13 @@ impl<S: Scanner> EventProcessor for BleScanProcessor<S> {
         match event {
             None => {}
             Some(BleScanEvent::ScanRequest(request)) => {
-                println!("Received BleScanEvent::ScanRequest.");
+                info!("(PresenceRust) Received BleScanEvent::ScanRequest.");
                 let ble_scan_provider = self.ble_scan_provider.clone().unwrap();
                 self.ble_scanner
                     .start(BleScanRequest::new(String::from(UUID), request.priority), BleScanCallback { ble_scan_provider });
             }
             Some(BleScanEvent::BleScanResult(result)) => {
-                println!("Received BleScanEvent::Result.");
+                info!("Received BleScanEvent::Result.");
                 self.engine.as_mut().unwrap().on_scan_result(ScanResult::new(result.service_data().clone())).await;
             }
             _ => panic!("Recived None BleScanEvent::Start."),

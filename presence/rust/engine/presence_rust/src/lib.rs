@@ -4,6 +4,7 @@ use crate::engine::EngineProcessor;
 use crate::util::async_block_on;
 use event_poller::EventPoller;
 use futures::future;
+use log::info;
 use ble::Scanner;
 use scan_provider::ble_scan_provider;
 
@@ -14,6 +15,7 @@ pub mod mock;
 mod scan_provider;
 
 pub fn create<C: DiscoveryCallback, S: Scanner>(ble_scanner: S) -> (Client, Runtime<C, S>) {
+    info!("Create Rust Engine.");
     let (engine, mut engine_poller) = engine::create();
     let (ble_scan_provider, mut ble_scan_poller) = ble_scan_provider::create(ble_scanner);
     engine_poller

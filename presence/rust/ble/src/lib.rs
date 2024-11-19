@@ -67,6 +67,7 @@ pub struct BleScanner {
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
+        info!("(PresenceRust) BleScanner start.");
         let scan_callback_box = ScanCallbackBox { scan_callback: Box::new(callback)};
         let callback_ptr = Box::into_raw(Box::new(scan_callback_box)) as jlong;
         info!("BleScanner Lib start with callback addr: {}.", callback_ptr);
@@ -106,7 +107,7 @@ pub unsafe extern "system" fn Java_com_google_nearby_ble_BleScanner_onScanResult
  callback_ptr: jlong,
  result: jlong,
 ) {
-    info!("BleScanner_onScanResult with callback_ptr: {}.", callback_ptr);
+    info!("(PresenceRust) BleScanner_onScanResult with callback_ptr: {}.", callback_ptr);
     let scan_callback_box_ptr = callback_ptr as *mut ScanCallbackBox;
     let result_ptr = result as *mut ScanResult;
     let service_data = (&*result_ptr).service_data().clone();

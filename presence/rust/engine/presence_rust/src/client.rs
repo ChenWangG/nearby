@@ -67,15 +67,15 @@ impl Device {
 }
 #[derive(Debug)]
 pub struct DiscoveryResult{
-    service_data: Vec<u8>,
+    service_data: Vec<i8>,
 }
 
 impl DiscoveryResult {
-    pub fn new(service_data: Vec<u8>) -> Self {
+    pub fn new(service_data: Vec<i8>) -> Self {
         Self { service_data }
     }
 
-    pub fn service_data(&self) -> &Vec<u8> {
+    pub fn service_data(&self) -> &Vec<i8> {
        &self.service_data
     }
 }

@@ -1,3 +1,4 @@
+use log::info;
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::scan_provider::ble_scan_provider::BleScanProvider;
 use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
@@ -15,6 +16,7 @@ pub struct Engine {
 
 impl Engine {
     pub async fn set_request(&mut self, request: DiscoveryRequest) {
+        info!("[PresenceRust] Engine set request: ");
         self.writer.write(EngineEvent::DiscoveryRequest(request)).await.unwrap();
     }
 
@@ -54,7 +56,7 @@ where
                 self.ble_scan_provider.as_mut().unwrap().stop().await;
             }
             Some(EngineEvent::DiscoveryRequest(request)) => {
-                print!("Engine set ble scan request.");
+                info!("[PresenceRust] Engine set ble scan request.");
                 self.ble_scan_provider.as_mut().unwrap().set_request(ScanRequest{ priority: request.priority}).await;
             }
             Some(EngineEvent::ScanResult(scan_result)) => {

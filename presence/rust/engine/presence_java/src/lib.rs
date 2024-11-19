@@ -2,9 +2,14 @@ use std::ptr::null_mut;
 use jni::objects::{GlobalRef, JClass, JObject};
 use jni::sys::jlong;
 use jni::{JNIEnv, JavaVM};
+
 use presence_rust::client::{Client, DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
 use ble::Scanner;
 use presence_rust::Runtime;
+
+use log::{debug, info};
+use log::LevelFilter;
+use android_logger::Config;
 
 #[cfg(feature = "mock")]
 use presence_rust::mock::ble::BleScanner;
@@ -41,9 +46,15 @@ struct PresenceRust {
 #[no_mangle]
 #[allow(non_snake_case)]
 pub unsafe extern "system" fn Java_com_google_nearby_presence_Presence_newPresence
-(_env: JNIEnv,
+(env: JNIEnv,
  _class: JClass) -> jlong {
-    let ble_scanner = BleScanner{};
+    println!("[Rust] Println newTestBleScanner before logging started.");
+    #[cfg(target_os = "linux")]
+    env_logger::init();
+    #[cfg(target_os = "android")]
+    android_logger::init_once(Config::default().with_max_level(LevelFilter::Info));
+    info!("[PresenceRust] new Presence Rust.");
+    let ble_scanner = BleScanner::new(env.get_java_vm().unwrap());
     let (client, runtime) = presence_rust::create(ble_scanner);
     let presence_rust = PresenceRust{client: Box::into_raw(Box::new(client)), runtime: Box::into_raw(Box::new(runtime))};
     Box::into_raw(Box::new(presence_rust)) as jlong
