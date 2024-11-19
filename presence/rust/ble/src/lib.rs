@@ -1,3 +1,5 @@
+mod scan_result;
+
 use jni::{JNIEnv, JavaVM};
 use jni::objects::{GlobalRef, JClass, JObject};
 use jni::sys::jlong;

@@ -9,4 +9,8 @@ public class ScanResult {
     return serviceData;
   }
   private final byte[] serviceData;
+
+  /* ========== Native methods implemented in Rust. ========== */
+  // Callback to Rus to deliver a scan result.
+   public static native long toRustScanResult(byte[] serviceData);
 }
