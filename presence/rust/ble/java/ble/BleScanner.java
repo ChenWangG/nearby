@@ -9,6 +9,8 @@ import com.google.nearby.ble.BleWrapperInterface.ScanCallback;
 
 // Counterpart of Rust BleScanner for FFI.
 public class BleScanner {
+  static final String TAG = "NearbyBle";
+
   // Static method called from Rust to return a Ble instance.
   public static BleScanner build() {
     return new BleScanner();

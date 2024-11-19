@@ -1,11 +1,15 @@
 package com.google.nearby.ble;
 
+import static com.google.nearby.ble.BleScanner.TAG;
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanRecord;
+import android.util.Log;
 
 public class BleWrapper implements BleWrapperInterface {
+
   public BleWrapper() {
     leScanner = BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
   }
@@ -20,8 +24,11 @@ public class BleWrapper implements BleWrapperInterface {
         byte[] serviceData = null;
         if (record != null) {
           serviceData = record.getServiceData(Constants.PRESENCE_SERVICE_DATA_UUID);
+          if (serviceData != null ) {
+            Log.d(TAG, "Received Presence BLE service data from: " + result.getDevice().getAddress());
+            callback.onScanResult(callbackType, new ScanResult(serviceData));
+          }
         }
-        callback.onScanResult(callbackType, new ScanResult(serviceData));
       }
     };
     leScanner.startScan(leScanCallback);
