@@ -14,6 +14,10 @@ impl ScanResult {
     pub fn new(service_data: Vec<i8>) -> Self {
         ScanResult { service_data }
     }
+
+    pub fn service_data(&self) -> &Vec<i8> {
+        &(self.service_data)
+    }
 }
 
 #[no_mangle]

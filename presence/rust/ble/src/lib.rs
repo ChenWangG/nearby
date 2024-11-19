@@ -3,7 +3,8 @@ mod scan_result;
 use jni::{JNIEnv, JavaVM};
 use jni::objects::{GlobalRef, JClass, JObject};
 use jni::sys::jlong;
-use log::info;
+use log::{debug, info};
+use crate::scan_result::ScanResult;
 
 static BLE_CLASS: &str = "com/google/nearby/ble/BleScanner";
 static BUILD_SIGNATURE: &str =
@@ -29,11 +30,11 @@ impl BleScanRequest {
 #[derive(Clone)]
 pub struct BleScanResult {
     tx_power: i32,
-    service_data: Vec<u8>,
+    service_data: Vec<i8>,
 }
 
 impl BleScanResult {
-    pub fn new(tx_power: i32, service_data: Vec<u8>) -> Self {
+    pub fn new(tx_power: i32, service_data: Vec<i8>) -> Self {
         BleScanResult { tx_power, service_data }
     }
 
@@ -41,7 +42,7 @@ impl BleScanResult {
         self.tx_power
     }
 
-    pub fn service_data(&self) -> &Vec<u8> {
+    pub fn service_data(&self) -> &Vec<i8> {
         &self.service_data
     }
 }
@@ -107,5 +108,11 @@ pub unsafe extern "system" fn Java_com_google_nearby_ble_BleScanner_onScanResult
 ) {
     info!("BleScanner_onScanResult with callback_ptr: {}.", callback_ptr);
     let scan_callback_box_ptr = callback_ptr as *mut ScanCallbackBox;
-    &(*scan_callback_box_ptr).scan_callback.on_update(BleScanResult::new(1, vec!(1)));
+    let result_ptr = result as *mut ScanResult;
+    let service_data = (&*result_ptr).service_data().clone();
+    debug!("BleScanner onScanResult:");
+    for data in &service_data {
+       debug!("{}", data)
+    }
+    &(*scan_callback_box_ptr).scan_callback.on_update(BleScanResult::new(1, service_data));
 }

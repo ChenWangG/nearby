@@ -23,8 +23,7 @@ public class BleScanner {
       @Override
       public void onScanResult(int callbackType, ScanResult result) {
         System.out.println("[Java][BleScanner] onScanResult called.");
-        BleScanner.onScanResult(rustCallbackPtr, 1);
-
+        BleScanner.onScanResult(rustCallbackPtr, result.toRustScanResult());
       }
       private final long rustCallbackPtr = callbackPtr;
     };
