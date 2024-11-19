@@ -11,7 +11,7 @@ public class Main {
     System.out.println("======== Test ScanResult FFI.==========");
     byte[] serviceData = new byte[]{1, 2, 3};
     ScanResult result = new ScanResult(serviceData);
-    result.toRustScanResult(serviceData);
+    result.toRustScanResult();
     System.out.println("======== Test E2E from mocked BleWrapper to TestBleScanner.==========");
     test_scanner.start();
     assert true;
