@@ -20,6 +20,7 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
 
   @Nullable
   private final BluetoothLeAdvertiser leAdvertiser;
+  private final AdvertiseCallback callback;
 
   @SuppressLint({"MissingPermission"})
   public BleAdvertiserActivity() {
@@ -30,44 +31,55 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
       Log.e(TAG, errorMsg);
       log(errorMsg);
       leAdvertiser = null;
+      callback = null;
       return;
     }
     bluetoothAdapter.setName("PresenceTest");
     leAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
+    callback = new AdvertiseCallback() {
+      @Override
+      public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+        super.onStartSuccess(settingsInEffect);
+        Log.i(TAG, "Succeeded to start advertising.");
+      }
+      @Override
+      public void onStartFailure(int errorCode) {
+        super.onStartFailure(errorCode);
+        Log.e(TAG, "Failed to start advertising.");
+      }
+    };
   }
 
   @Override
   public void start() {
     Log.i(TAG, "start BLE advertise.");
-    if (leAdvertiser != null) {
-      AdvertiseSettings settings =
-          new AdvertiseSettings.Builder()
-              .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-              .setConnectable(false)
-              .build();
+    AdvertiseSettings settings =
+        new AdvertiseSettings.Builder()
+            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+            .setConnectable(false)
+            .build();
 
-      AdvertiseData advertiseData =  new AdvertiseData.Builder()
-          .addServiceData(Constants.PRESENCE_SERVICE_DATA_UUID, getServiceData())
-          .build();
+    AdvertiseData advertiseData =  new AdvertiseData.Builder()
+        .addServiceData(Constants.PRESENCE_SERVICE_DATA_UUID, getServiceData())
+        .build();
 
-      AdvertiseData scanResponse = new AdvertiseData.Builder().build();
-      try {
-        leAdvertiser.startAdvertising(
-            settings, advertiseData, scanResponse, new AdvertiseCallback() {
-              @Override
-              public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-                super.onStartSuccess(settingsInEffect);
-                Log.i(TAG, "Succeeded to start advertising.");
-                // TODO: hook log to AdvertiserActivity.
-                // log("Succeeded to start advertising.");
-              }
-            });
-      } catch (NullPointerException | IllegalStateException | SecurityException e) {
-        Log.e(TAG, "Failed to start broadcast with Exception: " + e.toString());
-      }
+    AdvertiseData scanResponse = new AdvertiseData.Builder().build();
+    try {
+      assert leAdvertiser != null;
+      leAdvertiser.startAdvertising(settings, advertiseData, scanResponse, callback);
+    } catch (NullPointerException | IllegalStateException | SecurityException e) {
+      Log.e(TAG, "Failed to start broadcast with Exception: " + e.toString());
     }
   }
 
+
+  @Override
+  @SuppressLint({"MissingPermission"})
+  public void stop() {
+    Log.i(TAG, "stop BLE advertise.");
+    assert leAdvertiser != null;
+    leAdvertiser.stopAdvertising(callback);
+  }
   private byte[] getServiceData() {
     return new byte[] {
         0b00000001,
