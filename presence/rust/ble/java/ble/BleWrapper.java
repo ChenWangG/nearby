@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanRecord;
 import android.util.Log;
+import java.util.Arrays;
 
 public class BleWrapper implements BleWrapperInterface {
 
@@ -25,7 +26,8 @@ public class BleWrapper implements BleWrapperInterface {
         if (record != null) {
           serviceData = record.getServiceData(Constants.PRESENCE_SERVICE_DATA_UUID);
           if (serviceData != null ) {
-            Log.d(TAG, "Received Presence BLE service data from: " + result.getDevice().getAddress());
+            Log.d(TAG, "Received Presence BLE service data: " + bytesToString(serviceData)
+                + " from MAC addr " + result.getDevice().getAddress());
             callback.onScanResult(callbackType, new ScanResult(serviceData));
           }
         }
@@ -38,6 +40,16 @@ public class BleWrapper implements BleWrapperInterface {
   // Note: include callbackPtr into ScanCallback to setup the map.
   @SuppressLint({"MissingPermission"})
   public void stopScan(ScanCallback callback) {
+  }
+
+  private String bytesToString(byte[] numbers) {
+    StringBuilder result = new StringBuilder();
+    numbers = Arrays.copyOfRange(numbers, 0, 3);
+    for (byte number : numbers) {
+      result.append(String.format("%8s", Integer.toBinaryString(number & 0xFF)).replace(' ', '0'));
+      result.append(" ");
+    }
+    return result.toString();
   }
 
   private final BluetoothLeScanner leScanner;

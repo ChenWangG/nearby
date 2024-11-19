@@ -1,4 +1,8 @@
 package com.google.nearby.presence_test;
+
+import android.Manifest.permission;
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import com.google.nearby.ble.Constants;
 
 import static com.google.nearby.presence_test.MainActivity.TAG;
@@ -13,12 +17,14 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 public class BleAdvertiserActivity extends AdvertiserActivity {
+
   @Nullable
   private final BluetoothLeAdvertiser leAdvertiser;
 
+  @SuppressLint({"MissingPermission"})
   public BleAdvertiserActivity() {
     super();
-    BluetoothAdapter  bluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();
+    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     if (bluetoothAdapter == null) {
       String errorMsg = "Failed to get Bluetooth Adapter.";
       Log.e(TAG, errorMsg);
@@ -26,6 +32,7 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
       leAdvertiser = null;
       return;
     }
+    bluetoothAdapter.setName("PresenceTest");
     leAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
   }
 
@@ -35,7 +42,7 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
     if (leAdvertiser != null) {
       AdvertiseSettings settings =
           new AdvertiseSettings.Builder()
-              .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
+              .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
               .setConnectable(false)
               .build();
 

@@ -1,10 +1,11 @@
 package com.google.nearby.presence_test;
 
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.BLUETOOTH_ADVERTISE;
 import static android.Manifest.permission.BLUETOOTH_SCAN;
-import static android.Manifest.permission.UWB_RANGING;
+import static android.Manifest.permission.BLUETOOTH_CONNECT;
+import static android.Manifest.permission.BLUETOOTH;
 
+import android.Manifest.permission;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -36,7 +37,7 @@ public class MainActivity extends Activity {
     setBroadCastScanActivities(AdvertiserActivity.class, PresenceScannerActivity.class);
 
     requestPermissions(
-        new String[]{ BLUETOOTH_ADVERTISE, BLUETOOTH_SCAN },
+        new String[]{ BLUETOOTH_ADVERTISE, BLUETOOTH_SCAN,  BLUETOOTH_CONNECT, BLUETOOTH },
         REQUEST_CODE);
   }
 
