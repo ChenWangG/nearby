@@ -7,15 +7,15 @@ use crate::{BleScanResult, ScanCallbackBox};
 use jni::objects::ReleaseMode;
 
 pub struct ScanResult {
-    service_data: Vec<i8>,
+    service_data: Vec<u8>,
 }
 
 impl ScanResult {
-    pub fn new(service_data: Vec<i8>) -> Self {
+    pub fn new(service_data: Vec<u8>) -> Self {
         ScanResult { service_data }
     }
 
-    pub fn service_data(&self) -> &Vec<i8> {
+    pub fn service_data(&self) -> &Vec<u8> {
         &(self.service_data)
     }
 }
@@ -32,8 +32,9 @@ pub unsafe extern "system" fn Java_com_google_nearby_ble_ScanResult_toRustScanRe
     let element_vec = elements.to_vec();
 
     let mut service_data = Vec::new();
+    // TODO: the byte array contains i8, cast to u8 in Rust now. The binary value will not change.
     for element in element_vec {
-        service_data.push(element as i8);
+        service_data.push(element as u8);
     }
     debug!("service data length: {}",  service_data.len());
     for data in &service_data {

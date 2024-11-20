@@ -30,11 +30,11 @@ impl BleScanRequest {
 #[derive(Clone)]
 pub struct BleScanResult {
     tx_power: i32,
-    service_data: Vec<i8>,
+    service_data: Vec<u8>,
 }
 
 impl BleScanResult {
-    pub fn new(tx_power: i32, service_data: Vec<i8>) -> Self {
+    pub fn new(tx_power: i32, service_data: Vec<u8>) -> Self {
         BleScanResult { tx_power, service_data }
     }
 
@@ -42,7 +42,7 @@ impl BleScanResult {
         self.tx_power
     }
 
-    pub fn service_data(&self) -> &Vec<i8> {
+    pub fn service_data(&self) -> &Vec<u8> {
         &self.service_data
     }
 }

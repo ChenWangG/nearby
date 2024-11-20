@@ -5,7 +5,7 @@ use crate::engine::EngineEvent::Ble;
 use crate::scan_provider::ble_scan_provider::UUID;
 use jni::{JNIEnv, JavaVM};
 
-pub const SERVICE_DATA: &[i8] = &[1, 2, 3];
+pub const SERVICE_DATA: &[u8] = &[1, 2, 3];
 
 pub struct BleScanner;
 

@@ -29,6 +29,9 @@ impl DiscoveryCallback for Callback {
     fn on_update(&self, result: DiscoveryResult) {
         info!("(PresenceRust) DiscoveryCallback on_update");
         info!("(PresenceRust) {}", result.service_data().len());
+        for data in result.service_data() {
+            info!("(PresenceRust) {:08b}", data)
+        }
         let addr = 1 as jlong;
         self.jvm.get_env().unwrap().call_method(
             self.presence_java.as_obj(),

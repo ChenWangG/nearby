@@ -14,15 +14,15 @@ pub struct ScanRequest {
 
 #[derive(Clone, Debug)]
 pub struct ScanResult {
-    service_data: Vec<i8>,
+    service_data: Vec<u8>,
 }
 
 impl ScanResult {
-    pub fn new(service_data: Vec<i8>) -> Self {
+    pub fn new(service_data: Vec<u8>) -> Self {
         Self{ service_data }
     }
 
-    pub fn service_data(&self) -> &Vec<i8> {
+    pub fn service_data(&self) -> &Vec<u8> {
         &self.service_data
     }
 }
