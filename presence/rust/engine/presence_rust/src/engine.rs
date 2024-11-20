@@ -1,4 +1,9 @@
-use log::info;
+use crypto_provider_default::CryptoProviderImpl;
+use log::{debug, info};
+use np_adv::{deserialization_arena, deserialize_advertisement};
+use np_adv::credential::book::CredentialBookBuilder;
+use np_adv::credential::matched::EmptyMatchedCredential;
+use np_adv::extended::deserialize::Section;
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::scan_provider::ble_scan_provider::BleScanProvider;
 use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
@@ -61,7 +66,7 @@ where
             }
             Some(EngineEvent::ScanResult(scan_result)) => {
                 print!("Engine receives discovery result.");
-                self.discovery_callback.as_mut().unwrap().on_update(DiscoveryResult::new(scan_result.service_data().clone()));
+                self.process_scan_result(scan_result);
             }
             _ => { print!("Other event");}
         }
@@ -79,5 +84,30 @@ impl<C: DiscoveryCallback> EngineProcessor<C> {
     }
     pub fn set_discovery_callback(&mut self, callback: C) {
         self.discovery_callback = Some(callback);
+    }
+
+    fn process_scan_result(&mut self, result: ScanResult) {
+        let cred_book = CredentialBookBuilder::<EmptyMatchedCredential>::build_cached_slice_book::<
+            0,
+            0,
+            CryptoProviderImpl,
+        >(&[], &[]);
+        let arena = deserialization_arena!();
+        let contents =
+            deserialize_advertisement::<_, CryptoProviderImpl>(arena, result.service_data(), &cred_book)
+                .expect("Should be a valid advertisemement")
+                .into_v1()
+                .expect("Should be V1");
+        println!("[PresenceRust]Print NP Advertisement.");
+        info!("[PresenceRust]Print NP Advertisement.");
+        for section in contents.sections().collect::<Vec<_>>() {
+            for data_element in section.iter_data_elements().collect::<Result<Vec<_>, _>>().unwrap() {
+                println!("[PresenceRust] {:?}", data_element.de_type());
+                println!("[PresenceRust] {:?}", data_element.contents());
+                info!("[PresenceRust] {:?}", data_element.de_type());
+                info!("[PresenceRust] {:?}", data_element.contents());
+            }
+        }
+        self.discovery_callback.as_mut().unwrap().on_update(DiscoveryResult::new(result.service_data().clone()));
     }
 }
