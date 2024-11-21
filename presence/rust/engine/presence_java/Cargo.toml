@@ -4,7 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "presence_java"
+crate-type = ["lib", "cdylib"]
+
+[[example]]
+name = "test_discovery_result"
+path = "examples/test_discovery_result.rs"
 crate-type = ["cdylib"]
 
 [features]

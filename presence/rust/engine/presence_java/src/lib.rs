@@ -1,4 +1,4 @@
-mod java_discovery_result;
+pub mod java_discovery_result;
 
 use std::ptr::null_mut;
 use jni::objects::{GlobalRef, JClass, JObject};

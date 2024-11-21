@@ -59,9 +59,17 @@ add_jar(DiscoveryResult
 get_target_property(_discoveryResultJarFile DiscoveryResult JAR_FILE)
 message(STATUS "Jar file ${_discoveryResultJarFile}")
 
+
+set(TEST_DISCOVERY_RESULT_SO "${CMAKE_CURRENT_BINARY_DIR}/debug/examples/libtest_discovery_result.so")
+message(STATUS "Cargo build ${TEST_DISCOVERY_RESULT_SO}")
+add_custom_target(test_discovery_result_so ALL
+    COMMAND CARGO_TARGET_DIR=${CMAKE_CURRENT_BINARY_DIR} cargo build --examples
+    COMMAND cp ${TEST_DISCOVERY_RESULT_SO} ${CMAKE_CURRENT_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
 message(STATUS "Test FFI discovery result.")
 add_custom_target(test_discovery_result ALL
     COMMAND ${Java_JAVA_EXECUTABLE}
         -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
         -cp ${_discoveryResultJarFile} TestDiscoveryResult)
-add_dependencies(test_discovery_result DiscoveryResult)
+add_dependencies(test_discovery_result DiscoveryResult test_discovery_result_so)
