@@ -1,15 +1,16 @@
 import com.google.nearby.presence.Presence;
+import com.google.nearby.presence.DiscoveryResult;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 class TestCallbacks implements Presence.Callbacks {
-  synchronized public void onDiscovery(long result)  {
+  synchronized public void onDiscovery(DiscoveryResult result)  {
     System.out.println("TestCallbacks: onDiscovery");
     this.result = result;
     notify();
   }
 
- synchronized public long waitForResult() {
+ synchronized public DiscoveryResult waitForResult() {
      try {
        while(this.result == null) {
          this.wait();
@@ -21,7 +22,7 @@ class TestCallbacks implements Presence.Callbacks {
      return this.result;
    }
 
-   private Long result = null;
+   private DiscoveryResult result = null;
 }
 
 public class Main {
@@ -34,7 +35,8 @@ public class Main {
     ExecutorService executor = Executors.newSingleThreadExecutor();
     presence.start(executor);
     presence.setRequest();
-    callbacks.waitForResult();
+    DiscoveryResult result = callbacks.waitForResult();
+    System.out.println("result DE count: " + result.dataElements().size());
     presence.stop();
     executor.shutdown();
     System.out.println("Service shutdown.");

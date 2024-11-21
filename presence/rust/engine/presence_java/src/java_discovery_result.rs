@@ -1,6 +1,7 @@
 use jni::JavaVM;
 use jni::objects::{GlobalRef, JByteArray, JObject, JValue};
-use jni::sys::jint;
+use jni::sys::{jint, JNIEnv};
+use presence_rust::client::DiscoveryResult;
 
 static DISCOVERY_RESULT_CLASS: &str = "com/google/nearby/presence/DiscoveryResult";
 static NEW_BUILDER_SIGNATURE: &str = "()Lcom/google/nearby/presence/DiscoveryResult$Builder;";
@@ -9,7 +10,13 @@ static BUILDER_CLASS: &str = "com.google.nearby.presence.DiscoveryResult$Builder
 static ADD_DE_SIGNATURE: &str = "(I[B)V";
 static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/presence/DiscoveryResult;";
 
-
+pub fn from_discovery_result(jvm: JavaVM, result: DiscoveryResult) -> GlobalRef {
+    let mut builder = DiscoveryResultBuilder::new(jvm);
+    for de in result.data_elements() {
+        builder.add_data_element(de.de_type, de.content.clone());
+    }
+    builder.build()
+}
 pub struct DiscoveryResultBuilder {
     jvm: JavaVM,
     builder: GlobalRef,
@@ -43,13 +50,14 @@ impl DiscoveryResultBuilder {
         ).expect("Failed to add DE.");
     }
 
-    pub fn build(&self) {
+    pub fn build(&self) -> GlobalRef {
         let mut env = self.jvm.get_env().unwrap();
-        env.call_method(
+        let local_ref = env.call_method(
             self.builder.as_obj(),
             "build",
             BUILD_SIGNATURE,
             &[]
-        ).expect("Failed to build.");
+        ).unwrap().l().unwrap();
+        env.new_global_ref(local_ref).unwrap()
     }
 }

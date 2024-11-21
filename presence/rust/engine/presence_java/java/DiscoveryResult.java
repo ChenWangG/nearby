@@ -32,8 +32,8 @@ public class DiscoveryResult {
       this.content = content;
     }
 
-    private int type;
-    private byte[] content;
+    public int type;
+    public byte[] content;
   }
 
   public DiscoveryResult(ArrayList<DataElement> dataElements) {

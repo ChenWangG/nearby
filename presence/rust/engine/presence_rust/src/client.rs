@@ -68,8 +68,8 @@ impl Device {
 
 #[derive(Debug)]
 pub struct DataElement {
-    de_type: u32,
-    content: Vec<u8>,
+    pub de_type: u32,
+    pub content: Vec<u8>,
 
 }
 

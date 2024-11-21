@@ -1,7 +1,9 @@
 package com.google.nearby.presence_test;
 
 import android.annotation.SuppressLint;
+import com.google.nearby.presence.DiscoveryResult.DataElement;
 import com.google.nearby.presence.Presence;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,7 +23,12 @@ public class PresenceScannerActivity extends ScannerActivity {
 
   @Override
   protected void startScan() {
-    Presence.Callbacks callbacks = result -> log("onDiscovery");
+    Presence.Callbacks callbacks = result -> {
+      log("Found a device with DEs: ");
+      for (DataElement de : result.dataElements()) {
+        log("Type: " + de.type + " content: " + Arrays.toString(de.content));
+      }
+    };
     presence = new Presence(callbacks);
     executor = Executors.newSingleThreadExecutor();
     presence.start(executor);

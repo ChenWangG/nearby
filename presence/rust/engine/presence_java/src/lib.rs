@@ -1,7 +1,7 @@
 pub mod java_discovery_result;
 
 use std::ptr::null_mut;
-use jni::objects::{GlobalRef, JClass, JObject};
+use jni::objects::{GlobalRef, JClass, JObject, JValue};
 use jni::sys::jlong;
 use jni::{JNIEnv, JavaVM};
 
@@ -17,8 +17,9 @@ use android_logger::Config;
 use presence_rust::mock::ble::BleScanner;
 #[cfg(not(feature = "mock"))]
 use ble::BleScanner;
+use crate::java_discovery_result::from_discovery_result;
 
-static ON_DISCOVERY_SIGNATURE: &str = "(J)V";
+static ON_DISCOVERY_SIGNATURE: &str = "(Lcom/google/nearby/presence/DiscoveryResult;)V";
 
 struct Callback {
     jvm: JavaVM,
@@ -32,12 +33,13 @@ impl DiscoveryCallback for Callback {
         for de in result.data_elements() {
             info!("(PresenceRust) {:?}", de)
         }
+        let java_discovery_result = from_discovery_result(self.jvm.get_env().unwrap().get_java_vm().unwrap(), result);
         let addr = 1 as jlong;
         self.jvm.get_env().unwrap().call_method(
             self.presence_java.as_obj(),
             "onDiscovery",
             ON_DISCOVERY_SIGNATURE,
-            &[addr.into()],
+            &[JValue::Object(java_discovery_result.as_obj())],
         )
             .unwrap();
     }

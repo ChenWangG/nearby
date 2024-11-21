@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 // Presence in Java Wrapping the Rust implementation.
 public class Presence {
   public interface Callbacks {
-    public void onDiscovery(long result);
+    public void onDiscovery(DiscoveryResult result);
   }
 
   public long testNdk() {
@@ -27,7 +27,7 @@ public class Presence {
   private native void stop(long presence);
 
   /* ========== Callbacks called from Rust. ========== */
-  synchronized public void onDiscovery(long result) {
+  synchronized public void onDiscovery(DiscoveryResult result) {
       System.out.println("Java onDiscovery.");
       this.callbacks.onDiscovery(result);
 
