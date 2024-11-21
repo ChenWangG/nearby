@@ -15,6 +15,14 @@ public class DiscoveryResult {
       this.dataElements.add(new DataElement(type, content));
     }
 
+    public DiscoveryResult build() {
+      System.out.println("Build");
+      for (DataElement de : dataElements) {
+      System.out.println("DE type: " + de.type + "content " + Arrays.toString(de.content));
+      }
+      return new DiscoveryResult(dataElements);
+    }
+
     private ArrayList<DataElement> dataElements;
   }
 

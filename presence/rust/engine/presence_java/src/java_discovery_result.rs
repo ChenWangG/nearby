@@ -3,10 +3,12 @@ use jni::objects::{GlobalRef, JByteArray, JObject, JValue};
 use jni::sys::jint;
 
 static DISCOVERY_RESULT_CLASS: &str = "com/google/nearby/presence/DiscoveryResult";
-static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/presence/DiscoveryResult$Builder;";
+static NEW_BUILDER_SIGNATURE: &str = "()Lcom/google/nearby/presence/DiscoveryResult$Builder;";
 
 static BUILDER_CLASS: &str = "com.google.nearby.presence.DiscoveryResult$Builder";
 static ADD_DE_SIGNATURE: &str = "(I[B)V";
+static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/presence/DiscoveryResult;";
+
 
 pub struct DiscoveryResultBuilder {
     jvm: JavaVM,
@@ -19,7 +21,7 @@ impl DiscoveryResultBuilder {
         let builder_local = env.call_static_method(
             DISCOVERY_RESULT_CLASS,
             "newBuilder",
-            BUILD_SIGNATURE,
+            NEW_BUILDER_SIGNATURE,
             &[],
         )
             .unwrap()
@@ -39,5 +41,15 @@ impl DiscoveryResultBuilder {
             ADD_DE_SIGNATURE,
             &[de_type.into(), JValue::Object(&data_elements)]
         ).expect("Failed to add DE.");
+    }
+
+    pub fn build(&self) {
+        let mut env = self.jvm.get_env().unwrap();
+        env.call_method(
+            self.builder.as_obj(),
+            "build",
+            BUILD_SIGNATURE,
+            &[]
+        ).expect("Failed to build.");
     }
 }

@@ -15,4 +15,5 @@ pub unsafe extern "system" fn Java_TestDiscoveryResult_testDiscoveryResult
     info!("================== Test Discovery Result.");
     let builder = DiscoveryResultBuilder::new(env.get_java_vm().unwrap());
     builder.add_data_element(1, vec![1, 2, 3, 4]);
+    builder.build();
 }
