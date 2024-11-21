@@ -52,3 +52,16 @@ add_custom_target(presence_java_example ALL
         -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
         -cp ${_jarFile}:${_presenceJarFile} Main)
 add_dependencies(presence_java_example Main Presence presence_java)
+
+add_jar(DiscoveryResult
+        java/DiscoveryResult.java
+        examples/TestDiscoveryResult.java)
+get_target_property(_discoveryResultJarFile DiscoveryResult JAR_FILE)
+message(STATUS "Jar file ${_discoveryResultJarFile}")
+
+message(STATUS "Test FFI discovery result.")
+add_custom_target(test_discovery_result ALL
+    COMMAND ${Java_JAVA_EXECUTABLE}
+        -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
+        -cp ${_discoveryResultJarFile} TestDiscoveryResult)
+add_dependencies(test_discovery_result DiscoveryResult)
