@@ -37,6 +37,7 @@ public class Main {
     presence.setRequest();
     DiscoveryResult result = callbacks.waitForResult();
     System.out.println("result DE count: " + result.dataElements().size());
+    assert result.dataElements().size() == 1;
     presence.stop();
     executor.shutdown();
     System.out.println("Service shutdown.");

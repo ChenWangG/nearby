@@ -10,9 +10,9 @@ extern "C" {
 /*
  * Class:     TestDiscoveryResult
  * Method:    testDiscoveryResult
- * Signature: ()J
+ * Signature: ()Lcom/google/nearby/presence/DiscoveryResult;
  */
-JNIEXPORT jlong JNICALL Java_TestDiscoveryResult_testDiscoveryResult
+JNIEXPORT jobject JNICALL Java_TestDiscoveryResult_testDiscoveryResult
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus

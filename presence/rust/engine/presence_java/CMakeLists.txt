@@ -50,7 +50,7 @@ message(STATUS "Load Rust lib from ${CMAKE_CURRENT_BINARY_DIR}")
 add_custom_target(presence_java_example ALL
     COMMAND ${Java_JAVA_EXECUTABLE}
         -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
-        -cp ${_jarFile}:${_presenceJarFile} Main)
+        -cp ${_jarFile}:${_presenceJarFile} -ea Main)
 add_dependencies(presence_java_example Main Presence presence_java)
 
 add_jar(DiscoveryResult
@@ -71,5 +71,5 @@ message(STATUS "Test FFI discovery result.")
 add_custom_target(test_discovery_result ALL
     COMMAND ${Java_JAVA_EXECUTABLE}
         -Djava.library.path=${CMAKE_CURRENT_BINARY_DIR}
-        -cp ${_discoveryResultJarFile} TestDiscoveryResult)
+        -cp ${_discoveryResultJarFile} -ea TestDiscoveryResult)
 add_dependencies(test_discovery_result DiscoveryResult test_discovery_result_so)
