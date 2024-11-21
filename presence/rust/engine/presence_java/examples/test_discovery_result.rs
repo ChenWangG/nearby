@@ -2,7 +2,7 @@ use jni::JNIEnv;
 use jni::objects::JClass;
 use jni::sys::jlong;
 use log::info;
-use presence_java::java_discovery_result;
+use presence_java::java_discovery_result::DiscoveryResultBuilder;
 
 #[no_mangle]
 #[allow(non_snake_case)]
@@ -13,5 +13,6 @@ pub unsafe extern "system" fn Java_TestDiscoveryResult_testDiscoveryResult
     println!("================== Print Test Discovery Result.");
     env_logger::init();
     info!("================== Test Discovery Result.");
-    let _builder = java_discovery_result::new_builder(env.get_java_vm().unwrap());
+    let builder = DiscoveryResultBuilder::new(env.get_java_vm().unwrap());
+    builder.add_data_element(1, vec![1, 2, 3, 4]);
 }
