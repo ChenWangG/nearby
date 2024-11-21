@@ -6,7 +6,7 @@ use np_adv::credential::matched::EmptyMatchedCredential;
 use np_adv::extended::deserialize::Section;
 use event_poller::{EventPoller, EventProcessor, EventWriter};
 use crate::scan_provider::ble_scan_provider::BleScanProvider;
-use crate::client::{DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
+use crate::client::{DataElement, DiscoveryCallback, DiscoveryRequest, DiscoveryResult};
 use crate::scan_provider::{ScanProvider, ScanRequest, ScanResult};
 
 pub fn create<C: DiscoveryCallback>() -> (Engine, EventPoller<EngineProcessor<C>>) {
@@ -100,14 +100,16 @@ impl<C: DiscoveryCallback> EngineProcessor<C> {
                 .expect("Should be V1");
         println!("[PresenceRust]Print NP Advertisement.");
         info!("[PresenceRust]Print NP Advertisement.");
+        let mut data_elements = Vec::new();
         for section in contents.sections().collect::<Vec<_>>() {
             for data_element in section.iter_data_elements().collect::<Result<Vec<_>, _>>().unwrap() {
                 println!("[PresenceRust] {:?}", data_element.de_type());
                 println!("[PresenceRust] {:?}", data_element.contents());
                 info!("[PresenceRust] {:?}", data_element.de_type());
                 info!("[PresenceRust] {:?}", data_element.contents());
+                data_elements.push(DataElement::new(data_element.de_type().as_u32(), Vec::from(data_element.contents())));
             }
         }
-        self.discovery_callback.as_mut().unwrap().on_update(DiscoveryResult::new(result.service_data().clone()));
+        self.discovery_callback.as_mut().unwrap().on_update(DiscoveryResult::new(data_elements));
     }
 }

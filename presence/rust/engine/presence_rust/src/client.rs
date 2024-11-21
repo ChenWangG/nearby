@@ -65,18 +65,31 @@ impl Device {
         Self { actions }
     }
 }
+
+#[derive(Debug)]
+pub struct DataElement {
+    de_type: u32,
+    content: Vec<u8>,
+
+}
+
+impl DataElement {
+   pub fn new(de_type: u32, content: Vec<u8>) -> Self {
+      Self {de_type, content }
+   }
+}
 #[derive(Debug)]
 pub struct DiscoveryResult{
-    service_data: Vec<u8>,
+    data_elements: Vec<DataElement>,
 }
 
 impl DiscoveryResult {
-    pub fn new(service_data: Vec<u8>) -> Self {
-        Self { service_data }
+    pub fn new(data_elements: Vec<DataElement>) -> Self {
+        Self { data_elements }
     }
 
-    pub fn service_data(&self) -> &Vec<u8> {
-       &self.service_data
+    pub fn data_elements(&self) -> &Vec<DataElement> {
+       &(self.data_elements)
     }
 }
 

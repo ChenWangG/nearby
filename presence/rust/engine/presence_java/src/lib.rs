@@ -28,9 +28,9 @@ struct Callback {
 impl DiscoveryCallback for Callback {
     fn on_update(&self, result: DiscoveryResult) {
         info!("(PresenceRust) DiscoveryCallback on_update");
-        info!("(PresenceRust) {}", result.service_data().len());
-        for data in result.service_data() {
-            info!("(PresenceRust) {:08b}", data)
+        info!("(PresenceRust) {}", result.data_elements().len());
+        for de in result.data_elements() {
+            info!("(PresenceRust) {:?}", de)
         }
         let addr = 1 as jlong;
         self.jvm.get_env().unwrap().call_method(
