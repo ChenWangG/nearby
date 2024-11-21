@@ -2,6 +2,7 @@ package com.google.nearby.presence;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DiscoveryResult {
   public static class Builder {
@@ -9,10 +10,15 @@ public class DiscoveryResult {
       dataElements = new ArrayList<DataElement>();
     }
 
+    public void addDataElement(int type, byte[] content) {
+      System.out.println("Add DE type: " + type + "content " + Arrays.toString(content));
+      this.dataElements.add(new DataElement(type, content));
+    }
+
     private ArrayList<DataElement> dataElements;
   }
 
-  public class DataElement {
+  public static class DataElement {
     public DataElement(int type, byte[] content) {
       this.type = type;
       this.content = content;
