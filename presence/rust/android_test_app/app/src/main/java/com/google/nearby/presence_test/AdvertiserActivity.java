@@ -16,7 +16,6 @@ public class AdvertiserActivity extends BtActivity {
 
   private Button advertiseButton;
   private boolean isAdvertising = false;
-  private TextView textView;
 
   @SuppressLint("SetTextI18n")
   @Override

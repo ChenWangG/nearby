@@ -67,7 +67,9 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
     try {
       assert leAdvertiser != null;
       leAdvertiser.startAdvertising(settings, advertiseData, scanResponse, callback);
+      log("Succeeded to start BLE advertisement.");
     } catch (NullPointerException | IllegalStateException | SecurityException e) {
+      log("Failed to start BLE advertisement.");
       Log.e(TAG, "Failed to start broadcast with Exception: " + e.toString());
     }
   }
@@ -76,9 +78,10 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
   @Override
   @SuppressLint({"MissingPermission"})
   public void stop() {
-    Log.i(TAG, "stop BLE advertise.");
+    Log.i(TAG, "stop BLE advertisement.");
     assert leAdvertiser != null;
     leAdvertiser.stopAdvertising(callback);
+    log("Stopped BLE advertisement.");
   }
   private byte[] getServiceData() {
     return new byte[] {
