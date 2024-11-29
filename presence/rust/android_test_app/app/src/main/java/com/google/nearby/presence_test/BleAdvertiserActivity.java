@@ -15,6 +15,8 @@ import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.os.ParcelUuid;
 import android.util.Log;
 import androidx.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class BleAdvertiserActivity extends AdvertiserActivity {
 
@@ -59,15 +61,17 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
             .setConnectable(false)
             .build();
 
+    // TODO: switch back to getServiceData().
     AdvertiseData advertiseData =  new AdvertiseData.Builder()
-        .addServiceData(Constants.PRESENCE_SERVICE_DATA_UUID, getServiceData())
+        .addServiceData(Constants.PRESENCE_SERVICE_DATA_UUID, getTestData())
         .build();
 
     AdvertiseData scanResponse = new AdvertiseData.Builder().build();
     try {
       assert leAdvertiser != null;
       leAdvertiser.startAdvertising(settings, advertiseData, scanResponse, callback);
-      log("Succeeded to start BLE advertisement.");
+      log("Succeeded to start BLE advertisement with service data: " +
+          advertiseData.getServiceData().toString());
     } catch (NullPointerException | IllegalStateException | SecurityException e) {
       log("Failed to start BLE advertisement.");
       Log.e(TAG, "Failed to start broadcast with Exception: " + e.toString());
@@ -82,6 +86,13 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
     assert leAdvertiser != null;
     leAdvertiser.stopAdvertising(callback);
     log("Stopped BLE advertisement.");
+  }
+  private byte[] getTestData() {
+    // return "abcefghijklmnopqrst".getBytes(StandardCharsets.UTF_8);
+    // Max bytes to be received by iOS is 24.
+    byte[] bytes = new byte[24];
+    Arrays.fill( bytes, (byte) 3 );
+    return bytes;
   }
   private byte[] getServiceData() {
     return new byte[] {
