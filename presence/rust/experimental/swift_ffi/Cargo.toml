@@ -1,0 +1,10 @@
+[package]
+name = "swift_ffi"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "swift_ffi"
+crate-type = ["staticlib"]
+
+[dependencies]
