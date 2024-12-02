@@ -52,10 +52,6 @@ pub trait Scanner: Send + 'static {
 use jni::objects::GlobalRef;
 #[cfg(target_os = "android")]
 use jni::{JavaVM};
-#[cfg(target_os = "android")]
-pub struct ScanCallbackBox {
-    scan_callback: Box<dyn ScanCallback>,
-}
 
 #[cfg(target_os = "android")]
 pub struct BleScanner {

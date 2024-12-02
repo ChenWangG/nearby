@@ -1,5 +1,5 @@
 use crate::scan_result::ScanResult;
-use crate::{BleScanRequest, BleScanResult, BleScanner, ScanCallback, ScanCallbackBox, Scanner};
+use crate::{BleScanRequest, BleScanResult, BleScanner, ScanCallback, Scanner};
 use jni::objects::{GlobalRef, JClass};
 use jni::sys::jlong;
 use jni::{JNIEnv, JavaVM};
@@ -8,6 +8,10 @@ use log::{debug, info};
 static BLE_CLASS: &str = "com/google/nearby/ble/BleScanner";
 static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/ble/BleScanner;";
 static START_SIGNATURE: &str = "(J)V";
+
+pub struct ScanCallbackBox {
+    scan_callback: Box<dyn ScanCallback>,
+}
 
 impl Scanner for BleScanner {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {

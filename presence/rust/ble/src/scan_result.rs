@@ -3,7 +3,7 @@ use jni::objects::JClass;
 use jni::objects::JByteArray;
 use jni::sys::jlong;
 use log::{debug, info};
-use crate::{BleScanResult, ScanCallbackBox};
+use crate::BleScanResult;
 use jni::objects::ReleaseMode;
 
 pub struct ScanResult {
