@@ -1,4 +1,0 @@
-module SwiftFFI {
-  header "swift_ffi.h"
-  export *
-}
