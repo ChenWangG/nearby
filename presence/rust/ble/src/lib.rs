@@ -1,12 +1,4 @@
-mod android;
 mod scan_result;
-
-use jni::objects::GlobalRef;
-use jni::{JavaVM};
-
-static BLE_CLASS: &str = "com/google/nearby/ble/BleScanner";
-static BUILD_SIGNATURE: &str = "()Lcom/google/nearby/ble/BleScanner;";
-static START_SIGNATURE: &str = "(J)V";
 pub struct BleScanRequest {
     uuid: String,
     priority: i32,
@@ -56,11 +48,19 @@ pub trait Scanner: Send + 'static {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback);
 }
 
+#[cfg(target_os = "android")]
+use jni::objects::GlobalRef;
+#[cfg(target_os = "android")]
+use jni::{JavaVM};
+#[cfg(target_os = "android")]
 pub struct ScanCallbackBox {
     scan_callback: Box<dyn ScanCallback>,
 }
 
+#[cfg(target_os = "android")]
 pub struct BleScanner {
     jvm: JavaVM,
     java_ble_scanner: GlobalRef,
 }
+#[cfg(target_os = "android")]
+mod android;
