@@ -1,0 +1,2 @@
+Run:
+  cbindgen --lang c --output include/swift_ffi.h
