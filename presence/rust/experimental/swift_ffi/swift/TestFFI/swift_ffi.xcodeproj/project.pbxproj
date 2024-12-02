@@ -1,0 +1,608 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		2366797A87C81B307DDADC95 /* ZERO_CHECK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = CE58A1BB8C264584989A5E15 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+			buildPhases = (
+				266CB5145A568AD275813AD1 /* Generate CMakeFiles/ZERO_CHECK */,
+			);
+			dependencies = (
+			);
+			name = ZERO_CHECK;
+			productName = ZERO_CHECK;
+		};
+		3E47954C235C8B12EC50123D /* ALL_BUILD */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 4E8A9767EDB8490FBEF365A1 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+			buildPhases = (
+				434465B40032C27F9A8A4569 /* Generate CMakeFiles/ALL_BUILD */,
+			);
+			dependencies = (
+			);
+			name = ALL_BUILD;
+			productName = ALL_BUILD;
+		};
+		D85BF3E897EC8D46030CDDB5 /* swift_ffi */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 1567AE64F508401BAC55E944 /* Build configuration list for PBXAggregateTarget "swift_ffi" */;
+			buildPhases = (
+				6147242BBCAA24D6247032F1 /* Generate CMakeFiles/swift_ffi */,
+			);
+			dependencies = (
+				72835FF0BBEF4E20B6A5B00B /* PBXTargetDependency */,
+			);
+			name = swift_ffi;
+			productName = swift_ffi;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		5C5CB3108E4F415EB95AA39A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7ABC4B9FAA0F4A6BA9EA2E75 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2366797A87C81B307DDADC95;
+			remoteInfo = ZERO_CHECK;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		210673E75F8B4DE785B69C45 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		74A15A50A1314E7AB9DA1874 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0013B18FD3AC4C12B380A0B7 /* swift_ffi */ = {
+			isa = PBXGroup;
+			children = (
+				9505FFA421B040768BF084C1 /* CMake Rules */,
+				210673E75F8B4DE785B69C45 /* CMakeLists.txt */,
+			);
+			name = swift_ffi;
+			sourceTree = "<group>";
+		};
+		06B75DDF38E14487AA0112EC /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		62BB580DB88F45E7A0462C32 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		81B6F396156045F5A97FDD38 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8D0D80816B8B47F0AEA399A5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		9505FFA421B040768BF084C1 /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+		D898D64E47B940C69D4046AC = {
+			isa = PBXGroup;
+			children = (
+				0013B18FD3AC4C12B380A0B7 /* swift_ffi */,
+				E9C61AFD2E5C44BB81957EC3 /* ALL_BUILD */,
+				81B6F396156045F5A97FDD38 /* Products */,
+				62BB580DB88F45E7A0462C32 /* Frameworks */,
+				8D0D80816B8B47F0AEA399A5 /* Resources */,
+			);
+			sourceTree = "<group>";
+		};
+		E9C61AFD2E5C44BB81957EC3 /* ALL_BUILD */ = {
+			isa = PBXGroup;
+			children = (
+				06B75DDF38E14487AA0112EC /* CMake Rules */,
+				74A15A50A1314E7AB9DA1874 /* CMakeLists.txt */,
+			);
+			name = ALL_BUILD;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		7ABC4B9FAA0F4A6BA9EA2E75 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1610;
+			};
+			buildConfigurationList = 3C61A34C9B1B45E381D747D5 /* Build configuration list for PBXProject "swift_ffi" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D898D64E47B940C69D4046AC;
+			projectDirPath = /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi;
+			projectRoot = "";
+			targets = (
+				3E47954C235C8B12EC50123D /* ALL_BUILD */,
+				2366797A87C81B307DDADC95 /* ZERO_CHECK */,
+				D85BF3E897EC8D46030CDDB5 /* swift_ffi */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		266CB5145A568AD275813AD1 /* Generate CMakeFiles/ZERO_CHECK */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate CMakeFiles/ZERO_CHECK";
+			outputPaths = (
+				/Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/CMakeFiles/ZERO_CHECK,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nif test \"$CONFIGURATION\" = \"Debug\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  make -f /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/CMakeScripts/ReRunCMake.make\nfi\nif test \"$CONFIGURATION\" = \"Release\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  make -f /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/CMakeScripts/ReRunCMake.make\nfi\nif test \"$CONFIGURATION\" = \"MinSizeRel\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  make -f /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/CMakeScripts/ReRunCMake.make\nfi\nif test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  make -f /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/CMakeScripts/ReRunCMake.make\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		434465B40032C27F9A8A4569 /* Generate CMakeFiles/ALL_BUILD */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate CMakeFiles/ALL_BUILD";
+			outputPaths = (
+				/Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/CMakeFiles/ALL_BUILD,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nif test \"$CONFIGURATION\" = \"Debug\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  echo Build\\ all\\ projects\nfi\nif test \"$CONFIGURATION\" = \"Release\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  echo Build\\ all\\ projects\nfi\nif test \"$CONFIGURATION\" = \"MinSizeRel\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  echo Build\\ all\\ projects\nfi\nif test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build\n  echo Build\\ all\\ projects\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		6147242BBCAA24D6247032F1 /* Generate CMakeFiles/swift_ffi */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate CMakeFiles/swift_ffi";
+			outputPaths = (
+				/Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/CMakeFiles/swift_ffi,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nif test \"$CONFIGURATION\" = \"Debug\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi\n  CARGO_TARGET_DIR=/Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build /Users/chenw/.cargo/bin/cargo build --release --lib --target aarch64-apple-ios\n  rm -rf /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\n  xcodebuild -create-xcframework -library /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/aarch64-apple-ios/release/libswift_ffi.a -headers ./include/ -output /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\nfi\nif test \"$CONFIGURATION\" = \"Release\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi\n  CARGO_TARGET_DIR=/Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build /Users/chenw/.cargo/bin/cargo build --release --lib --target aarch64-apple-ios\n  rm -rf /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\n  xcodebuild -create-xcframework -library /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/aarch64-apple-ios/release/libswift_ffi.a -headers ./include/ -output /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\nfi\nif test \"$CONFIGURATION\" = \"MinSizeRel\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi\n  CARGO_TARGET_DIR=/Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build /Users/chenw/.cargo/bin/cargo build --release --lib --target aarch64-apple-ios\n  rm -rf /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\n  xcodebuild -create-xcframework -library /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/aarch64-apple-ios/release/libswift_ffi.a -headers ./include/ -output /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\nfi\nif test \"$CONFIGURATION\" = \"RelWithDebInfo\"; then :\n  cd /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi\n  CARGO_TARGET_DIR=/Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build /Users/chenw/.cargo/bin/cargo build --release --lib --target aarch64-apple-ios\n  rm -rf /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\n  xcodebuild -create-xcframework -library /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/aarch64-apple-ios/release/libswift_ffi.a -headers ./include/ -output /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/SwiftFFI.xcframework\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		72835FF0BBEF4E20B6A5B00B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2366797A87C81B307DDADC95 /* ZERO_CHECK */;
+			targetProxy = 5C5CB3108E4F415EB95AA39A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		093C8697136D4F0498F41194 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = RelWithDebInfo;
+		};
+		1718917D8106428AA3972B57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				MACOSX_DEPLOYMENT_TARGET = 14.7;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/build;
+			};
+			name = Release;
+		};
+		189CD100ED1F46AA9ADF5F41 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				MACOSX_DEPLOYMENT_TARGET = 14.7;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/build;
+			};
+			name = MinSizeRel;
+		};
+		1C00D6CD1C0E4D81B5FCA814 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = swift_ffi;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = Debug;
+		};
+		2DCCBE1BD3E046A2B51A056C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = Release;
+		};
+		300EBA96A6744167888FE708 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = Release;
+		};
+		63BB4309B08845D68FB14C00 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = swift_ffi;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = MinSizeRel;
+		};
+		6A4E86C6B843482F8039CE0C /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = MinSizeRel;
+		};
+		7D91F6B2D01B4DC7940FEFF7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				MACOSX_DEPLOYMENT_TARGET = 14.7;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk;
+				SYMROOT = /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/build;
+			};
+			name = Debug;
+		};
+		850D9744D93343E6A9996388 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = MinSizeRel;
+		};
+		8B2E48F50DFC4A82BF41C56A /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = swift_ffi;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = RelWithDebInfo;
+		};
+		9B99AAF4BD0D452AA8B35930 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = Debug;
+		};
+		AC99393AD4104A33932CB75E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = Debug;
+		};
+		B138AE0ACB084366B1B39E9B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = swift_ffi;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = Release;
+		};
+		E841D217214247058BD5F3D9 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				MACOSX_DEPLOYMENT_TARGET = 14.7;
+				SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SYMROOT = /Users/chenw/git_repo/nearby/presence/rust/experimental/swift_ffi/build/build;
+			};
+			name = RelWithDebInfo;
+		};
+		F22CF68DB9DD4F58A2E4D58E /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = " $(inherited)";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "$(inherited)";
+			};
+			name = RelWithDebInfo;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1567AE64F508401BAC55E944 /* Build configuration list for PBXAggregateTarget "swift_ffi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C00D6CD1C0E4D81B5FCA814 /* Debug */,
+				B138AE0ACB084366B1B39E9B /* Release */,
+				63BB4309B08845D68FB14C00 /* MinSizeRel */,
+				8B2E48F50DFC4A82BF41C56A /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3C61A34C9B1B45E381D747D5 /* Build configuration list for PBXProject "swift_ffi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D91F6B2D01B4DC7940FEFF7 /* Debug */,
+				1718917D8106428AA3972B57 /* Release */,
+				189CD100ED1F46AA9ADF5F41 /* MinSizeRel */,
+				E841D217214247058BD5F3D9 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4E8A9767EDB8490FBEF365A1 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B99AAF4BD0D452AA8B35930 /* Debug */,
+				2DCCBE1BD3E046A2B51A056C /* Release */,
+				850D9744D93343E6A9996388 /* MinSizeRel */,
+				093C8697136D4F0498F41194 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CE58A1BB8C264584989A5E15 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC99393AD4104A33932CB75E /* Debug */,
+				300EBA96A6744167888FE708 /* Release */,
+				6A4E86C6B843482F8039CE0C /* MinSizeRel */,
+				F22CF68DB9DD4F58A2E4D58E /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7ABC4B9FAA0F4A6BA9EA2E75 /* Project object */;
+}
