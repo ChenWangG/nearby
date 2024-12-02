@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
 
     // Default to test Presence V1.
     ((RadioButton) findViewById(R.id.radio_presence_v1)).setChecked(true);
-    setBroadCastScanActivities(BleAdvertiserActivity.class, PresenceScannerActivity.class);
+    setBroadCastScanActivities(PresenceAdvertiserActivity.class, PresenceScannerActivity.class);
 
     requestPermissions(
         new String[]{ BLUETOOTH_ADVERTISE, BLUETOOTH_SCAN,  BLUETOOTH_CONNECT, BLUETOOTH },
@@ -49,13 +49,13 @@ public class MainActivity extends Activity {
     }
     if (view.getId() == R.id.radio_presence_v1) {
       setBroadCastScanActivities(
-          BleAdvertiserActivity.class, PresenceScannerActivity.class);
+          PresenceAdvertiserActivity.class, PresenceScannerActivity.class);
     } else if (view.getId() == R.id.radio_ble_api) {
         setBroadCastScanActivities(
             BleAdvertiserActivity.class, ScannerActivity.class);
     } else if (view.getId() == R.id.radio_ble_rust_api) {
       setBroadCastScanActivities(
-          AdvertiserActivity.class, BleRustScannerActivity.class);
+          BleAdvertiserActivity.class, BleRustScannerActivity.class);
     }
   }
   @Override

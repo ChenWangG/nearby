@@ -63,7 +63,7 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
 
     // TODO: switch back to getServiceData().
     AdvertiseData advertiseData =  new AdvertiseData.Builder()
-        .addServiceData(Constants.PRESENCE_SERVICE_DATA_UUID, getTestData())
+        .addServiceData(Constants.PRESENCE_SERVICE_DATA_UUID, getServiceData())
         .build();
 
     AdvertiseData scanResponse = new AdvertiseData.Builder().build();
@@ -87,20 +87,11 @@ public class BleAdvertiserActivity extends AdvertiserActivity {
     leAdvertiser.stopAdvertising(callback);
     log("Stopped BLE advertisement.");
   }
-  private byte[] getTestData() {
+  protected byte[] getServiceData() {
     // return "abcefghijklmnopqrst".getBytes(StandardCharsets.UTF_8);
     // Max bytes to be received by iOS is 24.
     byte[] bytes = new byte[24];
     Arrays.fill( bytes, (byte) 3 );
     return bytes;
-  }
-  private byte[] getServiceData() {
-    return new byte[] {
-        0b00100000,
-        0b00000000,
-        0b00000010,
-        0b00010101,
-        0b00000110,
-    };
   }
 }

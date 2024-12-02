@@ -13,6 +13,8 @@
         android:parentActivityName=".MainActivity"/>
     <activity android:name=".BleAdvertiserActivity"
         android:parentActivityName=".MainActivity"/>
+    <activity android:name=".PresenceAdvertiserActivity"
+        android:parentActivityName=".MainActivity"/>
     <activity android:name=".ScannerActivity"
         android:parentActivityName=".MainActivity"/>
     <activity android:name=".PresenceScannerActivity"
