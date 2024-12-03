@@ -48,10 +48,10 @@ pub trait Scanner: Send + 'static {
     fn start(&self, request: BleScanRequest, callback: impl ScanCallback);
 }
 
-#[cfg(target_os = "android")]
-use jni::objects::GlobalRef;
-#[cfg(target_os = "android")]
-use jni::{JavaVM};
+
+#[cfg(target_os = "ios")]
+pub struct BleScanner {
+}
 
 #[cfg(target_os = "android")]
 pub struct BleScanner {
