@@ -1,0 +1,8 @@
+Directory to FFI BLE test to iOS.
+
+To generate the .h
+   # cd to the crate root.
+   cd ..
+   # run cbindgen with config.
+   cbindgen --config swift/cbindgen.toml --lang c --output swift/include/swift_ffi.h
+
