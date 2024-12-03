@@ -50,7 +50,12 @@ pub trait Scanner: Send + 'static {
 
 
 #[cfg(target_os = "ios")]
+mod swift;
+#[cfg(target_os = "ios")]
+pub type SwiftStartBleScan = fn();
+#[cfg(target_os = "ios")]
 pub struct BleScanner {
+    swift_start_ble_scan: SwiftStartBleScan,
 }
 
 #[cfg(target_os = "android")]
