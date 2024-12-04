@@ -11,22 +11,23 @@ class SwiftBleScanner : NSObject {
     private var centralManager: CBCentralManager!
     private var scanningTimer: Timer?
     private var rustBleScanner: OpaquePointer?
+    private var rustBleScanCallback: UnsafeMutableRawPointer?
 
     override init() {
         print("Init BLE Scanner.")
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
-        rustBleScanner = ble_scanner_new({
-            () -> () in
-            os_log("Rust calll Swift BLE Scan API.");
+        rustBleScanner = ble_scanner_new({ callback -> () in
+            os_log("BLE scan start called from Swift to Rust.")
         })
+        
     }
 
     func startScanning() {
         ble_scanner_start(rustBleScanner)
-        scanningTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(20), repeats: false, block: { (_) in
-            self.stopScanning()
-        })
+        // scanningTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(20), repeats: false, block: { (_) in
+        //     self.stopScanning()
+        // })
         centralManager.scanForPeripherals(withServices: [ SwiftBleScanner.serviceUUID ], options: nil)
         os_log("BLE scan started", log: SwiftBleScanner.log, type: .info)
     }
@@ -54,6 +55,8 @@ extension SwiftBleScanner : CBCentralManagerDelegate {
                 let serviceData = value as! [CBUUID : NSData]
                 for (uuid, data) in serviceData {
                     os_log("Advertisement data: %{public}s: %{public}s", log: SwiftBleScanner.log, type: .info, uuid.uuidString, data.debugDescription)
+                    let scanResult = scan_result_new(data.bytes, UInt32(data.length))
+                    ble_scanner_on_result(rustBleScanner, scanResult)
                 }
             }
         }

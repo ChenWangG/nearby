@@ -7,10 +7,7 @@ struct TestBleCallback;
 
 impl ScanCallback for TestBleCallback {
     fn on_update(&self, result: BleScanResult) {
-        info!("on_upate: BleScanResult.");
-        for data in result.service_data() {
-            debug!("{}", data);
-        }
+        info!("on_upate: BleScanResult: {:?} ", result);
     }
 }
 

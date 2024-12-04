@@ -3,22 +3,8 @@ use jni::objects::JClass;
 use jni::objects::JByteArray;
 use jni::sys::jlong;
 use log::{debug, info};
-use crate::BleScanResult;
+use crate::{BleScanResult, ScanResult};
 use jni::objects::ReleaseMode;
-
-pub struct ScanResult {
-    service_data: Vec<u8>,
-}
-
-impl ScanResult {
-    pub fn new(service_data: Vec<u8>) -> Self {
-        ScanResult { service_data }
-    }
-
-    pub fn service_data(&self) -> &Vec<u8> {
-        &(self.service_data)
-    }
-}
 
 #[no_mangle]
 #[allow(non_snake_case)]
