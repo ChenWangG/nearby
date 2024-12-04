@@ -3,4 +3,13 @@ name = "presence_swift"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+crate-type = ["lib", "cdylib"]
+
 [dependencies]
+presence_rust = { path = "../presence_rust" }
+jni = "0.21.1"
+log = "0.4.22"
+env_logger = "0.11.5"
+oslog = "0.2.0"
+ble = { path = "../../ble" }

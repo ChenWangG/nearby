@@ -15,7 +15,7 @@ pub const SERVICE_DATA: &[u8] = &[
 pub struct BleScanner;
 
 impl Scanner for BleScanner {
-    fn start(&self, request: BleScanRequest, callback: impl ScanCallback) {
+    fn start(&mut self, request: BleScanRequest, callback: impl ScanCallback) {
         info!("(PresenceRust) Mock BLE Scanner start.");
         assert_eq!(request.uuid(), UUID);
         assert_eq!(request.priority(), 100);
