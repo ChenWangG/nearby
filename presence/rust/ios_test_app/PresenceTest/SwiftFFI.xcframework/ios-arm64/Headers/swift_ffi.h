@@ -5,14 +5,16 @@
 #include <stdlib.h>
 
 
+#if defined(DEFINE_IOS)
 typedef struct BleScanner BleScanner;
+#endif
 
 typedef struct BleScanner BleScanner;
 
+#if defined(DEFINE_IOS)
 typedef void (*SwiftStartBleScan)(void);
+#endif
 
+#if defined(DEFINE_IOS)
 struct BleScanner *ble_scanner_new(SwiftStartBleScan swift_start_ble_scan);
-
-void ble_scanner_start(struct BleScanner *ble_scanner);
-
-void rust_object_test(void);
+#endif

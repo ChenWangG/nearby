@@ -55,7 +55,7 @@ mod swift;
 pub type SwiftStartBleScan = fn();
 #[cfg(target_os = "ios")]
 pub struct BleScanner {
-    swift_start_ble_scan: SwiftStartBleScan,
+    pub swift_start_ble_scan: SwiftStartBleScan,
 }
 
 #[cfg(target_os = "android")]

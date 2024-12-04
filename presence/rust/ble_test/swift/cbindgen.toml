@@ -54,8 +54,6 @@ usize_is_size_t = true
 [defines]
 # "target_os = freebsd" = "DEFINE_FREEBSD"
 # "feature = serde" = "DEFINE_SERDE"
-"target_os = ios" = "DEFINE_IOS"
-
 
 [export]
 include = []
