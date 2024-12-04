@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
 members = [
-    "presence_java",
     "presence_rust",
+    "presence_java", "presence_swift",
 ]
