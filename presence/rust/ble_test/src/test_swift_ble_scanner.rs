@@ -1,8 +1,18 @@
 use std::ptr::null_mut;
-use ble::BleScanner;
+use ble::{BleScanRequest, BleScanResult, BleScanner, ScanCallback, Scanner};
 use ble::SwiftStartBleScan;
-use log::{info, LevelFilter};
+use log::{debug, info, LevelFilter};
 use oslog::OsLogger;
+struct TestBleCallback;
+
+impl ScanCallback for TestBleCallback {
+    fn on_update(&self, result: BleScanResult) {
+        info!("on_upate: BleScanResult.");
+        for data in result.service_data() {
+            debug!("{}", data);
+        }
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn ble_scanner_new(swift_start_ble_scan: SwiftStartBleScan) -> *mut BleScanner {
@@ -11,14 +21,15 @@ pub extern "C" fn ble_scanner_new(swift_start_ble_scan: SwiftStartBleScan) -> *m
         .level_filter(LevelFilter::Debug)
         .init()
         .unwrap();
-    info!("new Rust BLE Scanner.");
+    info!("[test_swift_ble_scanner] ble_scanner_new.");
     Box::into_raw(Box::new(BleScanner::new(swift_start_ble_scan)))
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn ble_scanner_start(ble_scanner: *mut BleScanner) {
-    info!("start scanner.");
-    ((*ble_scanner).swift_start_ble_scan)();
+    info!("[test_swift_ble_scanner] ble_scanner.start.");
+    let scan_request = BleScanRequest::new(String::from("0000"), 1);
+    (*ble_scanner).start(scan_request, TestBleCallback{});
 }
 
 #[no_mangle]
