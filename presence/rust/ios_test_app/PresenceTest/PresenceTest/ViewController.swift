@@ -18,6 +18,11 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         print("Start Presence test.")
         rustPresence = presence_new()
+        
+        let iosPresence = IosPresence()
+        let rawPtr = iosPresence.ptrToSelf()
+        let ptr: Unmanaged<IosPresence> =  Unmanaged.fromOpaque(rawPtr)
+        ptr.takeUnretainedValue().print()
     }
 }
 
