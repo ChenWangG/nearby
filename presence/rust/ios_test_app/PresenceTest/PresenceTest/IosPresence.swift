@@ -24,6 +24,16 @@ class IosPresence  {
         })
     }
     
+    func start() {
+        os_log("Start Presence runtime.");
+        presence_start(rustPresence!)
+    }
+    
+    func set_request() {
+        os_log("Set Presence request.");
+        presence_set_request(rustPresence!)
+    }
+    
     func print() {
         os_log("print");
     }

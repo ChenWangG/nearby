@@ -5,7 +5,7 @@ import PresenceFFI
 
 class SwiftBleScanner : NSObject {
 
-    static let serviceUUID = CBUUID(string: "FF01")
+    static let serviceUUID = CBUUID(string: "FF07")
     static let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "Scanner")
 
     private var centralManager: CBCentralManager!
@@ -59,8 +59,10 @@ extension SwiftBleScanner : CBCentralManagerDelegate {
                 let serviceData = value as! [CBUUID : NSData]
                 for (uuid, data) in serviceData {
                     os_log("Advertisement data: %{public}s: %{public}s", log: SwiftBleScanner.log, type: .info, uuid.uuidString, data.debugDescription)
-                    // let scanResult = scan_result_new(data.bytes, UInt32(data.length))
-                    // ble_scanner_on_result(rustBleScanner, scanResult)
+                    let scanResult = scan_result_new(data.bytes, UInt32(data.length))
+                    if rustBleScanCallback != nil {
+                        ble_scanner_on_result(rustBleScanCallback, scanResult)
+                    }
                 }
             }
         }

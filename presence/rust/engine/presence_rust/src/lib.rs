@@ -49,7 +49,7 @@ impl<C: DiscoveryCallback, S: Scanner> Runtime<C, S> {
     }
 
     pub fn start(self) {
-        println!("Runtime start.");
+        info!("Runtime start.");
         async_block_on(async move {
             let results = future::join_all(vec![
                 self.ble_scan_poller.start(),

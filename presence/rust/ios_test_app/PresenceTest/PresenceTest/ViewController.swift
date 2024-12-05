@@ -17,6 +17,16 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         print("Start Presence test.")
         iosPresence = IosPresence()
+        DispatchQueue.global(qos: .userInitiated).async {
+            os_log("start run on backkground queue")
+            self.iosPresence?.start()
+
+            DispatchQueue.main.async {
+                os_log("start run on main queue")
+            }
+        }
+        os_log("Continue after starting background queue")
+        self.iosPresence?.set_request()
     }
 }
 

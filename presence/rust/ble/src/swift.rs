@@ -13,14 +13,17 @@ impl Scanner for BleScanner {
     fn start(&mut self, request: BleScanRequest, callback: impl ScanCallback) {
         info!("BleScanner.start()");
         // let callback = (Box::new(callback));
-        (self.swift_start_ble_scan)(self.ios_presence, Box::into_raw(Box::new(callback)) as *mut c_void);
+        let callback_boxed: Box<dyn ScanCallback> = Box::new(callback);
+        let callback_ptr = Box::into_raw(Box::new(callback_boxed));
+        (self.swift_start_ble_scan)(self.ios_presence, callback_ptr as *mut c_void);
     }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn ble_scanner_on_result(scan_callback: *mut dyn ScanCallback,
+pub unsafe extern "C" fn ble_scanner_on_result(scan_callback: *mut c_void,
                                                scan_result: *mut ScanResult) {
     info!("ble_scanner_on_result.");
+    let scan_callback = scan_callback as *mut Box<dyn ScanCallback>;
     let ble_scan_result = BleScanResult::new(1, (*scan_result).service_data.clone());
     (*scan_callback).on_update(ble_scan_result);
 }
