@@ -21,6 +21,11 @@ class SwiftBleScanner : NSObject {
         //    os_log("BLE scan start called from Swift to Rust.")
         // })
     }
+    
+    func setRustBleScanCallback(callback: UnsafeMutableRawPointer) {
+        os_log("set Rust Ble scan callback.")
+        rustBleScanCallback = callback
+    }
 
     func startScanning() {
         // ble_scanner_start(rustBleScanner)

@@ -25,7 +25,6 @@ struct PresenceRust {
     runtime: *mut Runtime<Callback, BleScanner>,
 }
 
-fn swift_start_ble_scan(result: *mut std::ffi::c_void) {}
 #[no_mangle]
 pub extern "C" fn presence_new(ios_presence: *mut std::ffi::c_void, swift_start_ble_scan: SwiftStartBleScan) -> *mut PresenceRust  {
     // TODO toggle on metadata in Xcode log view to show the log source.
@@ -35,9 +34,7 @@ pub extern "C" fn presence_new(ios_presence: *mut std::ffi::c_void, swift_start_
         .unwrap();
     info!("presence_new.");
 
-    swift_start_ble_scan(ios_presence);
-
-    let ble_scanner = BleScanner::new(swift_start_ble_scan);
+    let ble_scanner = BleScanner::new(ios_presence, swift_start_ble_scan);
     let (client, runtime) = presence_rust::create(ble_scanner);
     let presence_rust = PresenceRust{
         client: Box::into_raw(Box::new(client)),

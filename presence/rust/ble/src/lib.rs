@@ -1,3 +1,5 @@
+use  std::ffi::c_void;
+
 mod scan_result;
 pub struct BleScanRequest {
     uuid: String,
@@ -68,14 +70,17 @@ impl ScanResult {
 #[cfg(target_os = "ios")]
 mod swift;
 #[cfg(target_os = "ios")]
-pub type SwiftStartBleScan = fn(* mut std::ffi::c_void);
-// Two pointers: first for the IosBleScanner, second to pass the callback.
+pub type SwiftStartBleScan = fn(* mut c_void, * mut c_void);
+// Two pointers: first for the IosPresence, second to pass the callback.
 #[cfg(target_os = "ios")]
 pub struct BleScanner {
+    // Pointer back to IosScanner through IosPresence.
+    ios_presence: *mut c_void,
     swift_start_ble_scan: SwiftStartBleScan,
-    //  TODO: pass callback through start().
-    callback: Option<Box<dyn ScanCallback>>,
 }
+// Safe to move pointers (raw and function) around.
+#[cfg(target_os = "ios")]
+unsafe impl Send for BleScanner {}
 
 #[cfg(target_os = "android")]
 pub struct BleScanner {

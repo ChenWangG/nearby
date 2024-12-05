@@ -5,17 +5,11 @@
 #include <stdlib.h>
 
 
-typedef struct BleScanner BleScanner;
-
-typedef struct BleScanner BleScanner;
-
 typedef struct PresenceRust PresenceRust;
 
 typedef struct ScanResult ScanResult;
 
-typedef void (*SwiftStartBleScan)(void*);
-
-void ble_scanner_on_result(struct BleScanner *ble_scanner, struct ScanResult *scan_result);
+typedef void (*SwiftStartBleScan)(void*, void*);
 
 struct PresenceRust *presence_new(void *ios_presence, SwiftStartBleScan swift_start_ble_scan);
 
