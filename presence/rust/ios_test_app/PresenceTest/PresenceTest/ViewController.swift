@@ -6,16 +6,18 @@
 //
 
 import UIKit
-import SwiftFFI
 import os.log
+import PresenceFFI
 
 class ViewController: UIViewController {
     var bleScanner: SwiftBleScanner?
+    private var rustPresence: OpaquePointer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        bleScanner = SwiftBleScanner()
+        print("Start Presence test.")
+        rustPresence = presence_new()
     }
 }
 

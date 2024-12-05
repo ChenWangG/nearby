@@ -7,10 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		158E060C2CFFAD830012AE75 /* SwiftFFI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 158E06002CFFABCB0012AE75 /* SwiftFFI.xcframework */; };
+		150FFAAB2D012DC700BACCAE /* PresenceFFI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 150FFAA62D012C5400BACCAE /* PresenceFFI.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		150FFAA42D012BDC00BACCAE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 150FFA9C2D012B7000BACCAE /* presence_swift.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 6401491B20B907B0DEEB6007;
+			remoteInfo = presence_swift_ffi;
+		};
 		1534309E2CFF843C00AB489C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1534307F2CFF843B00AB489C /* Project object */;
@@ -25,16 +32,11 @@
 			remoteGlobalIDString = 153430862CFF843B00AB489C;
 			remoteInfo = PresenceTest;
 		};
-		158E060D2CFFAD900012AE75 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = F3FCFF2C0719B6857F8D2C81;
-			remoteInfo = swift_ffi;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		150FFA9C2D012B7000BACCAE /* presence_swift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = presence_swift.xcodeproj; path = /Users/chenw/git_repo/nearby/presence/rust/engine/presence_swift/swift/build/presence_swift.xcodeproj; sourceTree = "<absolute>"; };
+		150FFAA62D012C5400BACCAE /* PresenceFFI.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PresenceFFI.xcframework; path = ../../engine/presence_swift/swift/build/PresenceFFI.xcframework; sourceTree = "<group>"; };
 		153430872CFF843B00AB489C /* PresenceTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PresenceTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1534309D2CFF843C00AB489C /* PresenceTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PresenceTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		153430A72CFF843D00AB489C /* PresenceTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PresenceTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,7 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				158E060C2CFFAD830012AE75 /* SwiftFFI.xcframework in Frameworks */,
+				150FFAAB2D012DC700BACCAE /* PresenceFFI.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +101,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		150FFA9F2D012B7000BACCAE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		1534307E2CFF843B00AB489C = {
 			isa = PBXGroup;
 			children = (
@@ -108,6 +117,7 @@
 				153430882CFF843B00AB489C /* Products */,
 				153430BD2CFFA38500AB489C /* Frameworks */,
 				158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */,
+				150FFA9C2D012B7000BACCAE /* presence_swift.xcodeproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -124,6 +134,7 @@
 		153430BD2CFFA38500AB489C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				150FFAA62D012C5400BACCAE /* PresenceFFI.xcframework */,
 				158E06002CFFABCB0012AE75 /* SwiftFFI.xcframework */,
 			);
 			name = Frameworks;
@@ -150,7 +161,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				158E060E2CFFAD900012AE75 /* PBXTargetDependency */,
+				150FFAA52D012BDC00BACCAE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				153430892CFF843B00AB489C /* PresenceTest */,
@@ -248,6 +259,10 @@
 					ProductGroup = 158E06072CFFACF20012AE75 /* Products */;
 					ProjectRef = 158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */;
 				},
+				{
+					ProductGroup = 150FFA9F2D012B7000BACCAE /* Products */;
+					ProjectRef = 150FFA9C2D012B7000BACCAE /* presence_swift.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -307,6 +322,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		150FFAA52D012BDC00BACCAE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = presence_swift_ffi;
+			targetProxy = 150FFAA42D012BDC00BACCAE /* PBXContainerItemProxy */;
+		};
 		1534309F2CFF843C00AB489C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 153430862CFF843B00AB489C /* PresenceTest */;
@@ -316,11 +336,6 @@
 			isa = PBXTargetDependency;
 			target = 153430862CFF843B00AB489C /* PresenceTest */;
 			targetProxy = 153430A82CFF843D00AB489C /* PBXContainerItemProxy */;
-		};
-		158E060E2CFFAD900012AE75 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = swift_ffi;
-			targetProxy = 158E060D2CFFAD900012AE75 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

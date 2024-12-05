@@ -1,7 +1,7 @@
 import Foundation
 import CoreBluetooth
 import os.log
-import SwiftFFI
+import PresenceFFI
 
 class SwiftBleScanner : NSObject {
 
@@ -11,20 +11,21 @@ class SwiftBleScanner : NSObject {
     private var centralManager: CBCentralManager!
     private var scanningTimer: Timer?
     private var rustBleScanner: OpaquePointer?
+    private var rustPresence: OpaquePointer?
     private var rustBleScanCallback: UnsafeMutableRawPointer?
 
     override init() {
         print("Init BLE Scanner.")
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
-        rustBleScanner = ble_scanner_new({ callback -> () in
-            os_log("BLE scan start called from Swift to Rust.")
-        })
-        
+        // rustBleScanner = ble_scanner_new({ callback -> () in
+        //    os_log("BLE scan start called from Swift to Rust.")
+        // })
+        rustPresence = presence_new()
     }
 
     func startScanning() {
-        ble_scanner_start(rustBleScanner)
+        // ble_scanner_start(rustBleScanner)
         // scanningTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(20), repeats: false, block: { (_) in
         //     self.stopScanning()
         // })

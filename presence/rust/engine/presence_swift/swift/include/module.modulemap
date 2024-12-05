@@ -1,0 +1,4 @@
+module PresenceFFI {
+  header "presence_ffi.h"
+  export *
+}
