@@ -11,7 +11,6 @@ class SwiftBleScanner : NSObject {
     private var centralManager: CBCentralManager!
     private var scanningTimer: Timer?
     private var rustBleScanner: OpaquePointer?
-    private var rustPresence: OpaquePointer?
     private var rustBleScanCallback: UnsafeMutableRawPointer?
 
     override init() {
@@ -55,8 +54,8 @@ extension SwiftBleScanner : CBCentralManagerDelegate {
                 let serviceData = value as! [CBUUID : NSData]
                 for (uuid, data) in serviceData {
                     os_log("Advertisement data: %{public}s: %{public}s", log: SwiftBleScanner.log, type: .info, uuid.uuidString, data.debugDescription)
-                    let scanResult = scan_result_new(data.bytes, UInt32(data.length))
-                    ble_scanner_on_result(rustBleScanner, scanResult)
+                    // let scanResult = scan_result_new(data.bytes, UInt32(data.length))
+                    // ble_scanner_on_result(rustBleScanner, scanResult)
                 }
             }
         }

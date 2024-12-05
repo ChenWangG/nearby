@@ -3,20 +3,21 @@ import PresenceFFI
 
 class IosPresence  {
     var rustPresence: OpaquePointer?
+    var bleScanner: SwiftBleScanner?
+    
     init() {
         os_log("Init iOS Presence.")
-        let selfPtr = ptrToSelf()
+        bleScanner = SwiftBleScanner()
+        let selfPtr = Unmanaged.passUnretained(self).toOpaque()
         rustPresence = presence_new(selfPtr, { ptr -> () in
             os_log("Rust called Swift.")
-            if ptr != nil {
-                let presencePtr: Unmanaged<IosPresence> =  Unmanaged.fromOpaque(ptr!)
-                presencePtr.takeUnretainedValue().print()            }
+            if ptr == nil { return }
+            
+            let presencePtr: Unmanaged<IosPresence> =  Unmanaged.fromOpaque(ptr!)
+            let presence = presencePtr.takeUnretainedValue()
+            presence.print()
             
         })
-    }
-    
-    func ptrToSelf() -> UnsafeMutableRawPointer {
-        return Unmanaged.passUnretained(self).toOpaque()
     }
     
     func print() {

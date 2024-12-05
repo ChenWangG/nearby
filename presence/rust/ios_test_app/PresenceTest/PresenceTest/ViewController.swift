@@ -10,9 +10,7 @@ import os.log
 import PresenceFFI
 
 class ViewController: UIViewController {
-    var bleScanner: SwiftBleScanner?
-    var iosPresence: IosPresence?
-    private var rustPresence: OpaquePointer?
+    private var iosPresence: IosPresence?
     
     override func viewDidLoad() {
         super.viewDidLoad()
