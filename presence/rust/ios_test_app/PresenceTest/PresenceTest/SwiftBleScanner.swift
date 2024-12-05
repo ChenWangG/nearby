@@ -21,7 +21,6 @@ class SwiftBleScanner : NSObject {
         // rustBleScanner = ble_scanner_new({ callback -> () in
         //    os_log("BLE scan start called from Swift to Rust.")
         // })
-        rustPresence = presence_new()
     }
 
     func startScanning() {

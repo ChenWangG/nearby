@@ -11,18 +11,14 @@ import PresenceFFI
 
 class ViewController: UIViewController {
     var bleScanner: SwiftBleScanner?
+    var iosPresence: IosPresence?
     private var rustPresence: OpaquePointer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         print("Start Presence test.")
-        rustPresence = presence_new()
-        
-        let iosPresence = IosPresence()
-        let rawPtr = iosPresence.ptrToSelf()
-        let ptr: Unmanaged<IosPresence> =  Unmanaged.fromOpaque(rawPtr)
-        ptr.takeUnretainedValue().print()
+        iosPresence = IosPresence()
     }
 }
 
