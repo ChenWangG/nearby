@@ -18,7 +18,6 @@ class IosPresence  {
             
             let presencePtr: Unmanaged<IosPresence> =  Unmanaged.fromOpaque(ptr!)
             let presence = presencePtr.takeUnretainedValue()
-            presence.print()
             presence.bleScanner!.setRustBleScanCallback(callback: rust_callback!)
             
         })
@@ -26,7 +25,12 @@ class IosPresence  {
     
     func start() {
         os_log("Start Presence runtime.");
-        presence_start(rustPresence!)
+        presence_start(rustPresence!) { ptr, action -> () in
+            os_log("On Discovery: %{public}d", action)
+            let presencePtr: Unmanaged<IosPresence> =  Unmanaged.fromOpaque(ptr!)
+            let presence = presencePtr.takeUnretainedValue()
+            presence.print(action: action)
+        }
     }
     
     func set_request() {
@@ -34,8 +38,8 @@ class IosPresence  {
         presence_set_request(rustPresence!)
     }
     
-    func print() {
-        os_log("print");
+    func print(action: UInt32) {
+        os_log("print action: %{public}d", action);
     }
 }
 
