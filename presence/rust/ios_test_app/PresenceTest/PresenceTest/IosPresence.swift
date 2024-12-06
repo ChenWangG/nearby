@@ -1,12 +1,15 @@
 import os.log
 import PresenceFFI
+import UIKit
 
 class IosPresence  {
     var rustPresence: OpaquePointer?
     var bleScanner: SwiftBleScanner?
+    var view: UIView!
     
-    init() {
+    init(view: UIView) {
         os_log("Init iOS Presence.")
+        self.view = view
         bleScanner = SwiftBleScanner()
         let selfPtr = Unmanaged.passUnretained(self).toOpaque()
         rustPresence = presence_new(selfPtr, { ptr, rust_callback -> () in
@@ -40,6 +43,14 @@ class IosPresence  {
     
     func print(action: UInt32) {
         os_log("print action: %{public}d", action);
+        DispatchQueue.main.async {
+            os_log("access main thread.")
+            if action == 5 {
+                self.view.isHidden = true
+            } else {
+                self.view.isHidden = false
+            }
+        }
     }
 }
 

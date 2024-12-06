@@ -16,7 +16,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         print("Start Presence test.")
-        iosPresence = IosPresence()
+        iosPresence = IosPresence(view: self.view)
         DispatchQueue.global(qos: .userInitiated).async {
             os_log("start run on backkground queue")
             self.iosPresence?.start()
