@@ -27,6 +27,7 @@ class ViewController: UIViewController {
         }
         os_log("Continue after starting background queue")
         self.iosPresence?.set_request()
+        view.isHidden = true
     }
 }
 

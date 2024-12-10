@@ -5,7 +5,7 @@ import PresenceFFI
 
 class SwiftBleScanner : NSObject {
 
-    static let serviceUUID = CBUUID(string: "FF07")
+    static let serviceUUID = CBUUID(string: "F107")
     static let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "Scanner")
 
     private var centralManager: CBCentralManager!
