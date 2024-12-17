@@ -41,7 +41,7 @@
 		1534309D2CFF843C00AB489C /* PresenceTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PresenceTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		153430A72CFF843D00AB489C /* PresenceTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PresenceTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		158E06002CFFABCB0012AE75 /* SwiftFFI.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwiftFFI.xcframework; path = ../../ble_test/swift/build/SwiftFFI.xcframework; sourceTree = "<group>"; };
-		158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ble_swift.xcodeproj; path = /Users/chenw/git_repo/nearby/presence/rust/ble_test/swift/build/ble_swift.xcodeproj; sourceTree = "<absolute>"; };
+		158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ble_swift.xcodeproj; path = /Users/chenw/git_repo/nearby/presence/rust/ios_test_app/PresenceTest/ble_swift.xcodeproj; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -108,6 +108,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		150FFAD42D0B753900BACCAE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		1534307E2CFF843B00AB489C = {
 			isa = PBXGroup;
 			children = (
@@ -116,8 +123,8 @@
 				153430AA2CFF843D00AB489C /* PresenceTestUITests */,
 				153430882CFF843B00AB489C /* Products */,
 				153430BD2CFFA38500AB489C /* Frameworks */,
-				158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */,
 				150FFA9C2D012B7000BACCAE /* presence_swift.xcodeproj */,
+				158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -138,13 +145,6 @@
 				158E06002CFFABCB0012AE75 /* SwiftFFI.xcframework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		158E06072CFFACF20012AE75 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -256,7 +256,7 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 158E06072CFFACF20012AE75 /* Products */;
+					ProductGroup = 150FFAD42D0B753900BACCAE /* Products */;
 					ProjectRef = 158E06042CFFACF20012AE75 /* ble_swift.xcodeproj */;
 				},
 				{

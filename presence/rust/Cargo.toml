@@ -1,5 +1,5 @@
 [workspace]
 resolver = "2"
 members = [
-    "ble", "ble_test",
+    "ble", "ble_test", "experimental/generic", "experimental/lifetime",
 ]
